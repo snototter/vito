@@ -3,20 +3,28 @@
 """Utilities you'll often need when working with images ;-)"""
 
 import numpy as np
-import cv2
 from PIL import Image
-from .imutils_cpp import *
 
 
-################################################################################
-################################################################################
-# Image/cv::Mat I/O and basic conversion (grayscale, layer flipping, ...)
+def flip_layers(nparray):
+    """
+    Flip RGB to BGR image data (numpy ndarray).
+    Also accepts rgbA/bgrA and single channel images without crashing.
+    """
+    if len(nparray.shape) == 3:
+        if nparray.shape[2] == 4:
+            # We got xyzA, make zyxA
+            return nparray[..., [2, 1, 0, 3]]
+        else:
+            return nparray[:, :, ::-1]
+    return nparray
+
 
 def imread(filename, mode='RGB', flip_channels=False):
     """Load an image (using PIL) into a NumPy array.
 
-    Optionally specify PIL's loading 'mode', i.e. RGB for color, RGBA for a
-    transparent image and L for grayscale. You can also flip the channels,
+    Optionally specify PIL's loading 'mode', i.e. 'RGB' for color, 'RGBA' for a
+    transparent image and 'L' for grayscale. You can also flip the channels,
     i.e. convert RGB to BGR if you need it."""
     if filename is None:
         return None
@@ -27,17 +35,20 @@ def imread(filename, mode='RGB', flip_channels=False):
         return image
 
 
-def imsave(filename, image, flip_channels=False):
-    """Store an image, taking care of flipping for you."""
-    if flip_channels:
-        cv2.imwrite(filename, flip_layers(image))
-# crappy JPEG presets, wtf!        Image.fromarray(flip_layers(image)).save(filename)
-    else:
-        cv2.imwrite(filename, image)
+# TODO PIL had quite crappy JPEG presets, OpenCV worked out of the box
+# but I didn't want to add this dependency for now...
+# def imsave(filename, image, flip_channels=False):
+#     """Store an image, taking care of flipping for you."""
+#     if flip_channels:
+#         cv2.imwrite(filename, flip_layers(image))
+# # crappy JPEG presets:        Image.fromarray(flip_layers(image)).save(filename)
+#     else:
+#         cv2.imwrite(filename, image)
 
 
 def ndarray2memory_file(np_data, format='png'):
-    """Convert numpy (image) array to ByteIO stream. Useful to stream an image via sockets"""
+    """Convert numpy (image) array to ByteIO stream. 
+    Useful to stream an image via sockets."""
     img = Image.fromarray(np_data)
     img_memory_file = io.BytesIO()
     img.save(img_memory_file, format)
@@ -48,43 +59,16 @@ def memory_file2ndarray(memfile):
     """Load an image stored in the given io.BytesIO memory file memfile."""
     if memfile is None:
         return None
-    return np.asarray(Image.open(memfile)) # TODO try with .frombuffer()
+    return np.asarray(Image.open(memfile))
 
-
-def flip_layers(nparray):
-    """Flip RGB to BGR and vice versa, also accepts rgbA/bgrA and single channel images without crashing."""
-    if len(nparray.shape) == 3:
-        if nparray.shape[2] == 4:
-            # We have xyzA, make zyxA
-            return nparray[...,[2,1,0,3]]
-        else:
-            return nparray[:,:,::-1]
-    return nparray
-
-
-################################################################################
-################################################################################
-# Resizing & Conversion
-
-def fuzzy_resize(image, scaling_factor, output_scaling_factor=False):
-    """Rounds scaling_factor to the closest 1/10th before scaling."""
-    if scaling_factor == 1.0:
-        img, scale = image, 1.0
-    else:
-        img, scale = fuzzy_resize__(image, scaling_factor)
-    if output_scaling_factor:
-        return (img, scale)
-    else:
-        return img
-
-
-
-################################################################################
-################################################################################
-# Rotation, mirroring, flipping, ...
 
 def clip_rect_to_image(rect, img_width, img_height):
-    """Ensure that the rectangle is within the image boundaries, explicitly casts all entries to integer."""
+    """Ensure that the rectangle is within the image boundaries.
+    Explicitly casts all entries to integer.
+    :param rect: list/tuple (l,t,w,h)
+    :param img_width: int
+    :param img_height: int
+    """
     l, t, w, h = int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3])
     w = w if (l + w) < img_width else (img_width - max(l, 0) - 1)
     h = h if (t + h) < img_height else (img_height - max(t, 0) - 1)
@@ -99,7 +83,8 @@ def is_valid_bbox(rect):
 
 
 def apply_on_bboxes(image_np, bboxes, func):
-    """Applies the function func (which returns a modified image) on each bounding box.
+    """Applies the function func (which returns a modified image) on each
+    bounding box.
     Takes care of proper clipping, roi extraction and copying back the results.
     """
     # Ensure the image is writeable
@@ -108,6 +93,7 @@ def apply_on_bboxes(image_np, bboxes, func):
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb
+        # TODO check single vs multi-channel image
         roi = image_np[t:t+h, l:l+w]
         image_np[t:t+h, l:l+w] = func(roi)
     return image_np
@@ -116,7 +102,7 @@ def apply_on_bboxes(image_np, bboxes, func):
 def roi(image_np, rect):
     """Returns the cropped ROI, with rect = [l, t, w, h]."""
     if rect is None or any([r is None for r in rect]):
-        return None # or return the full image, or raise a custom exception?
+        return None  # TODO or return the full image, or raise a custom exception?
     l, t, w, h = rect
     r, b = l+w, t+h
     img_height, img_width = image_np.shape[0], image_np.shape[1]

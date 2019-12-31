@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
-"""Pseudocoloring image data."""
-import numpy as np
+"""Colormaps for visualization."""
 
 colormap_autumn_bgr = [
     (0, 0, 255), (0, 1, 255), (0, 2, 255), (0, 3, 255), (0, 4, 255), (0, 5, 255),
@@ -829,19 +828,3 @@ colormap_viridis_bgr = [
     (25, 228, 231), (26, 229, 234), (27, 229, 236), (28, 229, 239), (29, 229, 241), (30, 230, 244),
     (32, 230, 246), (33, 230, 248), (35, 231, 251), (37, 231, 253)]
 colormap_viridis_rgb = [(c[2], c[1], c[0]) for c in colormap_viridis_bgr]
-
-
-def pseudocolor(values, limits=[0.0, 1.0], color_map=colormap_parula_rgb):
-    if len(values.shape) > 2:
-        if values.shape[2] > 1:
-            raise ValueError('Input to pseudocoloring must be a single channel data matrix, shaped (H,W) or (H,W,1)!')
-        values = values.reshape((values.shape[0], values.shape[1]))
-    values = values.astype(np.float64)
-    lut = np.asarray(color_map)
-    interval = (limits[1] - limits[0]) / 255.0
-
-    values[values < limits[0]] = limits[0]
-    values[values > limits[1]] = limits[1]
-    lookup_values = np.floor((values - limits[0]) / interval).astype(np.int32)
-    colorized = lut[lookup_values].astype(np.uint8)
-    return colorized
