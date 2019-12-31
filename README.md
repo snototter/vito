@@ -1,4 +1,6 @@
 # vito - Vision Tools
+[![View on PyPI](https://img.shields.io/pypi/v/vito.svg)](https://pypi.org/project/vito)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
 Python utilities for common computer vision tasks.
 
