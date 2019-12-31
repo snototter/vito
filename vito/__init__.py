@@ -4,7 +4,7 @@
 Python utility package for common computer vision tasks.
 """
 
-__all__ = []
+__all__ = ['cam_projections']
 __author__ = 'snototter'
 
 # Load version
