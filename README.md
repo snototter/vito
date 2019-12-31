@@ -39,6 +39,6 @@ imvis.imshow(colorized)
   * Contains common python/language and camera projection utils
 
 ## TODO List
-* flow - read/write/visualize
+* flow - visualize
 * anonymization utils
 * augmentation

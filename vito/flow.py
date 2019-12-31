@@ -17,8 +17,8 @@ def floread(filename):
         if 202021.25 != magic:
             raise ValueError('Invalid magic number in file "%s".' % filename)
         # Next, get the image dimensions
-        w = np.fromfile(f, np.int32, count=1)
-        h = np.fromfile(f, np.int32, count=1)
+        w = int(np.fromfile(f, np.int32, count=1))
+        h = int(np.fromfile(f, np.int32, count=1))
         # Load the data and reshape
         flow = np.fromfile(f, np.float32, count=2*w*h)
         return np.resize(flow, (h, w, 2))
@@ -30,11 +30,9 @@ def flosave(filename, flow):
         raise ValueError('Invalid flow shape!')
     # Prepare data
     h, w = flow.shape[0], flow.shape[1]
-    u = flow[:, :, 0]
-    v = flow[:, :, 1]
     data = np.zeros((h, w*2))
-    data[:, np.arange(w)*2] = u
-    data[:, np.arange(w)*2 + 1] = v
+    data[:, np.arange(w)*2] = flow[:, :, 0]
+    data[:, np.arange(w)*2 + 1] = flow[:, :, 1]
 
     with open(filename, 'wb') as f:
         # Write magic number
@@ -44,3 +42,7 @@ def flosave(filename, flow):
         np.array(h).astype(np.int32).tofile(f)
         # Write actual data
         data.astype(np.float32).tofile(f)
+
+
+def flo_to_color(flow):
+    raise NotImplementedError('Not yet implemented')
