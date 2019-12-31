@@ -20,6 +20,8 @@ imvis.imshow(colorized)
 ```
 
 ## Changelog
+* `0.1.1`
+  * Changed supported python versions for legacy tests
 * `0.1.0`
   * First actually useful release
   * Contains most of the functionality of `pvt` (a library I developed throughout my studies)
