@@ -81,13 +81,12 @@ def log_nsec(string, nsec, label='default'):
 
 ################################################################################
 # Python language utils
-def enum(**enums):
-    """Utility to create enum-like classes, use it like: DrivingState = enum(STOPPED=1, FORWARD=2, BACKWARD=4)"""
-    return type('Enum', (), enums)
-
 def compare(a, b):
-    """Replacement for Python 2.x cmp(), https://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons"""
+    """Python3 replacement for Python 2.x cmp(), see
+    https://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons
+    """
     return (a > b) - (a < b)
+
 
 def compare_version_strings(v1, v2):
     """Compares version strings, returns -1/0/+1 if v1 less, equal or greater v2"""
@@ -103,8 +102,11 @@ try:
 except NameError:
     to_unicode = str
 
+
 def slugify(s):
-    """Converts a string to a slug (strip special characters, replace white space, convert to lowercase...) to be used for file names or URLs."""
+    """Converts a string to a slug (strip special characters, 
+    replace white space, convert to lowercase...) to be used for file names or
+    URLs."""
     import unicodedata
     s = unicodedata.normalize('NFKD', to_unicode(s)).encode('ascii', 'ignore').decode('ascii')
     s = to_unicode(re.sub('[^\w\s-]', '', s).strip().lower())
@@ -159,6 +161,8 @@ def date_str(delimiter=['','','-','',''], ):
     delimiter=['-'] returns YYYY-MM
     delimiter=['',''] returns YYYYMMDD
     etc.
+
+    Useful to generate timestamped output folder/file names.
     """
     now = datetime.datetime.now()
     res_str = now.strftime('%Y')
