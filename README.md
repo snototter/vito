@@ -11,7 +11,14 @@ containing pure python/numpy/PIL functionality
 * `PIL`
 
 ## Examples
-TODO
+* Pseudocoloring:
+```python
+# Load a single-channel image
+peaks = imutils.imread('peaks.png', mode='L')
+# Colorize it
+colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_parula_rgb)
+imvis.imshow(colorized)
+```
 
 ## Changelog
 * `0.1.0`
