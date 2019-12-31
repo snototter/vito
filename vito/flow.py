@@ -49,6 +49,86 @@ def flosave(filename, flow):
         data.astype(np.float32).tofile(f)
 
 
-def flo_to_color(flow):
-    # colorwheel = colormaps.make_color_wheel()
-    raise NotImplementedError('Not yet implemented')
+def colorize_flow(
+        u, v, return_rgb=True, colorwheel=colormaps.make_flow_color_wheel()):
+    """
+    Returns the flow color wheel pseudocolorization of the given optical flow.
+
+    This is a port of the C++/MATLAB code from
+    https://people.csail.mit.edu/celiu/OpticalFlow, also based on
+    https://github.com/tomrunia/OpticalFlow_Visualization.
+
+    :param u: horizontal flow components as HxW np.ndarray
+    :param v: vertical flow components as HxW np.ndarray
+    :param return_rgb: bool, whether to return RGB or BGR
+    :param colorwheel: provide a num_colors-by-3 color numpy nd.array
+            which will be used as color wheel
+    :param convert_to_bgr: bool, whether to change ordering and
+         output BGR instead of RGB
+    :return:  HxWx3 uint8 numpy ndarray.
+    """
+    vis = np.zeros((u.shape[0], u.shape[1], 3), np.uint8)
+    ncols = colorwheel.shape[0]
+
+    rad = np.sqrt(np.square(u) + np.square(v))
+    a = np.arctan2(-v, -u) / np.pi
+
+    fk = (a+1) / 2*(ncols-1)
+    k0 = np.floor(fk).astype(np.int32)
+    k1 = k0 + 1
+    k1[k1 == ncols] = 0
+    f = fk - k0
+
+    for i in range(colorwheel.shape[1]):
+        tmp = colorwheel[:, i]
+        col0 = tmp[k0] / 255.0
+        col1 = tmp[k1] / 255.0
+        col = (1-f)*col0 + f*col1
+
+        idx = (rad <= 1)
+        # Increase saturation with radius:
+        col[idx] = 1 - rad[idx] * (1-col[idx])
+        # Out of range:
+        col[~idx] = col[~idx] * 0.75
+        # BGR or RGB?
+        ch_idx = i if return_rgb else 2-i
+        vis[:, :, ch_idx] = np.floor(255.0 * col)
+    return vis
+
+
+def flow_to_color(flow, max_val=None, return_rgb=True, epsilon=1e-5):
+    """
+    Returns the widely used flow visualization.
+
+    This is a port of the C++/MATLAB code from
+    https://people.csail.mit.edu/celiu/OpticalFlow, also based on
+    https://github.com/tomrunia/OpticalFlow_Visualization.
+
+    :param flow:       stacked u, v flow components as HxWx2 numpy ndarray.
+    :param max_val:    float, if not None, flow values will be clipped to
+                       the range [0, max_val].
+    :param return_rgb: bool, set to False if you work with BGR images.
+    :param epsilon:    small value to prevent division-by-zero.
+    :return:  HxWx3 uint8 numpy ndarray.
+    """
+    # Sanity check
+    if flow.ndim != 3 or flow.shape[2] != 2:
+        raise ValueError('Input flow must be of shape HxWx2!')
+    # Clip values
+    if max_val is not None:
+        flow = np.clip(flow, 0, max_val)
+
+    # TODO set unknown/invalid flow to 0, see Deqing's MATLAB source
+    # threshold at 1e9; instead of clipping, get the invalid indices,
+    # then colorize and set the corresponding pixels to black!
+
+    u = flow[:, :, 0]
+    v = flow[:, :, 1]
+
+    # Normalize flow
+    rad = np.sqrt(np.square(u) + np.square(v))
+    rad_max = np.max(rad)
+    u = u / (rad_max + epsilon)
+    v = v / (rad_max + epsilon)
+
+    return colorize_flow(u, v, return_rgb)

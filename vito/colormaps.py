@@ -4,7 +4,7 @@
 
 import numpy as np
 
-def make_color_wheel():
+def make_flow_color_wheel():
     """Returns the standard color wheel (i.e. a 55x3 color map) used for
     optical flow visualization. This is a port of the C++/MATLAB code from
     https://people.csail.mit.edu/celiu/OpticalFlow, thus using similar/same
