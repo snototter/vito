@@ -57,13 +57,31 @@ except:
         return -1
 
 
-# #TODO implement
-# def color_by_id(id, flip_channels=False):
-#     """Returns a color tuple (rgb) to colorize labels, identities, segments, etc."""
-#     col = color_by_id__(id)
-#     if flip_channels:
-#         return (col[2], col[1], col[0])
-#     return col
+# Colors used to easily distinguish different IDs (e.g. when visualizing
+# tracking results).
+exemplary_colors = [
+    (255,   0,  0),   # red
+    (  0, 200,   0),  # light green(ish)
+    (  0,   0, 255),  # deep blue
+    (230, 230,   0),  # yellow(ish)
+    (230,   0, 230),  # magenta(ish)
+    (  0, 230, 230),  # cyan(ish)
+    (255, 128,   0),  # orange
+    (255, 128, 128),  # skin(ish)
+    (128,  64,   0),  # brown(ish)
+    (160, 160, 160),  # gray(ish)
+    (  0, 128, 255),  # light blue
+    (153,  77, 204)   # lilac
+]
+
+
+def color_by_id(id, flip_channels=False):
+    """Returns a color tuple (rgb) to colorize labels, identities,
+    segments, trajectories, etc."""
+    col = exemplary_colors[id % len(exemplary_colors)]
+    if flip_channels:
+        return (col[2], col[1], col[0])
+    return col
 
 
 def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_rgb):

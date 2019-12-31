@@ -1,5 +1,5 @@
 import numpy as np
-from ..imvis import pseudocolor
+from ..imvis import pseudocolor, color_by_id, exemplary_colors
 from .. import colormaps
 
 
@@ -24,3 +24,12 @@ def test_pseudocolor():
         for r in range(data.shape[0]):
             for c in range(data.shape[1]):
                 assert_color_equal(pc[r, c, :], cm[0])
+
+
+def test_color_by_id():
+    assert_color_equal(color_by_id(0), exemplary_colors[0])
+    nc = len(exemplary_colors)
+    assert_color_equal(color_by_id(nc), exemplary_colors[0])
+    assert_color_equal(color_by_id(nc-1), exemplary_colors[-1])
+    assert_color_equal(color_by_id(-1), exemplary_colors[-1])
+    assert_color_equal(color_by_id(-3), exemplary_colors[-3])
