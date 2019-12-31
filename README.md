@@ -21,6 +21,7 @@ imvis.imshow(colorized)
 
 ## Changelog
 * Upcoming `0.1.2` (`0.2.0` if flow is included)
+  * Optical flow (Middlebury .flo format) I/O
   * Support saving images
   * Colorization to visualize tracking results
 * `0.1.1`
