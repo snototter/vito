@@ -26,7 +26,7 @@ imvis.imshow(colorized)
 from vito import flow
 from vito import imvis
 
-# Load optical flow (Middlebury format)
+# Load optical flow file
 flow_uv = flow.floread('color_wheel.flo')
 # Colorize it
 colorized = flow.flow_to_color(flow_uv)
