@@ -23,15 +23,17 @@ imvis.imshow(colorized)
 ## Changelog
 * `0.1.0`
   * First actually useful release
-  * Contains most of the functionality of `pvt` (a library I developed throughout my studies).
+  * Contains most of the functionality of `pvt` (a library I developed throughout my studies)
+    * `cam_projections` - projective geometry, lens distortion/rectification (Plumb Bob model), etc.
+    * `colormaps` - colormap definitions for visualization (jet, parula, magma, viridis, etc.)
+    * `imutils` - image loading, conversion, RoI handling (e.g. apply functions on several patches of an image)
+    * `imvis` - visualization helpers, e.g. pseudocoloring or overlaying images
+    * `pyutils` - common python functions (timing code, string manipulation, list sorting/search, etc.)
 * `0.0.1`
   * Initial public release
   * Contains common python/language and camera projection utils
 
 ## TODO List
 * flow - read/write/visualize
-* pseudocolor
-* pvt3 imutils
-  * checks (is_valid_bbox, inside image, etc.)
-* anonymization
+* anonymization utils
 * augmentation
