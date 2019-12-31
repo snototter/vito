@@ -109,8 +109,8 @@ def slugify(s):
     URLs."""
     import unicodedata
     s = unicodedata.normalize('NFKD', to_unicode(s)).encode('ascii', 'ignore').decode('ascii')
-    s = to_unicode(re.sub('[^\w\s-]', '', s).strip().lower())
-    s = to_unicode(re.sub('[-\s]+', '-', s))
+    s = to_unicode(re.sub(r'[^\w\s-]', '', s).strip().lower())
+    s = to_unicode(re.sub(r'[-\s]+', '-', s))
     return s
 
 
@@ -155,7 +155,7 @@ def is_tool(name):
         return False
 
 
-def date_str(delimiter=['','','-','',''], ):
+def date_str(delimiter=['','','-','',''], dt=None):
     """Returns a YYYY*MM*DD*hh*mm*ss string using the given delimiters.
     Provide less delimiter to return shorter strings, e.g.
     delimiter=['-'] returns YYYY-MM
@@ -163,8 +163,13 @@ def date_str(delimiter=['','','-','',''], ):
     etc.
 
     Useful to generate timestamped output folder/file names.
+    You can pass a custom datetime.datetime object dt. If dt is None,
+    datetime.datetime.now() will be taken
     """
-    now = datetime.datetime.now()
+    if dt is None:
+        now = datetime.datetime.now()
+    else:
+        now = dt
     res_str = now.strftime('%Y')
     month = now.strftime('%m')
     day = now.strftime('%d')
