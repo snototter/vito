@@ -20,6 +20,8 @@ imvis.imshow(colorized)
 ```
 
 ## Changelog
+* Upcoming `0.1.2` (`0.2.0` if flow is included)
+  * Support saving images
 * `0.1.1`
   * Changed supported python versions for legacy tests
 * `0.1.0`

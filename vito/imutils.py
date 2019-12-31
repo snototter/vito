@@ -36,15 +36,27 @@ def imread(filename, mode='RGB', flip_channels=False):
         return image
 
 
-# TODO PIL had quite crappy JPEG presets, OpenCV worked out of the box
-# but I didn't want to add this dependency for now...
-# def imsave(filename, image, flip_channels=False):
-#     """Store an image, taking care of flipping for you."""
-#     if flip_channels:
-#         cv2.imwrite(filename, flip_layers(image))
-# # crappy JPEG presets: Image.fromarray(flip_layers(image)).save(filename)
-#     else:
-#         cv2.imwrite(filename, image)
+try:
+    # Try to load OpenCV (in case you installed it in your workspace)
+    import cv2
+
+    def imsave(filename, image, flip_channels=False):
+        """Store an image using OpenCV, optionally flipping layers, i.e. BGR -> RGB."""
+        if flip_channels:
+            cv2.imwrite(filename, flip_layers(image))
+        else:
+            cv2.imwrite(filename, image)
+except:
+    # Fall back to Pillow
+    def imsave(filename, image, flip_channels=False):
+        """Store an image using PIL, optionally flipping layers, i.e. BGR -> RGB."""
+        if flip_channels:
+            im_np = flip_layers(image)
+        else:
+            im_np = image
+        # TODO On my Ubuntu 16.04 machine, PIL's JPEG preset were crap. Need
+        # to check this for other versions.
+        Image.fromarray(im_np).save(filename)
 
 
 def ndarray2memory_file(np_data, format='png'):
