@@ -15,6 +15,7 @@ import numpy as np
 # Extend the python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from vito import colormaps
+from vito import flow
 from vito import imutils
 from vito import imvis
 
@@ -32,4 +33,9 @@ if __name__ == "__main__":
     peaks = imutils.imread('peaks.png', mode='L')
     # Colorize it
     colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_parula_rgb)
+    imvis.imshow(colorized)
+
+    # Load optical flow and visualize it
+    flow_uv = flow.floread('color_wheel.flo')
+    colorized = flow.flow_to_color(flow_uv)
     imvis.imshow(colorized)

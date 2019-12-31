@@ -20,7 +20,7 @@ imvis.imshow(colorized)
 ```
 
 ## Changelog
-* Upcoming `0.2.0`
+* `0.2.0`
   * Optical flow (Middlebury .flo format) I/O and visualization
   * Support saving images
   * Colorization to visualize tracking results
@@ -39,6 +39,5 @@ imvis.imshow(colorized)
   * Contains common python/language and camera projection utils
 
 ## TODO List
-* flow - visualize
 * anonymization utils
 * augmentation
