@@ -12,12 +12,27 @@ The goal of this package is to provide a lightweight, python-only package helpin
 ## Examples
 * Pseudocoloring:
 ```python
+from vito import imutils
+from vito import imvis
+
 # Load a single-channel image
 peaks = imutils.imread('peaks.png', mode='L')
 # Colorize it
 colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_parula_rgb)
 imvis.imshow(colorized)
 ```
+* Optical flow:
+```python
+from vito import flow
+from vito import imvis
+
+# Load optical flow (Middlebury format)
+flow_uv = flow.floread('color_wheel.flo')
+# Colorize it
+colorized = flow.flow_to_color(flow_uv)
+imvis.imshow(colorized)
+```
+
 
 ## Changelog
 * `0.2.0`
