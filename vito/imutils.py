@@ -2,6 +2,7 @@
 # coding=utf-8
 """Utilities you'll often need when working with images ;-)"""
 
+import io
 import numpy as np
 from PIL import Image
 
@@ -41,13 +42,13 @@ def imread(filename, mode='RGB', flip_channels=False):
 #     """Store an image, taking care of flipping for you."""
 #     if flip_channels:
 #         cv2.imwrite(filename, flip_layers(image))
-# # crappy JPEG presets:        Image.fromarray(flip_layers(image)).save(filename)
+# # crappy JPEG presets: Image.fromarray(flip_layers(image)).save(filename)
 #     else:
 #         cv2.imwrite(filename, image)
 
 
 def ndarray2memory_file(np_data, format='png'):
-    """Convert numpy (image) array to ByteIO stream. 
+    """Convert numpy (image) array to ByteIO stream.
     Useful to stream an image via sockets."""
     img = Image.fromarray(np_data)
     img_memory_file = io.BytesIO()
@@ -69,12 +70,12 @@ def clip_rect_to_image(rect, img_width, img_height):
     :param img_width: int
     :param img_height: int
     """
-    l, t, w, h = int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3])
-    w = w if (l + w) < img_width else (img_width - max(l, 0) - 1)
-    h = h if (t + h) < img_height else (img_height - max(t, 0) - 1)
-    l = l if l >= 0 else 0
-    t = t if t >= 0 else 0
-    return [l, t, w, h]
+    li, ti, wi, hi = int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3])
+    wi = wi if (li + wi) < img_width else (img_width - max(li, 0) - 1)
+    hi = hi if (ti + hi) < img_height else (img_height - max(ti, 0) - 1)
+    li = li if li >= 0 else 0
+    ti = ti if ti >= 0 else 0
+    return [li, ti, wi, hi]
 
 
 def is_valid_bbox(rect):
@@ -89,7 +90,8 @@ def apply_on_bboxes(image_np, bboxes, func):
     """
     # Ensure the image is writeable
     image_np = image_np.copy()
-    bboxes = [clip_rect_to_image(bb, image_np.shape[1], image_np.shape[0]) for bb in bboxes]
+    bboxes = [clip_rect_to_image(bb, image_np.shape[1], image_np.shape[0])
+        for bb in bboxes]
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb
@@ -102,11 +104,11 @@ def apply_on_bboxes(image_np, bboxes, func):
 def roi(image_np, rect):
     """Returns the cropped ROI, with rect = [l, t, w, h]."""
     if rect is None or any([r is None for r in rect]):
-        return None  # TODO or return the full image, or raise a custom exception?
+        return None
     l, t, w, h = rect
     r, b = l+w, t+h
     img_height, img_width = image_np.shape[0], image_np.shape[1]
-    
+
     # Right/bottom bounds are exclusive; left/top are inclusive
     l = max(0, min(img_width-1, l))
     r = max(0, min(img_width, r))
