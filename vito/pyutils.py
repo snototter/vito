@@ -2,18 +2,18 @@
 # coding=utf-8
 """Utilities for timing, logging, etc."""
 
-#import random
 import timeit
-import io
 import re
 import sys
 import os
 import datetime
 import argparse
 
-################################################################################
+
 # Timing code, similar to MATLAB's tic/toc
 __tictoc_timers = {}
+
+
 def tic(label='default'):
     """Start a timer."""
     __tictoc_timers[label] = timeit.default_timer()
@@ -50,9 +50,10 @@ def toc_nsec(label='default', nsec=0.5, seconds=False):
         log_nsec(s, nsec, label)
 
 
-################################################################################
 # Log only once every x sec
 __log_timers = {}
+
+
 def log_nsec(string, nsec, label='default'):
     """Display 'string' only once every nsec seconds (floating point number). Use it to avoid spamming your terminal."""
     if label in __log_timers:
@@ -63,10 +64,8 @@ def log_nsec(string, nsec, label='default'):
     __log_timers[label] = timeit.default_timer()
 
 
-
-################################################################################
 # Math
-#def rand_mod(m):
+# def rand_mod(m):
 #    """Correctly sample a random number modulo m (avoiding modulo bias)"""
 #    # python's random lib has random.uniform(a,b), a <= N <= b
 #    return random.uniform(0, m-1)
@@ -79,8 +78,6 @@ def log_nsec(string, nsec, label='default'):
 #  see also: https://stackoverflow.com/a/10984975/400948
 
 
-################################################################################
-# Python language utils
 def compare(a, b):
     """Python3 replacement for Python 2.x cmp(), see
     https://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons
@@ -92,7 +89,7 @@ def compare_version_strings(v1, v2):
     """Compares version strings, returns -1/0/+1 if v1 less, equal or greater v2"""
     # Based on https://stackoverflow.com/a/1714190/400948
     def normalize_version_string(v):
-        return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
+        return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
     return compare(normalize_version_string(v1), normalize_version_string(v2))
 
 
@@ -104,7 +101,7 @@ except NameError:
 
 
 def slugify(s):
-    """Converts a string to a slug (strip special characters, 
+    """Converts a string to a slug (strip special characters,
     replace white space, convert to lowercase...) to be used for file names or
     URLs."""
     import unicodedata
@@ -139,11 +136,9 @@ def argsort(seq, indices_only=False):
         return zip(*sorted(enumerate(seq), key=itemgetter(1)))
 
 
-################################################################################
-# OS interaction
 def is_tool(name):
     """Check whether `name` is on PATH and marked as executable."""
-    if sys.version_info >= (3,3):
+    if sys.version_info >= (3, 3):
         # Taken from https://stackoverflow.com/a/34177358
         from shutil import which
         return which(name) is not None
@@ -155,7 +150,7 @@ def is_tool(name):
         return False
 
 
-def date_str(delimiter=['','','-','',''], dt=None):
+def date_str(delimiter=['', '', '-', '', ''], dt=None):
     """Returns a YYYY*MM*DD*hh*mm*ss string using the given delimiters.
     Provide less delimiter to return shorter strings, e.g.
     delimiter=['-'] returns YYYY-MM
@@ -195,7 +190,7 @@ def date_str(delimiter=['','','-','',''], dt=None):
     if num_delim > 5:
         raise RuntimeError('Too many delimiter, currently we only support formating up until seconds')
     return res_str
-    
+
 
 ################################################################################
 # Data validation (e.g. argument parsing)

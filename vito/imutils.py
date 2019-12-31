@@ -91,7 +91,7 @@ def apply_on_bboxes(image_np, bboxes, func):
     # Ensure the image is writeable
     image_np = image_np.copy()
     bboxes = [clip_rect_to_image(bb, image_np.shape[1], image_np.shape[0])
-        for bb in bboxes]
+            for bb in bboxes]
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb

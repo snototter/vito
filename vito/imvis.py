@@ -18,7 +18,7 @@ try:
         :param img_np:    Should be provided as BGR, otherwise use flip_channels=True
         :param title:  Window title
         :param wait_ms: cv2.waitKey() input
-        :param flip_channels: if you want to display an RGB image poperly, we need 
+        :param flip_channels: if you want to display an RGB image poperly, we need
                             to flip the color channels
         :return: Pressed key or -1, i.e. cv2.waitKey() output
         """
@@ -43,7 +43,7 @@ except:
 
         :param img:    Should be provided as BGR, otherwise use flip_channels=True
         :param title:  Window title
-        :param flip_channels: if you want to display an RGB image poperly, we need 
+        :param flip_channels: if you want to display an RGB image poperly, we need
                             to flip the color channels
         :return: -1 for compatibility reasons (the same return value as if you
                         used the OpenCV-based version and there was no key press)
@@ -55,7 +55,6 @@ except:
         im = Image.fromarray(disp)
         im.show(title=title)
         return -1
-
 
 
 # #TODO implement
@@ -133,9 +132,9 @@ def overlay(img1, img2, weight1, mask1=None):
         raise ValueError('Can only extrapolate single channel image to the others dimension')
 
     if channels1 == 1 and channels2 > 1:
-        img1 = np.repeat(img1[:,:,np.newaxis], channels2, axis=2)
+        img1 = np.repeat(img1[:, :, np.newaxis], channels2, axis=2)
     if channels2 == 1 and channels1 > 1:
-        img2 = np.repeat(img2[:,:,np.newaxis], channels1, axis=2)
+        img2 = np.repeat(img2[:, :, np.newaxis], channels1, axis=2)
 
     num_channels = 1 if len(img1.shape) == 2 else img1.shape[2]
 
@@ -161,7 +160,7 @@ def overlay(img1, img2, weight1, mask1=None):
         out = weight1 * img1 + (1. - weight1) * img2
     else:
         if num_channels == 1:
-            img1 = np.where(np.repeat(mask1[:,:,np.newaxis], num_channels, axis=2) > 0, img1, img2)
+            img1 = np.where(np.repeat(mask1[:, :, np.newaxis], num_channels, axis=2) > 0, img1, img2)
         else:
             img1 = np.where(mask1 > 0, img1, img2)
         out = weight1 * img1 + (1. - weight1) * img2
