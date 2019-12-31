@@ -118,10 +118,6 @@ def flow_to_color(flow, max_val=None, return_rgb=True, epsilon=1e-5):
     if max_val is not None:
         flow = np.clip(flow, 0, max_val)
 
-    # TODO set unknown/invalid flow to 0, see Deqing's MATLAB source
-    # threshold at 1e9; instead of clipping, get the invalid indices,
-    # then colorize and set the corresponding pixels to black!
-
     u = flow[:, :, 0]
     v = flow[:, :, 1]
 
