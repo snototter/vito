@@ -229,7 +229,7 @@ def normalize_image_coordinates_with_distortion(K, dist_coeff, pixel_coords):
     # We also use his variable names and naming conventions
     pixel_coords = pixel_coords.astype(np.float64)
     K = K.astype(np.float64)
-    alpha_c = K[0,1] / K[0,0] # In Bouguet's toolbox, K[0,:] = [f_x, alpha_c * f_x, cc_x], alpha_c is the skew coefficient
+    alpha_c = K[0,1] / K[0,0]  # In Bouguet's toolbox, K[0,:] = [f_x, alpha_c * f_x, cc_x], alpha_c is the skew coefficient
     fc = (K[0,0], K[1,1])
     cc = (K[0,2], K[1,2])
     dist_coeff = dist_coeff.astype(np.float64)
@@ -262,7 +262,7 @@ def comp_distortion_oulu(xd, k):
     # Initial guess
     x = xd
     num_pts = xd.shape[1]
-    for kk in range(20):
+    for _ in range(20):
         r_2 = np.sum(np.power(x, 2), axis=0)
         # r_2 = sum(x.^2);
         k_radial = np.reshape(1.0 + k1 * r_2 + k2 * np.power(r_2, 2) + k3 * np.power(r_2,3), (1,num_pts))
@@ -297,12 +297,15 @@ def get_projection_matrix(K, R, t):
 
 
 def get_groundplane_to_image_homography(P):
-    """Given the 3x4 camera projection matrix P returns the homography mapping ground plane points onto the image plane."""
+    """Given the 3x4 camera projection matrix P, returns the homography
+    mapping ground plane points onto the image plane."""
     P = P.astype(np.float64)
     return P[:, [0,1,3]]
 
 
 def get_image_to_groundplane_homography(P):
+    """Given the 3x4 camera projection matrix P, returns the homography
+    mapping image plane points onto the ground plane."""
     return np.linalg.inv(get_groundplane_to_image_homography(P))
 
 

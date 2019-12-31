@@ -8,13 +8,13 @@ from . import colormaps
 
 #TODO try import cv2 for imshow else convert to Image, then show...
 
-#TODO
-def color_by_id(id, flip_channels=False):
-    """Returns a color tuple (rgb) to colorize labels, identities, segments, etc."""
-    col = color_by_id__(id)
-    if flip_channels:
-        return (col[2], col[1], col[0])
-    return col
+# #TODO implement
+# def color_by_id(id, flip_channels=False):
+#     """Returns a color tuple (rgb) to colorize labels, identities, segments, etc."""
+#     col = color_by_id__(id)
+#     if flip_channels:
+#         return (col[2], col[1], col[0])
+#     return col
 
 
 def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_rgb):
