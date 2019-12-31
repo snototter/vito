@@ -3,8 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
 Python utilities for common computer vision tasks.
-This is a stripped down version of my `pvt` library (C++ with python bindings), only
-containing pure python/numpy/PIL functionality
+The goal of this package is to provide a lightweight, python-only package helping you with standard/recurring image manipulation tasks.
 
 ## Dependencies
 * `numpy`
