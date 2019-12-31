@@ -2,6 +2,50 @@
 # coding=utf-8
 """Colormaps for visualization."""
 
+import numpy as np
+
+def make_color_wheel():
+    """Returns the standard color wheel (i.e. a 55x3 color map) used for
+    optical flow visualization. This is a port of the C++/MATLAB code from
+    https://people.csail.mit.edu/celiu/OpticalFlow, thus using similar/same
+    names for variables.
+    """
+    # Color encoding schema
+    RY = 15
+    YG = 6
+    GC = 4
+    CB = 11
+    BM = 13
+    MR = 6
+    ncols = RY + YG + GC + CB + BM + MR
+    colorwheel = np.zeros([ncols, 3])
+    col = 0
+    # RY
+    colorwheel[0:RY, 0] = 255
+    colorwheel[0:RY, 1] = np.floor(255*np.arange(0, RY, 1)/RY)
+    col += RY
+    # YG
+    colorwheel[col:YG+col, 0]= 255 - np.floor(255*np.arange(0, YG, 1)/YG)
+    colorwheel[col:YG+col, 1] = 255
+    col += YG
+    # GC
+    colorwheel[col:GC+col, 1]= 255 
+    colorwheel[col:GC+col, 2] = np.floor(255*np.arange(0, GC, 1)/GC)
+    col += GC
+    # CB
+    colorwheel[col:CB+col, 1]= 255 - np.floor(255*np.arange(0, CB, 1)/CB)
+    colorwheel[col:CB+col, 2] = 255
+    col += CB
+    # BM
+    colorwheel[col:BM+col, 2]= 255 
+    colorwheel[col:BM+col, 0] = np.floor(255*np.arange(0, BM, 1)/BM)
+    col += BM
+    # MR
+    colorwheel[col:MR+col, 2]= 255 - np.floor(255*np.arange(0, MR, 1)/MR)
+    colorwheel[col:MR+col, 0] = 255
+    return colorwheel
+
+
 colormap_autumn_bgr = [
     (0, 0, 255), (0, 1, 255), (0, 2, 255), (0, 3, 255), (0, 4, 255), (0, 5, 255),
     (0, 6, 255), (0, 7, 255), (0, 8, 255), (0, 9, 255), (0, 10, 255), (0, 11, 255),

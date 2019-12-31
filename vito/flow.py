@@ -1,5 +1,10 @@
+#!/usr/bin/env python
+# coding=utf-8
+"""Optical flow I/O and visualization."""
+
 import sys
 import numpy as np
+from . import colormaps
 
 
 def floread(filename):
@@ -45,4 +50,5 @@ def flosave(filename, flow):
 
 
 def flo_to_color(flow):
+    # colorwheel = colormaps.make_color_wheel()
     raise NotImplementedError('Not yet implemented')
