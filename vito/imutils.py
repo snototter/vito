@@ -4,6 +4,7 @@
 
 import io
 import numpy as np
+import png
 from PIL import Image
 
 
@@ -29,11 +30,19 @@ def imread(filename, mode='RGB', flip_channels=False):
     i.e. convert RGB to BGR if you need it."""
     if filename is None:
         return None
-    image = np.asarray(Image.open(filename).convert(mode))
-    if flip_channels:
-        return flip_layers(image)
+    # Load PNGs using pypng
+    if filename.lower().endswith('.png'):
+        reader = png.Reader(filename)
+        pngdata = reader.read()
+        #TODO check data type, convert to numpy and optionally flip:
+        # https://pythonhosted.org/pypng/ex.html#reading
     else:
-        return image
+        # Otherwise, use PIL
+        image = np.asarray(Image.open(filename).convert(mode))
+        if flip_channels:
+            return flip_layers(image)
+        else:
+            return image
 
 
 try:

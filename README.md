@@ -3,11 +3,12 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
 Python utilities for common computer vision tasks.
-The goal of this package is to provide a lightweight, python-only package helping you with standard/recurring image manipulation tasks.
+The goal of this package is to provide a lightweight package helping you with standard/recurring image manipulation tasks.
 
 ## Dependencies
 * `numpy`
 * `PIL`
+* `pypng` to support loading PNGs with different bit depths (e.g. 16bit depth images)
 
 ## Examples
 * Pseudocoloring:
@@ -35,6 +36,8 @@ imvis.imshow(colorized)
 
 
 ## Changelog
+* Upcoming `0.2.1`
+  * Use python-only pypng to support loading PNGs with different bit depths TODO: check if newer PIL actually reads (single-channel) 16bit correctly, https://github.com/python-pillow/Pillow/issues/2107 otherwise convert (need to know the expected data type though, at least that's what it seems from https://stackoverflow.com/questions/32622658/read-16-bit-png-image-file-using-python)
 * `0.2.0`
   * Optical flow (Middlebury .flo format) I/O and visualization
   * Support saving images

@@ -35,7 +35,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'numpy',
-        'Pillow'],
+        'Pillow',
+        'pypng'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
