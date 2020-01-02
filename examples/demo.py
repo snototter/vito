@@ -9,9 +9,6 @@ This example script needs PIL (Pillow package) to load images from disk.
 import os
 import sys
 
-from PIL import Image
-import numpy as np
-
 # Extend the python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from vito import colormaps
