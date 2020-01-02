@@ -49,10 +49,12 @@ def flosave(filename, flow):
         data.astype(np.float32).tofile(f)
 
 
-def colorize_flow(
+def colorize_uv(
         u, v, return_rgb=True, colorwheel=colormaps.make_flow_color_wheel()):
     """
     Returns the flow color wheel pseudocolorization of the given optical flow.
+    This function performs no normalization or sanity checks. Usually, you
+    should prefer colorize_flow() instead!
 
     This is a port of the C++/MATLAB code from
     https://people.csail.mit.edu/celiu/OpticalFlow, also based on
@@ -96,7 +98,7 @@ def colorize_flow(
     return vis
 
 
-def flow_to_color(flow, max_val=None, return_rgb=True, epsilon=1e-5):
+def colorize_flow(flow, max_val=None, return_rgb=True, epsilon=1e-5):
     """
     Returns the widely used flow visualization.
 
@@ -127,4 +129,4 @@ def flow_to_color(flow, max_val=None, return_rgb=True, epsilon=1e-5):
     u = u / (rad_max + epsilon)
     v = v / (rad_max + epsilon)
 
-    return colorize_flow(u, v, return_rgb)
+    return colorize_uv(u, v, return_rgb)

@@ -31,7 +31,7 @@ from vito import imvis
 # Load optical flow file
 flow_uv = flow.floread('color_wheel.flo')
 # Colorize it
-colorized = flow.flow_to_color(flow_uv)
+colorized = flow.colorize_flow(flow_uv)
 imvis.imshow(colorized)
 ```
 * Depth image stored as 16-bit PNG:
@@ -48,6 +48,8 @@ imvis.imshow(colorized)
 
 
 ## Changelog
+* `0.3.2`
+  * Rename colorization for optical flow.
 * `0.3.1`
   * Fix `colormaps.by_name()` for grayscale.
 * `0.3.0`

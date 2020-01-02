@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Load optical flow and visualize it
     flow_uv = flow.floread('color_wheel.flo')
-    colorized = flow.flow_to_color(flow_uv)
+    colorized = flow.colorize_flow(flow_uv)
     imvis.imshow(colorized)
 
     # Load depth and visualize it
