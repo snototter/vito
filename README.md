@@ -34,12 +34,24 @@ flow_uv = flow.floread('color_wheel.flo')
 colorized = flow.flow_to_color(flow_uv)
 imvis.imshow(colorized)
 ```
+* Depth image stored as 16-bit PNG:
+```python
+from vito import imread
+from vito import imvis
+
+# Load 16-bit depth (will be of type np.int32)
+depth = imutils.imread('depth.png')
+# Colorize it
+colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
+imvis.imshow(colorized)
+```
 
 
 ## Changelog
 * `0.3.0`
   * `apply_on_bboxes()` now supports optional kwargs to be passed on to the user-defined function handle.
   * Changed `imread()`'s default `mode` parameter to optional kwargs which are passed on to Pillow.
+  * Added `colormaps.by_name()` functionality.
   * Fixed bounding box clipping off-by-one issue.
   * Added `imutils` tests ensuring proper data types.
 * `0.2.0`

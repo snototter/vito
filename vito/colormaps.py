@@ -4,6 +4,23 @@
 
 import numpy as np
 
+colormap_names = [
+    'Autumn', 'Bone', 'Cold', 'Disparity',
+    'Earth', 'Grayscale', 'Hot', 'HSV', 'Inferno', 'Jet',
+    'Magma', 'Parula', 'Pastel', 'Plasma', 'Sepia',
+    'Temperature', 'Thermal', 'Turbo', 'Viridis'
+]
+
+def by_name(colormap_name, return_rgb=True):
+    cmn = colormap_name.lower()
+    if cmn == 'gray':
+        return colormap_gray
+    return globals()['colormap_{:s}_{:s}'.format(
+            cmn,
+            'rgb' if return_rgb else 'bgr'
+        )]
+
+
 def make_flow_color_wheel():
     """Returns the standard color wheel (i.e. a 55x3 color map) used for
     optical flow visualization. This is a port of the C++/MATLAB code from
@@ -828,6 +845,9 @@ colormap_thermal_bgr = [
 colormap_thermal_rgb = [(c[2], c[1], c[0]) for c in colormap_thermal_bgr]
 
 
+# Google's rainbow "Turbo" colormap, see
+# https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
+# Adapted from https://gist.github.com/mikhailov-work/ee72ba4191942acecc03fe6da94fc73f
 colormap_turbo_bgr = [
     (59, 18, 48), (66, 21, 49), (74, 24, 50), (81, 27, 52), (88, 30, 53), (95, 33, 54),
     (101, 35, 55), (108, 38, 56), (114, 41, 57), (121, 44, 58), (127, 47, 59), (133, 50, 60),

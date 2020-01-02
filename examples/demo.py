@@ -43,5 +43,5 @@ if __name__ == "__main__":
     # Load depth and visualize it
     # Range of this rendered depth image would be [1882, 8000]
     depth = imutils.imread('depth.png')
-    colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
+    colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.by_name('Turbo'))
     imvis.imshow(colorized)
