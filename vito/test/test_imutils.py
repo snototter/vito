@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pytest
 from ..imutils import flip_layers, imread, apply_on_bboxes
 
 
@@ -26,7 +27,9 @@ def test_flip_layers():
 def test_imread():
     exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples')
     assert imread(None) is None
-    assert imread('') is None
+    for fn in ['', 'a-non-existing.file']:
+        with pytest.raises(FileNotFoundError):
+            imread(fn)
     # Load RGB JPG
     img = imread(os.path.join(exdir, 'lena.jpg'))
     assert img.ndim == 3 and img.shape[2] == 3

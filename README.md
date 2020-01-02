@@ -51,6 +51,7 @@ imvis.imshow(colorized)
 * `0.3.0`
   * `apply_on_bboxes()` now supports optional kwargs to be passed on to the user-defined function handle.
   * Changed `imread()`'s default `mode` parameter to optional kwargs which are passed on to Pillow.
+  * Raising error for non-existing files in `imread()`
   * Added `colormaps.by_name()` functionality.
   * Fixed bounding box clipping off-by-one issue.
   * Added `imutils` tests ensuring proper data types.
