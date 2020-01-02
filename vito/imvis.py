@@ -119,7 +119,7 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_r
     if interval > 0:
         lookup_values = np.floor((values - limits[0]) / interval).astype(np.int32)
     else:
-        lookup_values = np.zeros(values.shape, dtype=np.int32)
+        lookup_values = np.ones(values.shape, dtype=np.int32) * 255 * np.int32(limits[0])
     colorized = lut[lookup_values].astype(np.uint8)
     return colorized
 
