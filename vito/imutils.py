@@ -32,8 +32,10 @@ def imread(filename, flip_channels=False, **kwargs):
     specifiy PIL's loading 'mode', e.g. 'RGB' for color, 'RGBA' for a
     transparent image and 'L' for grayscale.
     """
-    if filename is None or not os.path.exists(filename):
+    if filename is None:
         return None
+    if not os.path.exists(filename):
+        raise FileNotFoundError('Image %s does not exist' % filename)
     # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
     # bit depths, we should look into using pypng, see documentation at
     # https://pythonhosted.org/pypng/ex.html#reading

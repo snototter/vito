@@ -39,3 +39,9 @@ if __name__ == "__main__":
     flow_uv = flow.floread('color_wheel.flo')
     colorized = flow.flow_to_color(flow_uv)
     imvis.imshow(colorized)
+
+    # Load depth and visualize it
+    # Range of this rendered depth image would be [1882, 8000]
+    depth = imutils.imread('depth.png')
+    colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
+    imvis.imshow(colorized)
