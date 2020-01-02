@@ -1,6 +1,6 @@
 # vito - Vision Tools
 [![View on PyPI](https://badge.fury.io/py/vito.svg)](https://pypi.org/project/vito)
-[![License](https://img.shields.io/pypi/l/vito)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
 Python utilities for common computer vision tasks.
 The goal of this package is to provide a lightweight package helping you with standard/recurring image manipulation tasks.
