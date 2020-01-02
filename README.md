@@ -48,6 +48,8 @@ imvis.imshow(colorized)
 
 
 ## Changelog
+* `1.0.1`
+  * Fix colorizing boolean masks (where mask[:] = True or mask[:] = False).
 * `1.0.0`
   * Rename flow package to `flowutils`.
 * `0.3.2`
