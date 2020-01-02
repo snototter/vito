@@ -25,13 +25,13 @@ imvis.imshow(colorized)
 ```
 * Optical flow:
 ```python
-from vito import flow
+from vito import flowutils
 from vito import imvis
 
 # Load optical flow file
-flow_uv = flow.floread('color_wheel.flo')
+flow = flowutils.floread('color_wheel.flo')
 # Colorize it
-colorized = flow.colorize_flow(flow_uv)
+colorized = flowutils.colorize_flow(flow)
 imvis.imshow(colorized)
 ```
 * Depth image stored as 16-bit PNG:
@@ -48,6 +48,8 @@ imvis.imshow(colorized)
 
 
 ## Changelog
+* `1.0.0`
+  * Rename flow package to `flowutils`.
 * `0.3.2`
   * Rename colorization for optical flow.
 * `0.3.1`

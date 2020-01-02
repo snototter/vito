@@ -15,7 +15,7 @@ import numpy as np
 # Extend the python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from vito import colormaps
-from vito import flow
+from vito import flowutils
 from vito import imutils
 from vito import imvis
 
@@ -36,8 +36,8 @@ if __name__ == "__main__":
     imvis.imshow(colorized)
 
     # Load optical flow and visualize it
-    flow_uv = flow.floread('color_wheel.flo')
-    colorized = flow.colorize_flow(flow_uv)
+    flow_uv = flowutils.floread('color_wheel.flo')
+    colorized = flowutils.colorize_flow(flow_uv)
     imvis.imshow(colorized)
 
     # Load depth and visualize it
