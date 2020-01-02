@@ -37,7 +37,7 @@ imvis.imshow(colorized)
 
 ## Changelog
 * Upcoming `0.2.1`
-  * Use python-only pypng to support loading PNGs with different bit depths TODO: check if newer PIL actually reads (single-channel) 16bit correctly, https://github.com/python-pillow/Pillow/issues/2107 otherwise convert (need to know the expected data type though, at least that's what it seems from https://stackoverflow.com/questions/32622658/read-16-bit-png-image-file-using-python)
+  * Added imutils tests ensuring proper data types.
 * `0.2.0`
   * Optical flow (Middlebury .flo format) I/O and visualization
   * Support saving images

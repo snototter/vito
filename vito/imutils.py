@@ -3,8 +3,8 @@
 """Utilities you'll often need when working with images ;-)"""
 
 import io
+import os
 import numpy as np
-import png
 from PIL import Image
 
 
@@ -22,27 +22,27 @@ def flip_layers(nparray):
     return nparray
 
 
-def imread(filename, mode='RGB', flip_channels=False):
+def imread(filename, flip_channels=False, **kwargs):
     """Load an image (using PIL) into a NumPy array.
 
-    Optionally specify PIL's loading 'mode', i.e. 'RGB' for color, 'RGBA' for a
-    transparent image and 'L' for grayscale. You can also flip the channels,
-    i.e. convert RGB to BGR if you need it."""
-    if filename is None:
+    You can also flip the channels, to work with BGR instead of RGB color
+    images.
+
+    Optional kwargs will be passed on to PIL's Image.convert(). Thus, you can
+    specifiy PIL's loading 'mode', e.g. 'RGB' for color, 'RGBA' for a
+    transparent image and 'L' for grayscale.
+    """
+    if filename is None or not os.path.exists(filename):
         return None
-    # Load PNGs using pypng
-    if filename.lower().endswith('.png'):
-        reader = png.Reader(filename)
-        pngdata = reader.read()
-        #TODO check data type, convert to numpy and optionally flip:
-        # https://pythonhosted.org/pypng/ex.html#reading
+    # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
+    # bit depths, we should look into using pypng, see documentation at
+    # https://pythonhosted.org/pypng/ex.html#reading
+    # For now, PIL provides all we need
+    image = np.asarray(Image.open(filename).convert(**kwargs))
+    if flip_channels:
+        return flip_layers(image)
     else:
-        # Otherwise, use PIL
-        image = np.asarray(Image.open(filename).convert(mode))
-        if flip_channels:
-            return flip_layers(image)
-        else:
-            return image
+        return image
 
 
 try:
