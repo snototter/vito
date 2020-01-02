@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from ..imutils import flip_layers, imread
+from ..imutils import flip_layers, imread, apply_on_bboxes
 
 
 def test_flip_layers():
@@ -55,3 +55,42 @@ def test_imread():
     img = imread(os.path.join(exdir, 'depth.png'))
     assert img.ndim == 2 or img.shape[2] == 1
     assert img.dtype == np.int32
+
+
+def test_apply_on_bboxes():
+    # Single and multi-channel test data
+    x1 = np.zeros((5, 5), dtype=np.uint8)
+    x3 = np.zeros((5, 5, 3), dtype=np.uint8)
+    # Example boxes
+    boxes = [
+        (0, 0, 1, 2),
+        (5, 5, 3, 2),   # outside image
+        (2, 3, 10, 9),  # should be clipped
+        (3, 0, 0, 0),   # invalid
+        (3, 1, 5, 1)    # should be clipped
+    ]
+    # Expected results
+    e255 = x3.copy()
+    e255[0:2, 0, :] = 255
+    e255[3:, 2:, :] = 255
+    e255[1, 3:, :] = 255
+    e42 = x3.copy()
+    e42[0:2, 0, :] = 42
+    e42[3:, 2:, :] = 42
+    e42[1, 3:, :] = 42
+    # Exemplary functions
+    def _set(img, value):
+        img[:] = value
+        return img
+    def _set255(img):
+        return _set(img, 255)
+    # No kwargs:
+    r1 = apply_on_bboxes(x1, boxes, _set255)
+    assert np.all(r1 == e255[:, :, 0])
+    r3 = apply_on_bboxes(x3, boxes, _set255)
+    assert np.all(r3 == e255)
+    # With kwargs
+    r1 = apply_on_bboxes(x1, boxes, _set, value=42)
+    assert np.all(r1 == e42[:, :, 0])
+    r3 = apply_on_bboxes(x3, boxes, _set, value=42)
+    assert np.all(r3 == e42)

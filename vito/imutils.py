@@ -90,13 +90,16 @@ def clip_rect_to_image(rect, img_width, img_height):
     :param rect: list/tuple (l,t,w,h)
     :param img_width: int
     :param img_height: int
+    :return: (l, t, w, h)
     """
-    li, ti, wi, hi = int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3])
-    wi = wi if (li + wi) < img_width else (img_width - max(li, 0) - 1)
-    hi = hi if (ti + hi) < img_height else (img_height - max(ti, 0) - 1)
-    li = li if li >= 0 else 0
-    ti = ti if ti >= 0 else 0
-    return [li, ti, wi, hi]
+    l, t, w, h = int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3])
+    # Right/bottom bounds are exclusive
+    r = max(0, min(img_width, l+w))
+    b = max(0, min(img_height, t+h))
+    # Left/top bounds are inclusive
+    l = max(0, l)
+    t = max(0, t)
+    return (l, t, r-l, b-t)
 
 
 def is_valid_bbox(rect):
@@ -104,21 +107,29 @@ def is_valid_bbox(rect):
     return rect[0] >= 0 and rect[1] >= 0 and rect[2] > 0 and rect[3] > 0
 
 
-def apply_on_bboxes(image_np, bboxes, func):
+def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
     """Applies the function func (which returns a modified image) on each
-    bounding box.
-    Takes care of proper clipping, roi extraction and copying back the results.
+    bounding box. Takes care of proper clipping, roi extraction and copying
+    back the results.
+    :param image_np:    numpy ndarray, input image
+    :param bboxes:      list of bounding boxes, i.e. [(l, t, w, h), (...)]
+    :param func:        function handle to apply on each bounding box
+    :param func_kwargs: optional kwargs passed on to the function
+    :return: numpy ndarray, a copy of the input image after applying the given
+             function on each (valid) bounding box
     """
     # Ensure the image is writeable
     image_np = image_np.copy()
+    # Prevent invalid memory access
     bboxes = [clip_rect_to_image(bb, image_np.shape[1], image_np.shape[0])
             for bb in bboxes]
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb
+        print(bb)
         # TODO check single vs multi-channel image
         roi = image_np[t:t+h, l:l+w]
-        image_np[t:t+h, l:l+w] = func(roi)
+        image_np[t:t+h, l:l+w] = func(roi, **func_kwargs)
     return image_np
 
 

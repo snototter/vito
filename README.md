@@ -1,14 +1,15 @@
 # vito - Vision Tools
-[![View on PyPI](https://img.shields.io/pypi/v/vito.svg)](https://pypi.org/project/vito)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
+[![View on PyPI](https://badge.fury.io/py/vito.svg)](https://pypi.org/project/vito)
+[![License](https://img.shields.io/pypi/l/vito)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
 Python utilities for common computer vision tasks.
 The goal of this package is to provide a lightweight package helping you with standard/recurring image manipulation tasks.
 
+
 ## Dependencies
 * `numpy`
-* `PIL`
-* `pypng` to support loading PNGs with different bit depths (e.g. 16bit depth images)
+* `Pillow`
+
 
 ## Examples
 * Pseudocoloring:
@@ -36,25 +37,28 @@ imvis.imshow(colorized)
 
 
 ## Changelog
-* Upcoming `0.2.1`
-  * Added imutils tests ensuring proper data types.
+* `0.3.0`
+  * `apply_on_bboxes()` now supports optional kwargs to be passed on to the user-defined function handle.
+  * Changed `imread()`'s default `mode` parameter to optional kwargs which are passed on to Pillow.
+  * Fixed bounding box clipping off-by-one issue.
+  * Added `imutils` tests ensuring proper data types.
 * `0.2.0`
-  * Optical flow (Middlebury .flo format) I/O and visualization
-  * Support saving images
-  * Colorization to visualize tracking results
+  * Optical flow (Middlebury .flo format) I/O and visualization.
+  * Support saving images.
+  * Colorization to visualize tracking results.
 * `0.1.1`
-  * Changed supported python versions for legacy tests
+  * Changed supported python versions for legacy tests.
 * `0.1.0`
-  * First actually useful release
-  * Contains most of the functionality of `pvt` (a library I developed throughout my studies)
+  * First actually useful release.
+  * Contains most of the functionality of `pvt` (a library I developed throughout my studies).
     * `cam_projections` - projective geometry, lens distortion/rectification (Plumb Bob model), etc.
     * `colormaps` - colormap definitions for visualization (jet, parula, magma, viridis, etc.)
-    * `imutils` - image loading, conversion, RoI handling (e.g. apply functions on several patches of an image)
-    * `imvis` - visualization helpers, e.g. pseudocoloring or overlaying images
+    * `imutils` - image loading, conversion, RoI handling (e.g. apply functions on several patches of an image).
+    * `imvis` - visualization helpers, e.g. pseudocoloring or overlaying images.
     * `pyutils` - common python functions (timing code, string manipulation, list sorting/search, etc.)
 * `0.0.1`
-  * Initial public release
-  * Contains common python/language and camera projection utils
+  * Initial public release.
+  * Contains common python/language and camera projection utils.
 
 ## TODO List
 * anonymization utils
