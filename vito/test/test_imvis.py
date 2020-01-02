@@ -10,7 +10,7 @@ def assert_color_equal(a, b):
 
 def test_pseudocolor():
     data = np.array([[0, 1, 2], [255, 42, 0]], dtype=np.uint8)
-    for cm in [colormaps.colormap_parula_rgb, colormaps.colormap_jet_rgb, \
+    for cm in [colormaps.colormap_parula_rgb, colormaps.colormap_jet_rgb,
             colormaps.colormap_magma_rgb, colormaps.colormap_gray]:
         pc = pseudocolor(data, limits=None, color_map=cm)
         assert np.all(pc[0, 0, :] == pc[1, 2, :])

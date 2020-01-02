@@ -11,6 +11,7 @@ colormap_names = [
     'Temperature', 'Thermal', 'Turbo', 'Viridis'
 ]
 
+
 def by_name(colormap_name, return_rgb=True):
     cmn = colormap_name.lower()
     if cmn == 'gray':
@@ -42,23 +43,23 @@ def make_flow_color_wheel():
     colorwheel[0:RY, 1] = np.floor(255*np.arange(0, RY, 1)/RY)
     col += RY
     # YG
-    colorwheel[col:YG+col, 0]= 255 - np.floor(255*np.arange(0, YG, 1)/YG)
+    colorwheel[col:YG+col, 0] = 255 - np.floor(255 * np.arange(0, YG, 1) / YG)
     colorwheel[col:YG+col, 1] = 255
     col += YG
     # GC
-    colorwheel[col:GC+col, 1]= 255 
-    colorwheel[col:GC+col, 2] = np.floor(255*np.arange(0, GC, 1)/GC)
+    colorwheel[col:GC+col, 1] = 255
+    colorwheel[col:GC+col, 2] = np.floor(255 * np.arange(0, GC, 1) / GC)
     col += GC
     # CB
-    colorwheel[col:CB+col, 1]= 255 - np.floor(255*np.arange(0, CB, 1)/CB)
+    colorwheel[col:CB+col, 1] = 255 - np.floor(255 * np.arange(0, CB, 1) / CB)
     colorwheel[col:CB+col, 2] = 255
     col += CB
     # BM
-    colorwheel[col:BM+col, 2]= 255 
-    colorwheel[col:BM+col, 0] = np.floor(255*np.arange(0, BM, 1)/BM)
+    colorwheel[col:BM+col, 2] = 255
+    colorwheel[col:BM+col, 0] = np.floor(255 * np.arange(0, BM, 1) / BM)
     col += BM
     # MR
-    colorwheel[col:MR+col, 2]= 255 - np.floor(255*np.arange(0, MR, 1)/MR)
+    colorwheel[col:MR+col, 2] = 255 - np.floor(255 * np.arange(0, MR, 1) / MR)
     colorwheel[col:MR+col, 0] = 255
     return colorwheel
 

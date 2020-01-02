@@ -1,6 +1,7 @@
 import numpy as np
 from ..cam_projections import dot
 
+
 def test_dot():
     x = np.random.rand(3, 1)
     y = np.random.rand(3)

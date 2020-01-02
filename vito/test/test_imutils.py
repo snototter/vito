@@ -78,12 +78,15 @@ def test_apply_on_bboxes():
     e42[0:2, 0, :] = 42
     e42[3:, 2:, :] = 42
     e42[1, 3:, :] = 42
+
     # Exemplary functions
     def _set(img, value):
         img[:] = value
         return img
+
     def _set255(img):
         return _set(img, 255)
+
     # No kwargs:
     r1 = apply_on_bboxes(x1, boxes, _set255)
     assert np.all(r1 == e255[:, :, 0])

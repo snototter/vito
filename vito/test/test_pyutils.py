@@ -1,6 +1,5 @@
 import argparse
 import datetime
-import numpy as np
 import pytest
 from ..pyutils import compare_version_strings, slugify, find_first_index, \
     find_last_index, argsort, is_tool, date_str, check_positive_int, \
@@ -68,8 +67,8 @@ def test_date_str():
 
 def test_is_tool():
     # TODO check if 'dir' works on Windows/Mac test servers
-    assert is_tool('fooblablub') == False
-    assert is_tool('dir') == True
+    assert is_tool('fooblablub') is False
+    assert is_tool('dir') is True
 
 
 def test_check_positive_int():
