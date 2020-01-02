@@ -48,6 +48,8 @@ imvis.imshow(colorized)
 
 
 ## Changelog
+* `0.3.1`
+  * Fix `colormaps.by_name()` for grayscale.
 * `0.3.0`
   * `apply_on_bboxes()` now supports optional kwargs to be passed on to the user-defined function handle.
   * Changed `imread()`'s default `mode` parameter to optional kwargs which are passed on to Pillow.
