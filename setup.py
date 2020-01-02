@@ -28,7 +28,7 @@ setuptools.setup(
     version=loaded_vars['__version__'],
     author="snototter",
     author_email="muspellr@gmail.com",
-    description="Python utility package for common computer vision tasks.",
+    description="Lightweight utility package for common computer vision tasks.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/snototter/vito",
