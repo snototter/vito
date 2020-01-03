@@ -48,8 +48,9 @@ imvis.imshow(colorized)
 
 
 ## Changelog
-* Upcoming
+* `1.0.2`
   * Additional tests and minor improvements (potential bug fixes, especially for edge case inputs).
+  * Ensure default image I/O parametrization always returns/saves/loads color images as RGB (even if OpenCV is available/used on your system).
 * `1.0.1`
   * Fix colorizing boolean masks (where mask[:] = True or mask[:] = False).
 * `1.0.0`
