@@ -126,9 +126,6 @@ def test_imsave(tmp_path):
     # Loading, however, will still produce a int32 image.
     assert img_out.dtype == np.int32
     assert np.all(img_in[:] == img_out[:])
-    
-
-#TODO test imsave/flosave (add test_flowutils.py)
 
 
 def test_apply_on_bboxes():
