@@ -131,7 +131,9 @@ def test_imsave(tmp_path):
 def test_apply_on_bboxes():
     # Single and multi-channel test data
     x1 = np.zeros((5, 5), dtype=np.uint8)
+    x2 = np.zeros((5, 5, 1), dtype=np.int32)
     x3 = np.zeros((5, 5, 3), dtype=np.uint8)
+
     # Example boxes
     boxes = [
         (0, 0, 1, 2),
@@ -140,11 +142,13 @@ def test_apply_on_bboxes():
         (3, 0, 0, 0),   # invalid
         (3, 1, 5, 1)    # should be clipped
     ]
+
     # Expected results
     e255 = x3.copy()
     e255[0:2, 0, :] = 255
     e255[3:, 2:, :] = 255
     e255[1, 3:, :] = 255
+    
     e42 = x3.copy()
     e42[0:2, 0, :] = 42
     e42[3:, 2:, :] = 42
@@ -152,19 +156,37 @@ def test_apply_on_bboxes():
 
     # Exemplary functions
     def _set(img, value):
+        print(img.shape)
         img[:] = value
+        print('changed to', img.shape)
         return img
 
     def _set255(img):
         return _set(img, 255)
 
     # No kwargs:
-    r1 = apply_on_bboxes(x1, boxes, _set255)
+    r1 = apply_on_bboxes(x1, boxes, _set255).copy()
     assert np.all(r1 == e255[:, :, 0])
+    assert r1.dtype == np.uint8
+
+    r2 = apply_on_bboxes(x2, boxes, _set255)
+    e = e255[:, :, 0]
+    assert np.all(r2.reshape(e.shape) == e)
+    assert r2.dtype == np.int32
+
     r3 = apply_on_bboxes(x3, boxes, _set255)
     assert np.all(r3 == e255)
+    assert r3.dtype == np.uint8
+
     # With kwargs
     r1 = apply_on_bboxes(x1, boxes, _set, value=42)
     assert np.all(r1 == e42[:, :, 0])
+    assert r1.dtype == np.uint8
+
+    r2 = apply_on_bboxes(x2, boxes, _set, value=42)
+    assert np.all(r2 == e42)
+    assert r2.dtype == np.int32
+    
     r3 = apply_on_bboxes(x3, boxes, _set, value=42)
     assert np.all(r3 == e42)
+    assert r3.dtype == np.uint8

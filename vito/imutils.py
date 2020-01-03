@@ -42,8 +42,6 @@ except:
             im_np = flip_layers(image)
         else:
             im_np = image
-        # TODO On my Ubuntu 16.04 machine, PIL's JPEG presets were crap. Need
-        # to check this for other versions.
         Image.fromarray(im_np).save(filename)
 
 
@@ -129,7 +127,6 @@ def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb
-        print(bb)
         # TODO check single vs multi-channel image
         roi = image_np[t:t+h, l:l+w]
         image_np[t:t+h, l:l+w] = func(roi, **func_kwargs)
