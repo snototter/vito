@@ -8,6 +8,8 @@ import sys
 import os
 import datetime
 import argparse
+import subprocess
+import traceback
 
 
 # Timing code, similar to MATLAB's tic/toc
@@ -148,6 +150,25 @@ def is_tool(name):
             if os.path.exists(os.path.join(path, name)):
                 return True
         return False
+
+
+def safe_shell_output(*args):
+    """Executes the given shell command and returns the output
+    with leading/trailing whitespace trimmed. For example:
+    * sso('ls')
+    * sso('ls', '-l', '-a')
+    Returns the tuple (True/False, output/error_message)
+    """
+    try:
+        # with open(os.devnull, 'wb') as devnull:
+        #     by = subprocess.check_output(list(args), stderr=devnull)
+        by = subprocess.check_output(list(args))
+        out = by.decode('utf-8').strip()
+        success = True
+    except:
+        out = traceback.format_exc(limit=3)
+        success = False
+    return success, out
 
 
 def date_str(delimiter=['', '', '-', '', ''], dt=None):

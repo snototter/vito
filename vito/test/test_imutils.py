@@ -1,7 +1,8 @@
 import numpy as np
 import os
 import pytest
-from ..imutils import flip_layers, imread, apply_on_bboxes
+from ..imutils import flip_layers, imread, imsave, apply_on_bboxes
+from ..pyutils import safe_shell_output
 
 
 def test_flip_layers():
@@ -62,6 +63,55 @@ def test_imread():
     img = imread(os.path.join(exdir, 'depth.png'), mode='I')
     assert img.ndim == 2 or img.shape[2] == 1
     assert img.dtype == np.int32
+
+
+def test_imsave(tmp_path):
+    #TODO only works on unix-based os due to safe_shell_output()
+    exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples')
+    out_fn = str(tmp_path / 'test.png')
+    ##########################################################################
+    # Test RGB
+    img_in = imread(os.path.join(exdir, 'lena.jpg'))
+    assert img_in.ndim == 3 and img_in.shape[2] == 3
+    assert img_in.dtype == np.uint8
+    # Save (lossless) and reload
+    imsave(out_fn, img_in)
+    _, finfo = safe_shell_output('file', out_fn)
+    assert finfo.split(':')[1].strip() == 'PNG image data, 512 x 512, 8-bit/color RGB, non-interlaced'
+    img_out = imread(out_fn)
+    assert img_out.ndim == 3 and img_out.shape[2] == 3
+    assert img_out.dtype == np.uint8
+    assert np.all(img_in[:] == img_out[:])
+    ##########################################################################
+    # Test monochrome 8 bit
+    img_in = imread(os.path.join(exdir, 'peaks.png'))
+    assert img_in.ndim == 2 or img_in.shape[2] == 1
+    assert img_in.dtype == np.uint8
+    # Save (lossless) and reload
+    imsave(out_fn, img_in)
+    _, finfo = safe_shell_output('file', out_fn)
+    assert finfo.split(':')[1].strip() == 'PNG image data, 256 x 256, 8-bit grayscale, non-interlaced'
+    img_out = imread(out_fn)
+    assert img_out.ndim == 2 or img_out.shape[2] == 1
+    assert img_out.dtype == np.uint8
+    assert np.all(img_in[:] == img_out[:])
+    ##########################################################################
+    # Test monochrome 16 bit (will be loaded as np.int32, using PIL's 'I' mode)
+    img_in = imread(os.path.join(exdir, 'depth.png'))
+    assert img_in.ndim == 2 or img_in.shape[2] == 1
+    assert img_in.dtype == np.int32
+    # Explicitly cast to uint16
+    img_in = img_in.astype(np.uint16)
+    # Save (lossless) and reload
+    imsave(out_fn, img_in)
+    _, finfo = safe_shell_output('file', out_fn)
+    assert finfo.split(':')[1].strip() == 'PNG image data, 800 x 600, 16-bit grayscale, non-interlaced'
+    img_out = imread(out_fn)
+    assert img_out.ndim == 2 or img_out.shape[2] == 1
+    # Loading, however, will still produce a int32 image.
+    assert img_out.dtype == np.int32
+    assert np.all(img_in[:] == img_out[:])
+    
 
 
 #TODO test imsave/flosave (add test_flowutils.py)
