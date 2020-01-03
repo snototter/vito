@@ -66,7 +66,8 @@ def test_imread():
 
 
 def test_imsave(tmp_path):
-    #TODO only works on unix-based os due to safe_shell_output()
+    # This test will only work on Unix-based test environments because we
+    # use the 'file' command to ensure the stored file is correct.
     exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples')
     out_fn = str(tmp_path / 'test.png')
     ##########################################################################
@@ -82,6 +83,20 @@ def test_imsave(tmp_path):
     assert img_out.ndim == 3 and img_out.shape[2] == 3
     assert img_out.dtype == np.uint8
     assert np.all(img_in[:] == img_out[:])
+    ##########################################################################
+    # Test RGB with flipping channels
+    img_in = imread(os.path.join(exdir, 'lena.jpg'))
+    assert img_in.ndim == 3 and img_in.shape[2] == 3
+    assert img_in.dtype == np.uint8
+    # Save (lossless) and reload
+    imsave(out_fn, img_in, flip_channels=True)
+    _, finfo = safe_shell_output('file', out_fn)
+    assert finfo.split(':')[1].strip() == 'PNG image data, 512 x 512, 8-bit/color RGB, non-interlaced'
+    img_out = imread(out_fn)
+    assert img_out.ndim == 3 and img_out.shape[2] == 3
+    assert img_out.dtype == np.uint8
+    for c in range(3):
+        assert np.all(img_in[:, :, c] == img_out[:, :, 2-c])
     ##########################################################################
     # Test monochrome 8 bit
     img_in = imread(os.path.join(exdir, 'peaks.png'))
@@ -112,7 +127,6 @@ def test_imsave(tmp_path):
     assert img_out.dtype == np.int32
     assert np.all(img_in[:] == img_out[:])
     
-
 
 #TODO test imsave/flosave (add test_flowutils.py)
 

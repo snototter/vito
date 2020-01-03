@@ -2,6 +2,7 @@
 # coding=utf-8
 """Optical flow I/O and visualization."""
 
+import os
 import sys
 import numpy as np
 from . import colormaps
@@ -15,6 +16,11 @@ def floread(filename):
     """
     if sys.byteorder != 'little':
         raise RuntimeError('Current .flo support requires little-endian architecture!')
+
+    if filename is None:
+        return None
+    if not os.path.exists(filename):
+        raise FileNotFoundError('File %s does not exist' % filename)
 
     with open(filename, 'rb') as f:
         # Check magic number
