@@ -1,2 +1,2 @@
 numpy
-Pillow
+Pillow>=5.0.0
