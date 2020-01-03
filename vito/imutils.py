@@ -65,7 +65,7 @@ except:
             im_np = flip_layers(image)
         else:
             im_np = image
-        # TODO On my Ubuntu 16.04 machine, PIL's JPEG preset were crap. Need
+        # TODO On my Ubuntu 16.04 machine, PIL's JPEG presets were crap. Need
         # to check this for other versions.
         Image.fromarray(im_np).save(filename)
 

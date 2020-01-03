@@ -58,6 +58,13 @@ def test_imread():
     img = imread(os.path.join(exdir, 'depth.png'))
     assert img.ndim == 2 or img.shape[2] == 1
     assert img.dtype == np.int32
+    # Load 16-bit PNG, specifying mode manually:
+    img = imread(os.path.join(exdir, 'depth.png'), mode='I')
+    assert img.ndim == 2 or img.shape[2] == 1
+    assert img.dtype == np.int32
+
+
+#TODO test imsave/flosave (add test_flowutils.py)
 
 
 def test_apply_on_bboxes():
