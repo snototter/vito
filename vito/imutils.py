@@ -127,7 +127,6 @@ def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb
-        # TODO check single vs multi-channel image
         roi = image_np[t:t+h, l:l+w]
         image_np[t:t+h, l:l+w] = func(roi, **func_kwargs)
     return image_np
