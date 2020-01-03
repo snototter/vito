@@ -15,14 +15,14 @@ try:
         """
         Convenience 1-liner to display image and wait for key input.
 
-        :param img_np:    Should be provided as BGR, otherwise use flip_channels=True
-        :param title:  Window title
-        :param wait_ms: cv2.waitKey() input
-        :param flip_channels: if you want to display an RGB image poperly, we need
-                            to flip the color channels
+        :param img_np:    Should be provided as RGB, otherwise use flip_channels=True
+        :param title:     Window title
+        :param wait_ms:   cv2.waitKey() input
+        :param flip_channels: if you want to display a BGR image poperly, set this
+                            to True
         :return: Pressed key or -1, i.e. cv2.waitKey() output
         """
-        if flip_channels:
+        if not flip_channels:
             disp = imutils.flip_layers(img_np)
         else:
             disp = img_np
@@ -41,10 +41,10 @@ except:
 
         Note that the window usually doesn't block!
 
-        :param img:    Should be provided as BGR, otherwise use flip_channels=True
+        :param img:    Should be provided as RGB, otherwise use flip_channels=True
         :param title:  Window title
-        :param flip_channels: if you want to display an RGB image poperly, we need
-                            to flip the color channels
+        :param flip_channels: if you want to display a BGR image poperly, set this
+                            to True
         :return: -1 for compatibility reasons (the same return value as if you
                         used the OpenCV-based version and there was no key press)
         """
