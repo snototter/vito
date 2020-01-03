@@ -49,7 +49,7 @@ imvis.imshow(colorized)
 
 ## Changelog
 * Upcoming
-  * Additional tests.
+  * Additional tests and minor improvements (potential bug fixes, especially for edge case inputs).
 * `1.0.1`
   * Fix colorizing boolean masks (where mask[:] = True or mask[:] = False).
 * `1.0.0`
