@@ -164,7 +164,7 @@ def test_apply_on_bboxes():
     e255[0:2, 0, :] = 255
     e255[3:, 2:, :] = 255
     e255[1, 3:, :] = 255
-    
+
     e42 = x3.copy()
     e42[0:2, 0, :] = 42
     e42[3:, 2:, :] = 42
@@ -202,7 +202,7 @@ def test_apply_on_bboxes():
     r2 = apply_on_bboxes(x2, boxes, _set, value=42)
     assert np.all(r2 == e42)
     assert r2.dtype == np.int32
-    
+
     r3 = apply_on_bboxes(x3, boxes, _set, value=42)
     assert np.all(r3 == e42)
     assert r3.dtype == np.uint8
