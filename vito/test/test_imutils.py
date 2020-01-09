@@ -63,6 +63,10 @@ def test_imread():
     img = imread(os.path.join(exdir, 'depth.png'), mode='I')
     assert img.ndim == 2 or img.shape[2] == 1
     assert img.dtype == np.int32
+    # Load 1-bit PNG (requires specifying the mode!)
+    img = imread(os.path.join(exdir, 'space-invader.png'), mode='L')
+    assert img.ndim == 2 or img.shape[2] == 1
+    assert img.dtype == np.uint8
 
 
 def test_imsave(tmp_path):
@@ -126,12 +130,26 @@ def test_imsave(tmp_path):
     # Loading, however, will still produce a int32 image.
     assert img_out.dtype == np.int32
     assert np.all(img_in[:] == img_out[:])
+    ##########################################################################
+    # Test 1-bit PNG (requires specifying the mode!)
+    img_in = imread(os.path.join(exdir, 'space-invader.png'), mode='L').astype(np.bool)
+    assert img_in.ndim == 2 or img_in.shape[2] == 1
+    assert img_in.dtype == np.bool
+    imsave(out_fn, img_in)
+    _, finfo = safe_shell_output('file', out_fn)
+    assert (finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit colormap, non-interlaced' or
+        finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit grayscale, non-interlaced')
+    img_out = imread(out_fn, mode='L').astype(np.bool)
+    assert img_out.ndim == 2 or img_out.shape[2] == 1
+    assert np.all(img_in[:] == img_out[:])
 
 
 def test_apply_on_bboxes():
     # Single and multi-channel test data
     x1 = np.zeros((5, 5), dtype=np.uint8)
+    x2 = np.zeros((5, 5, 1), dtype=np.int32)
     x3 = np.zeros((5, 5, 3), dtype=np.uint8)
+
     # Example boxes
     boxes = [
         (0, 0, 1, 2),
@@ -140,11 +158,13 @@ def test_apply_on_bboxes():
         (3, 0, 0, 0),   # invalid
         (3, 1, 5, 1)    # should be clipped
     ]
+
     # Expected results
     e255 = x3.copy()
     e255[0:2, 0, :] = 255
     e255[3:, 2:, :] = 255
     e255[1, 3:, :] = 255
+
     e42 = x3.copy()
     e42[0:2, 0, :] = 42
     e42[3:, 2:, :] = 42
@@ -152,19 +172,37 @@ def test_apply_on_bboxes():
 
     # Exemplary functions
     def _set(img, value):
+        print(img.shape)
         img[:] = value
+        print('changed to', img.shape)
         return img
 
     def _set255(img):
         return _set(img, 255)
 
     # No kwargs:
-    r1 = apply_on_bboxes(x1, boxes, _set255)
+    r1 = apply_on_bboxes(x1, boxes, _set255).copy()
     assert np.all(r1 == e255[:, :, 0])
+    assert r1.dtype == np.uint8
+
+    r2 = apply_on_bboxes(x2, boxes, _set255)
+    e = e255[:, :, 0]
+    assert np.all(r2.reshape(e.shape) == e)
+    assert r2.dtype == np.int32
+
     r3 = apply_on_bboxes(x3, boxes, _set255)
     assert np.all(r3 == e255)
+    assert r3.dtype == np.uint8
+
     # With kwargs
     r1 = apply_on_bboxes(x1, boxes, _set, value=42)
     assert np.all(r1 == e42[:, :, 0])
+    assert r1.dtype == np.uint8
+
+    r2 = apply_on_bboxes(x2, boxes, _set, value=42)
+    assert np.all(r2 == e42)
+    assert r2.dtype == np.int32
+
     r3 = apply_on_bboxes(x3, boxes, _set, value=42)
     assert np.all(r3 == e42)
+    assert r3.dtype == np.uint8
