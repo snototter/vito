@@ -178,9 +178,9 @@ def overlay(img1, img2, weight1, mask1=None):
         out = weight1 * img1 + (1. - weight1) * img2
     else:
         if num_channels == 1:
-            img1 = np.where(np.repeat(mask1[:, :, np.newaxis], num_channels, axis=2) > 0, img1, img2)
-        else:
             img1 = np.where(mask1 > 0, img1, img2)
+        else:
+            img1 = np.where(np.repeat(mask1[:, :, np.newaxis], num_channels, axis=2) > 0, img1, img2)
         out = weight1 * img1 + (1. - weight1) * img2
         # out = img2
         # idx = np.where(mask1 > 0)

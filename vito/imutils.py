@@ -2,6 +2,9 @@
 # coding=utf-8
 """Utilities you'll often need when working with images ;-)"""
 
+# TODOs:
+# * imread/imsave should use tifffile for tiff files - supports multi-band images
+
 import io
 import os
 import numpy as np
