@@ -35,7 +35,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'numpy',
-        'Pillow>=5.0.0'],
+        'Pillow>=5.0.0',
+        'tifffile'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

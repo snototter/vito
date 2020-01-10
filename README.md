@@ -9,6 +9,7 @@ The goal of this package is to provide a lightweight package helping you with st
 ## Dependencies
 * `numpy`
 * `Pillow`
+* `tifffile`
 
 
 ## Examples

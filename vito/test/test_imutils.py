@@ -67,6 +67,7 @@ def test_imread():
     img = imread(os.path.join(exdir, 'space-invader.png'), mode='L')
     assert img.ndim == 2 or img.shape[2] == 1
     assert img.dtype == np.uint8
+    # TODO test multi-channel TIFF
 
 
 def test_imsave(tmp_path):

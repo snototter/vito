@@ -2,12 +2,10 @@
 # coding=utf-8
 """Utilities you'll often need when working with images ;-)"""
 
-# TODOs:
-# * imread/imsave should use tifffile for tiff files - supports multi-band images
-
 import io
 import os
 import numpy as np
+import tifffile
 from PIL import Image
 
 
@@ -15,6 +13,9 @@ def flip_layers(nparray):
     """
     Flip RGB to BGR image data (numpy ndarray).
     Also accepts rgbA/bgrA and single channel images without crashing.
+
+    For multi-channel images (number of channels > 4), the channel order
+    will be reversed.
     """
     if len(nparray.shape) == 3:
         if nparray.shape[2] == 4:
@@ -25,46 +26,54 @@ def flip_layers(nparray):
     return nparray
 
 
-try:
-    # Try to load OpenCV (in case you installed it in your workspace)
-    import cv2
+def is_tiff(filename):
+    """Returns True if file extension is either .tif or .tiff"""
+    return filename.lower().endswith('.tif') \
+        or filename.lower().endswith('.tiff')
 
-    def imsave(filename, image, flip_channels=False):
-        """Store an image using OpenCV."""
-        # To be compatible with the Pillow/PIL version (see below), we have to
-        # invert the flip_channels flag.
-        if not flip_channels:
-            cv2.imwrite(filename, flip_layers(image))
-        else:
-            cv2.imwrite(filename, image)
-except:
-    # Fall back to Pillow
-    def imsave(filename, image, flip_channels=False):
-        """Store an image using PIL/Pillow, optionally flipping layers, i.e. BGR -> RGB."""
-        if flip_channels:
-            im_np = flip_layers(image)
-        else:
-            im_np = image
-        Image.fromarray(im_np).save(filename)
+
+def imsave(filename, image, flip_channels=False, **kwargs):
+    """
+    Store an image to disk, optionally flipping layers, e.g. BGR -> RGB.
+    TIFF files will be stored using tifffile. Any other image types will
+    be stored using Pillow/PIL.
+    Additional kwargs will be passed on to PIL's save() or tifffile's imwrite().
+    """
+    if flip_channels:
+        im_np = flip_layers(image)
+    else:
+        im_np = image
+    
+    if is_tiff(filename):
+        tifffile.imwrite(filename, im_np, **kwargs)
+    else:
+        Image.fromarray(im_np).save(filename, **kwargs)
 
 
 def imread(filename, flip_channels=False, **kwargs):
-    """Load an image (using PIL) into a NumPy array.
+    """Load an image into a NumPy array.
     Multi-channel images are returned as RGB unless you set flip_channels=True.
+
+    TIFF files will be loaded using the tifffile package, any other image
+    formats will be loaded using Pillow/PIL.
     
-    Optional kwargs will be passed on to PIL's Image.convert(). Thus, you can
-    specifiy PIL's loading 'mode', e.g. 'RGB' for color, 'RGBA' for a
-    transparent image and 'L' for grayscale.
+    Optional kwargs will be passed on to PIL's Image.convert() or tifffile's
+    imread, respectively. Thus, you can specifiy PIL's loading 'mode', e.g.
+    'RGB' for color, 'RGBA' for a transparent image and 'L' for grayscale.
+    Or you could load the first page of a TIFF file by passing key=0.
     """
     if filename is None:
         return None
     if not os.path.exists(filename):
         raise FileNotFoundError('Image %s does not exist' % filename)
-    # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
-    # bit depths, we should look into using pypng, see documentation at
-    # https://pythonhosted.org/pypng/ex.html#reading
-    # For now, PIL provides all we need
-    image = np.asarray(Image.open(filename).convert(**kwargs))
+    if is_tiff(filename):
+        image = tifffile.imread(filename, **kwargs)
+    else:
+        # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
+        # bit depths, we should look into using pypng, see documentation at
+        # https://pythonhosted.org/pypng/ex.html#reading
+        # For now, PIL provides all we need
+        image = np.asarray(Image.open(filename).convert(**kwargs))
     
     if flip_channels:
         return flip_layers(image)
