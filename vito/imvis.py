@@ -120,7 +120,7 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_r
         lookup_values = np.floor((values - limits[0]) / interval).astype(np.int32)
     else:
         # Fall back to maximum value
-        lookup_values = np.ones(values.shape, dtype=np.int32) * 255
+        lookup_values = np.zeros(values.shape, dtype=np.int32)
     colorized = lut[lookup_values].astype(np.uint8)
     return colorized
 
