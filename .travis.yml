@@ -1,0 +1,16 @@
+language: python
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+before_install:
+  - pip install -U pip
+  - pip install -U pytest
+  - pip install -U pytest-cov
+  - pip install -U coveralls
+install:
+  - pip install "."
+script:
+  - pytest --cov=vito/
+after_success:
+  - coveralls
