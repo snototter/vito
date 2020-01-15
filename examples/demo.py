@@ -19,12 +19,12 @@ from vito import imvis
 
 if __name__ == "__main__":
     # Standard loading/display
-    lena = imutils.imread('lena.jpg', mode='RGB')
-    imvis.imshow(lena)
+    rgb = imutils.imread('flamingo.jpg', mode='RGB')
+    imvis.imshow(rgb)
 
     # Load as BGR
-    lena = imutils.imread('lena.jpg', mode='RGB', flip_channels=True)
-    imvis.imshow(lena)
+    bgr = imutils.imread('flamingo.jpg', mode='RGB', flip_channels=True)
+    imvis.imshow(bgr)
 
     # Load a single-channel image
     peaks = imutils.imread('peaks.png', mode='L')

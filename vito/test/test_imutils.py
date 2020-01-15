@@ -32,16 +32,16 @@ def test_imread():
         with pytest.raises(FileNotFoundError):
             imread(fn)
     # Load RGB JPG
-    img = imread(os.path.join(exdir, 'lena.jpg'))
+    img = imread(os.path.join(exdir, 'flamingo.jpg'))
     assert img.ndim == 3 and img.shape[2] == 3
     assert img.dtype == np.uint8
     # Same image, but BGR
-    img_flipped = imread(os.path.join(exdir, 'lena.jpg'), flip_channels=True)
+    img_flipped = imread(os.path.join(exdir, 'flamingo.jpg'), flip_channels=True)
     for c in range(img.shape[2]):
         complement = 2-c if c < 3 else 3
         assert np.all(img[:, :, c] == img_flipped[:, :, complement])
     # Same image, but monochrome
-    img = imread(os.path.join(exdir, 'lena.jpg'), mode='L')
+    img = imread(os.path.join(exdir, 'flamingo.jpg'), mode='L')
     assert img.ndim == 2 or img.shape[2] == 1
     assert img.dtype == np.uint8
     # Load 8-bit single-channel PNG
@@ -76,26 +76,26 @@ def test_imsave(tmp_path):
     out_fn = str(tmp_path / 'test.png')
     ##########################################################################
     # Test RGB
-    img_in = imread(os.path.join(exdir, 'lena.jpg'))
+    img_in = imread(os.path.join(exdir, 'flamingo.jpg'))
     assert img_in.ndim == 3 and img_in.shape[2] == 3
     assert img_in.dtype == np.uint8
     # Save (lossless) and reload
     imsave(out_fn, img_in)
     _, finfo = safe_shell_output('file', out_fn)
-    assert finfo.split(':')[1].strip() == 'PNG image data, 512 x 512, 8-bit/color RGB, non-interlaced'
+    assert finfo.split(':')[1].strip() == 'PNG image data, 400 x 400, 8-bit/color RGB, non-interlaced'
     img_out = imread(out_fn)
     assert img_out.ndim == 3 and img_out.shape[2] == 3
     assert img_out.dtype == np.uint8
     assert np.all(img_in[:] == img_out[:])
     ##########################################################################
     # Test RGB with flipping channels
-    img_in = imread(os.path.join(exdir, 'lena.jpg'))
+    img_in = imread(os.path.join(exdir, 'flamingo.jpg'))
     assert img_in.ndim == 3 and img_in.shape[2] == 3
     assert img_in.dtype == np.uint8
     # Save (lossless) and reload
     imsave(out_fn, img_in, flip_channels=True)
     _, finfo = safe_shell_output('file', out_fn)
-    assert finfo.split(':')[1].strip() == 'PNG image data, 512 x 512, 8-bit/color RGB, non-interlaced'
+    assert finfo.split(':')[1].strip() == 'PNG image data, 400 x 400, 8-bit/color RGB, non-interlaced'
     img_out = imread(out_fn)
     assert img_out.ndim == 3 and img_out.shape[2] == 3
     assert img_out.dtype == np.uint8
