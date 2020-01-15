@@ -138,18 +138,23 @@ def argsort(seq, indices_only=False):
         return zip(*sorted(enumerate(seq), key=itemgetter(1)))
 
 
+def in_ospath(name):
+    """Check whether 'name' is on PATH."""
+    # Search the PATH variable, taken from https://stackoverflow.com/a/5227009
+    for path in os.environ['PATH'].split(os.pathsep):
+        if os.path.exists(os.path.join(path, name)):
+            return True
+    return False
+
+
 def is_tool(name):
-    """Check whether `name` is on PATH and marked as executable."""
+    """Check whether 'name' is on PATH and marked as executable."""
     if sys.version_info >= (3, 3):
         # Taken from https://stackoverflow.com/a/34177358
         from shutil import which
         return which(name) is not None
     else:
-        # Search the PATH variable, taken from https://stackoverflow.com/a/5227009
-        for path in os.environ['PATH'].split(os.pathsep):
-            if os.path.exists(os.path.join(path, name)):
-                return True
-        return False
+        return in_ospath(name)
 
 
 def safe_shell_output(*args):

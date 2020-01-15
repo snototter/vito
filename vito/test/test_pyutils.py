@@ -3,7 +3,8 @@ import datetime
 import pytest
 from ..pyutils import compare_version_strings, slugify, find_first_index, \
     find_last_index, argsort, is_tool, date_str, check_positive_int, \
-    check_positive_real
+    check_positive_real, safe_shell_output, in_ospath, tic, toc, ttoc, \
+    toc_nsec, log_nsec
 
 
 def test_compare_version_strings():
@@ -21,16 +22,24 @@ def test_slugify():
 
 
 def test_find_indices():
-    x = [0, 1, 17, -5, 17, 3, 3, 2, 0, -5]
+    x = [0, 1, 17, -5, 17, 3, 3, 2, 0, -5, 'b']
     assert find_first_index(x, 0) == 0
     assert find_first_index(x, 17) == 2
     assert find_first_index(x, 3) == 5
+    with pytest.raises(ValueError):
+        find_first_index(x, 1000)
+    with pytest.raises(ValueError):
+        find_first_index(x, 'a')
 
     assert find_last_index(x, 0) == 8
     assert find_last_index(x, 3) == 6
     assert find_last_index(x, -5) == 9
     assert find_last_index(x, 17) == 4
     assert find_last_index(x, 2) == find_first_index(x, 2)
+    with pytest.raises(ValueError):
+        find_last_index(x, -1000)
+    with pytest.raises(ValueError):
+        find_last_index(x, 'a')
 
 
 def test_argsort():
@@ -63,12 +72,22 @@ def test_date_str():
         '_'.join([year, month, day, hour, minute, sec])
     assert date_str(['', '-', '<#>', ':', ':|:_#'], ts) == \
         '{}{}-{}<#>{}:{}:|:_#{}'.format(year, month, day, hour, minute, sec)
+    with pytest.raises(RuntimeError):
+        date_str(['', '', '', ':', ':', ''])
 
 
 def test_is_tool():
-    # TODO check if 'dir' works on Windows/Mac test servers
     assert is_tool('fooblablub') is False
     assert is_tool('dir') is True
+    assert in_ospath('fooblablub') is False
+    assert in_ospath('dir') is True
+
+
+def test_safe_shell_output():
+    res, _ = safe_shell_output('ls')
+    assert res
+    res, _ = safe_shell_output('an-invalidcmd')
+    assert res is False
 
 
 def test_check_positive_int():
@@ -85,3 +104,55 @@ def test_check_positive_real():
             check_positive_real(v)
     for v in [0.0000001, 1, 1.01, 17, 23, 555.777, 10000000.01]:
         check_positive_real(v)
+
+
+def test_tictoc(capsys):
+    import time
+    tic()
+    time.sleep(0.5)
+    # Time into variable
+    passed_ms = ttoc(seconds=False)
+    passed_s = ttoc(seconds=True)
+    assert passed_ms >= 500.0
+    assert passed_s >= 0.5
+    # Log time to stdout
+    toc(seconds=False)
+    captured = capsys.readouterr()
+    assert captured.out.startswith('[default] Elapsed time: ')
+    assert captured.out.endswith(' ms\n')
+    tic('test')
+    toc('test', seconds=True)
+    captured = capsys.readouterr()
+    assert captured.out.startswith('[test] Elapsed time: ')
+    assert captured.out.endswith(' s\n')
+    # Test toc_nsec
+    tic(label='nsec')
+    toc_nsec(label='nsec', nsec=0.5, seconds=False)
+    toc_nsec(label='nsec', nsec=0.5, seconds=False)
+    toc_nsec(label='nsec', nsec=0.5, seconds=False)
+    captured = capsys.readouterr()
+    assert captured.out.startswith('[nsec] Elapsed time: ')
+    assert captured.out.endswith(' ms\n')
+    assert captured.out.count('\n') == 1
+    time.sleep(0.5)
+    toc_nsec(label='nsec', nsec=0.5, seconds=True)
+    toc_nsec(label='nsec', nsec=0.5, seconds=False)
+    captured = capsys.readouterr()
+    assert captured.out.startswith('[nsec] Elapsed time: ')
+    assert captured.out.endswith(' s\n')
+    assert captured.out.count('\n') == 1
+
+
+def test_log_nsec(capsys):
+    log_nsec('foo', 5)
+    log_nsec('bar', 5)
+    log_nsec('bla', 5)
+    log_nsec('nice', 10, label='other')
+    captured = capsys.readouterr()
+    assert captured.out == 'foo\nnice\n'
+    log_nsec('foo', 5)
+    captured = capsys.readouterr()
+    assert len(captured.out) == 0
+    log_nsec('override', 0)
+    captured = capsys.readouterr()
+    assert captured.out == 'override\n'
