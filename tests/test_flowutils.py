@@ -1,12 +1,12 @@
 import numpy as np
 import os
 import pytest
-from ..flowutils import floread, flosave, colorize_flow
+from vito.flowutils import floread, flosave, colorize_flow
 
 
 def test_floread():
-    exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples', 'color_wheel.flo')
-    eximg = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples', 'flamingo.jpg')
+    exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'examples', 'color_wheel.flo')
+    eximg = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'examples', 'flamingo.jpg')
     assert floread(None) is None
     for fn in ['', 'a-non-existing.file']:
         with pytest.raises(FileNotFoundError):
@@ -23,7 +23,7 @@ def test_floread():
 
 
 def test_flosave(tmp_path):
-    exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples', 'color_wheel.flo')
+    exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'examples', 'color_wheel.flo')
     # Load example .flo
     flow_in = floread(exfile)
     assert flow_in.ndim == 3 and flow_in.shape[2] == 2

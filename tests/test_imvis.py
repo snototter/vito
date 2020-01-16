@@ -1,6 +1,6 @@
 import numpy as np
-from ..imvis import pseudocolor, color_by_id, exemplary_colors
-from .. import colormaps
+from vito.imvis import pseudocolor, color_by_id, exemplary_colors
+from vito import colormaps
 
 
 def assert_color_equal(a, b):

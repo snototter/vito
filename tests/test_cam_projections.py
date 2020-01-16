@@ -1,5 +1,5 @@
 import numpy as np
-from ..cam_projections import dot
+from vito.cam_projections import dot
 
 
 def test_dot():

@@ -1,8 +1,8 @@
 import numpy as np
 import os
 import pytest
-from ..imutils import flip_layers, imread, imsave, apply_on_bboxes
-from ..pyutils import safe_shell_output
+from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes
+from vito.pyutils import safe_shell_output
 
 
 def test_flip_layers():
@@ -26,7 +26,7 @@ def test_flip_layers():
 
 
 def test_imread():
-    exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples')
+    exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'examples')
     assert imread(None) is None
     for fn in ['', 'a-non-existing.file']:
         with pytest.raises(FileNotFoundError):
@@ -72,7 +72,7 @@ def test_imread():
 def test_imsave(tmp_path):
     # This test will only work on Unix-based test environments because we
     # use the 'file' command to ensure the stored file is correct.
-    exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'examples')
+    exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'examples')
     out_fn = str(tmp_path / 'test.png')
     ##########################################################################
     # Test RGB

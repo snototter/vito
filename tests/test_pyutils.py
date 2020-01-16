@@ -1,7 +1,7 @@
 import argparse
 import datetime
 import pytest
-from ..pyutils import compare_version_strings, slugify, find_first_index, \
+from vito.pyutils import compare_version_strings, slugify, find_first_index, \
     find_last_index, argsort, is_tool, date_str, check_positive_int, \
     check_positive_real, safe_shell_output, in_ospath, tic, toc, ttoc, \
     toc_nsec, log_nsec
@@ -159,6 +159,6 @@ def test_log_nsec(capsys):
 
 
 def test_version():
-    import .. as vito
+    import vito
     assert compare_version_strings(vito.__version__, "1.0") > 0
     
