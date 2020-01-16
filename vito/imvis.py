@@ -147,13 +147,19 @@ def overlay(img1, img2, weight1, mask1=None):
     else:
         channels2 = img2.shape[2]
 
-    if channels1 == channels2 and not (channels1 == 1 or channels1 == 3):
+    if channels1 != channels2 and not (channels1 == 1 or channels1 == 3):
         raise ValueError('Can only extrapolate single channel image to the others dimension')
 
     if channels1 == 1 and channels2 > 1:
-        img1 = np.repeat(img1[:, :, np.newaxis], channels2, axis=2)
+        if img1.ndim == 2:
+            img1 = np.repeat(img1[:, :, np.newaxis], channels2, axis=2)
+        else:
+            img1 = np.repeat(img1[:, :, :], channels2, axis=2)
     if channels2 == 1 and channels1 > 1:
-        img2 = np.repeat(img2[:, :, np.newaxis], channels1, axis=2)
+        if img2.ndim == 2:
+            img2 = np.repeat(img2[:, :, np.newaxis], channels1, axis=2)
+        else:
+            img2 = np.repeat(img2[:, :, :], channels1, axis=2)
 
     num_channels = 1 if len(img1.shape) == 2 else img1.shape[2]
 
@@ -178,14 +184,18 @@ def overlay(img1, img2, weight1, mask1=None):
     if mask1 is None:
         out = weight1 * img1 + (1. - weight1) * img2
     else:
+        if mask1.shape[0] != img1.shape[0] or mask1.shape[1] != img1.shape[1] \
+                or (mask1.ndim > 2 and mask1.shape[2] != 1):
+            raise ValueError('Mask must be 2D and of same width/height as inputs')
         if num_channels == 1:
-            img1 = np.where(mask1 > 0, img1, img2)
+            img1 = np.where(mask1.reshape(img1.shape) > 0, img1, img2)
         else:
-            img1 = np.where(np.repeat(mask1[:, :, np.newaxis], num_channels, axis=2) > 0, img1, img2)
+            if mask1.ndim == 2:
+                _mask = np.repeat(mask1[:, :, np.newaxis], num_channels, axis=2)
+            else:
+                _mask = np.repeat(mask1[:, :], num_channels, axis=2)
+            img1 = np.where(_mask > 0, img1, img2)
         out = weight1 * img1 + (1. - weight1) * img2
-        # out = img2
-        # idx = np.where(mask1 > 0)
-        # out[idx] = weight1 * img1[idx] + (1. - weight1) * img2[idx]
     return (scale2 * out).astype(target_dtype)
 
 #TODO once vitocpp is available, add convenience wrappers similar to pvt
