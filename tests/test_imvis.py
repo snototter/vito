@@ -29,6 +29,19 @@ def test_pseudocolor():
             for c in range(data.shape[1]):
                 assert_color_equal(pc[r, c, :], cm[0])
 
+    data = np.random.rand(3, 7, 2)
+    with pytest.raises(ValueError):
+        _ = pseudocolor(data)
+
+    data = np.zeros((2, 3, 1), dtype=np.uint8)
+    data[0, 0] = 20
+    data[1, 2] = 10
+    pc = pseudocolor(data, limits=None)
+    cm = colormaps.colormap_parula_rgb
+    assert_color_equal(pc[0, 0, :], cm[-1])
+    assert_color_equal(pc[1, 0, :], cm[0])
+    assert_color_equal(pc[1, 2, :], cm[127])
+
 
 def test_colormap_by_name():
     cm = colormaps.by_name('HSV')

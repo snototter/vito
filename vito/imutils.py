@@ -29,7 +29,7 @@ try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
 
-    def imsave(filename, image, flip_channels=False):
+    def imsave(filename, image, flip_channels=False):  # pragma: no cover
         """Store an image using OpenCV."""
         # To be compatible with the Pillow/PIL version (see below), we have to
         # invert the flip_channels flag.
