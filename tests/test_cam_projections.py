@@ -38,3 +38,7 @@ def test_dot():
         dot(np.zeros((10)), np.zeros((20)))
     with pytest.raises(ValueError):
         dot(np.zeros((10,)), np.zeros((20,)))
+    with pytest.raises(ValueError):
+        dot(np.array([]), np.zeros((20,)))
+    with pytest.raises(ValueError):
+        dot(np.zeros((13,)), np.array([]))
