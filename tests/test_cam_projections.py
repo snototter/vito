@@ -7,7 +7,9 @@ from vito.cam_projections import dot, apply_transformation, \
     project_world_to_image_with_distortion_K_R_t, \
     project_world_to_image_with_distortion_K_R_C, \
     get_groundplane_to_image_homography, shift_points_along_viewing_rays, \
-    apply_dehomogenization, C_from_Rt, C_from_R_t
+    apply_dehomogenization, C_from_Rt, C_from_R_t, \
+    get_image_to_groundplane_homography, \
+    normalize_image_coordinates, normalize_image_coordinates_with_distortion
 
 
 def test_dot():
@@ -113,16 +115,34 @@ def test_apply_projection():
     tmp = project_world_to_image_K_R_C(K, R, C_from_Rt(Rt), pts)
     assert np.all(tmp == z)
 
-    H = get_groundplane_to_image_homography(T)
+    P = P_from_K_R_t(K, R, t)
+    H = get_groundplane_to_image_homography(P)
     assert H.shape[0] == 3 and H.shape[1] == 3
-    assert np.all(H[:, 0] == T[:, 0])
-    assert np.all(H[:, 1] == T[:, 1])
-    assert np.all(H[:, 2] == T[:, 3])
+    assert np.all(H[:, 0] == P[:, 0])
+    assert np.all(H[:, 1] == P[:, 1])
+    assert np.all(H[:, 2] == P[:, 3])
+
+    Hinv = np.linalg.inv(H)
+    H2 = get_image_to_groundplane_homography(P)
+    assert np.all(Hinv == H2)
 
     # Divide by zero (NumPy should take care of this)
     np.seterr(divide='ignore', invalid='ignore')
     x = apply_projection(np.random.rand(3, 4), np.zeros((4, 1)))
     assert np.all(np.isnan(x))
+
+    # Normalization of image coordinates
+    K[0, 1] = 0.05
+    K[0, 2] = 77
+    K[1, 2] = 99
+    img_pts = np.random.rand(2, 100)
+    n_pts = normalize_image_coordinates(K, img_pts)
+    Kinv = np.linalg.inv(K)
+    assert np.all(apply_transformation(Kinv, img_pts) == n_pts)
+
+    n_pts_wo = normalize_image_coordinates_with_distortion(
+        K, np.zeros((5, )), img_pts)
+    assert np.all(n_pts == pytest.approx(n_pts_wo))
 
 
 def test_P():
