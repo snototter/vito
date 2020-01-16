@@ -1,0 +1,6 @@
+[run]
+omit =
+    # Don't consider tests
+    tests/*
+    # version.py is exec'd but not run by vito, thus pytest-cov isn't able to count it correctly
+    vito/version.py
