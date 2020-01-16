@@ -137,7 +137,7 @@ def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
 
 def roi(image_np, rect):
     """Returns the cropped ROI, with rect = [l, t, w, h]."""
-    if rect is None or any([r is None for r in rect]):
+    if image_np is None or rect is None or any([r is None for r in rect]):
         return None
     l, t, w, h = rect
     r, b = l+w, t+h

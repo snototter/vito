@@ -1,7 +1,8 @@
 import numpy as np
 import os
 import pytest
-from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes
+from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
+    ndarray2memory_file, memory_file2ndarray, roi
 from vito.pyutils import safe_shell_output
 
 
@@ -206,3 +207,63 @@ def test_apply_on_bboxes():
     r3 = apply_on_bboxes(x3, boxes, _set, value=42)
     assert np.all(r3 == e42)
     assert r3.dtype == np.uint8
+
+
+def test_np2mem():
+    shapes = [(20, 128), (32, 64, 3), (64, 32, 3)]
+    for s in shapes:
+        if isinstance(s, tuple):
+            x = (255.0 * np.random.rand(*s)).astype(np.uint8)
+        else:
+            x = (255.0 * np.random.rand(s)).astype(np.uint8)
+        mfpng = ndarray2memory_file(x, format='png')
+        y = memory_file2ndarray(mfpng)
+        assert np.all(x[:] == y[:])
+        # Encode as JPG, this should decrease quality - at least we're not
+        # able to decode the original input data
+        mfjpg = ndarray2memory_file(x, format='jpeg')
+        y = memory_file2ndarray(mfjpg)
+        assert not np.all(x[:] == y[:])
+    # PIL assumes a 2D image and performs no checking:
+    with pytest.raises(IndexError):
+        _ = ndarray2memory_file(np.random.rand(3).astype(np.uint8))
+
+
+def test_roi():
+    assert roi(np.zeros((3, 3)), None) == None
+    assert roi(np.zeros((3, 3)), [1, 2, 3, None]) == None
+    assert roi(None, [1, 2, 3, 4]) == None
+    invalid = roi(np.zeros((3, 3), dtype=np.uint8), [1, 1, 0, 1])
+    assert invalid.shape[0] == 1 and invalid.shape[1] == 0
+    invalid = roi(np.zeros((3, 3), dtype=np.uint8), [1, 1, 1, 0])
+    assert invalid.shape[0] == 0 and invalid.shape[1] == 1
+
+    # Proper clipping of corners:
+    x = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.int32)
+    clipped = roi(x, [-1, -3, 2, 4])
+    assert clipped.shape[0] == 1 and clipped.shape[1] == 1
+    assert clipped[0, 0] == x[0, 0]
+    clipped = roi(x, [3, -2, 2, 3])
+    assert clipped.shape[0] == 1 and clipped.shape[1] == 1
+    assert clipped[0, 0] == x[0, 2]
+
+    rects = [
+        (2, 5, 1, 2),
+        (20, 20, 100, 100),
+        (-5, 2, 1, 2)
+    ]
+    for shape in [(10, 10), (10, 10, 2)]:
+        x = np.random.rand(*shape)
+        for rect in rects:
+            roi_ = roi(x, rect)
+            l, t, w, h = rect
+            r, b = l + w, t + h
+            l = max(0, min(x.shape[1]-1, l))
+            r = max(0, min(x.shape[1], r))
+            t = max(0, min(x.shape[0]-1, t))
+            b = max(0, min(x.shape[0], b))
+            if x.ndim == 2:
+                expected = x[t:b, l:r]
+            else:
+                expected = x[t:b, l:r, :]
+            assert np.all(expected[:] == roi_[:])
