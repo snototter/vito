@@ -50,9 +50,9 @@ imvis.imshow(colorized)
 
 
 ## Changelog
-* Upcoming `1.0.4`
+* `1.0.4`
   * Improved test coverage.
-  * Fixed potential future bugs (due to wrong/unexpected user inputs).
+  * Fixed potential future bugs - explicit handling of wrong/unexpected user inputs.
 * `1.0.3`
   * Minor bug fix: handle invalid user inputs in `imvis`.
 * `1.0.2`
