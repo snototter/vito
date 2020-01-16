@@ -14,9 +14,9 @@ __has_np_matmul = pu.compare_version_strings(np.version.version, '1.10.0') >= 0
 matmul = np.matmul if __has_np_matmul else np.dot
 
 
-def dot(a,b):
+def dot(a, b):
     """Dot product of Dx1 vectors.
-    :params a,b: np.array    
+    :params a,b: np.array
     """
     las = len(a.shape)
     lbs = len(b.shape)
@@ -57,7 +57,7 @@ def apply_transformation(T, pts):
             npts = 1
         else:
             npts = pts.shape[1]
-        pts  = np.row_stack((pts, np.ones((1,npts), np.float64)))
+        pts = np.row_stack((pts, np.ones((1, npts), np.float64)))
 
     # Dimension check
     if pts.shape[0] != ndim:
@@ -81,12 +81,12 @@ def apply_dehomogenization(pts):
     :param pts: DxN points
     :returns: (D-1)xN dehomogeneous points
 
-    This will issue a RuntimeWarning if the last dimension is 0. The 
+    This will issue a RuntimeWarning if the last dimension is 0. The
     corresponding division result will be set to nan.
     If you're aware of this, you can suppress the warnings, see:
     https://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
     """
-    return np.divide(pts[:-1,:], pts[-1,:])
+    return np.divide(pts[:-1, :], pts[-1, :])
 
 
 def shift_points_along_viewing_rays(pts, distance):
@@ -100,13 +100,14 @@ def shift_points_along_viewing_rays(pts, distance):
     num_pts = pts.shape[1]
     # Leverage similar triangles
     if isinstance(distance, numbers.Number):
-        shifted = np.row_stack((pts[:-1,:] / pts[-1,:] * distance,
+        shifted = np.row_stack((pts[:-1, :] / pts[-1, :] * distance,
             np.array([distance]*num_pts, dtype=np.float64)))
     else:
         if distance.shape[1] != num_pts:
-            raise ValueError('Number of pts and distances must match: {} points, but {} distances!'.format(num_pts, distance.shape[1]))
+            raise ValueError('Number of pts and distances must match: {} points, but {} distances!'.format(
+                num_pts, distance.shape[1]))
         distance = distance.astype(np.float64)
-        shifted = np.row_stack((np.multiply(pts[:-1,:] / pts[-1,:], distance),
+        shifted = np.row_stack((np.multiply(pts[:-1, :] / pts[-1, :], distance),
             distance))
     return shifted
 
@@ -198,19 +199,19 @@ def project_world_to_image_with_distortion_K_Rt(K, Rt, dist_coeff, coords):
 
     # Perform the "normalized pinhole projection", i.e. shift the points along
     # the viewing rays to the "image plane". This is done via similar triangles:
-    coords_normalized = coords_cam[0:2,:] / coords_cam[2,:]
+    coords_normalized = coords_cam[0:2, :] / coords_cam[2, :]
 
     # Apply distortion model, since we use imperfect optics:
     kappa1, kappa2, rho1, rho2, kappa3 = dist_coeff
-    r2 = np.sum(np.power(coords_normalized, 2), axis=0) # squared radius, r^2 = x^2 + y^2
+    r2 = np.sum(np.power(coords_normalized, 2), axis=0)  # squared radius, r^2 = x^2 + y^2
     r4 = np.multiply(r2, r2)
     r6 = np.multiply(r2, r4)
 
     rd = kappa1 * r2 + kappa2 * r4 + kappa3 * r6
-    radial_distortion = np.multiply(coords_normalized, np.row_stack((rd,rd)))
-    xy = np.multiply(coords_normalized[0,:], coords_normalized[1,:])
-    x2 = np.power(coords_normalized[0,:],2)
-    y2 = np.power(coords_normalized[1,:],2)
+    radial_distortion = np.multiply(coords_normalized, np.row_stack((rd, rd)))
+    xy = np.multiply(coords_normalized[0, :], coords_normalized[1, :])
+    x2 = np.power(coords_normalized[0, :], 2)
+    y2 = np.power(coords_normalized[1, :], 2)
     tdx = 2.0 * rho1 * xy + rho2 * (r2 + 2.0 * x2)
     tdy = rho1 * (r2 + 2.0 * y2) + 2.0 * rho2 * xy
     tangential_distortion = np.row_stack((tdx, tdy))
@@ -227,7 +228,7 @@ def project_world_to_image_with_distortion_K_R_C(K, R, C, dist_coeff, coords):
     """
     R = R.astype(np.float64)
     C = C.astype(np.float64)
-    Rt = np.column_stack((R, -matmul(R,C)))
+    Rt = np.column_stack((R, -matmul(R, C)))
     return project_world_to_image_with_distortion_K_Rt(K, Rt, dist_coeff, coords)
 
 
@@ -260,24 +261,23 @@ def normalize_image_coordinates_with_distortion(K, dist_coeff, pixel_coords):
     # We also use his variable names and naming conventions
     pixel_coords = pixel_coords.astype(np.float64)
     K = K.astype(np.float64)
-    alpha_c = K[0,1] / K[0,0]  # In Bouguet's toolbox, K[0,:] = [f_x, alpha_c * f_x, cc_x], alpha_c is the skew coefficient
-    fc = (K[0,0], K[1,1])
-    cc = (K[0,2], K[1,2])
+    alpha_c = K[0, 1] / K[0, 0]  # In Bouguet's toolbox, K[0,:] = [f_x, alpha_c * f_x, cc_x], alpha_c is the skew coefficient
+    fc = (K[0, 0], K[1, 1])
+    cc = (K[0, 2], K[1, 2])
     dist_coeff = dist_coeff.astype(np.float64)
 
     # Subtract principal point, and divide by the focal length:
-    xdx = (pixel_coords[0,:] - cc[0]) / fc[0]
-    xdy = (pixel_coords[1,:] - cc[1]) / fc[1]
+    xdx = (pixel_coords[0, :] - cc[0]) / fc[0]
+    xdy = (pixel_coords[1, :] - cc[1]) / fc[1]
 
     # Second, undo skew
     xdx = xdx - alpha_c * xdy
-
     x_distort = np.row_stack((xdx, xdy))
 
-	# Third, compensate for lens distortion:
+    # Third, compensate for lens distortion:
     xn = comp_distortion_oulu(x_distort, dist_coeff)
     npts = xn.shape[1]
-    return np.row_stack((xn, np.ones((1,npts), dtype=np.float64)))
+    return np.row_stack((xn, np.ones((1, npts), dtype=np.float64)))
 
 
 def comp_distortion_oulu(xd, k):  # pragma: no cover
@@ -293,14 +293,14 @@ def comp_distortion_oulu(xd, k):  # pragma: no cover
     # Initial guess
     x = xd
     num_pts = xd.shape[1]
-    for _ in range(20):
+    iteration = 0
+    while iteration < 20:
         r_2 = np.sum(np.power(x, 2), axis=0)
         # r_2 = sum(x.^2);
-        k_radial = np.reshape(1.0 + k1 * r_2 + k2 * np.power(r_2, 2) + k3 * np.power(r_2,3), (1,num_pts))
-        # k_radial =  1 + k1 * r_2 + k2 * r_2.^2 + k3 * r_2.^3;
-        _xy = np.multiply(x[0,:], x[1,:])
-        dxx = 2.0 * p1 * _xy +  p2 * (r_2 + 2.0 * np.power(x[0,:],2))
-        dxy = p1 * (r_2 + 2.0 * np.power(x[1,:],2)) + 2.0 * p2 * _xy
+        k_radial = np.reshape(1.0 + k1 * r_2 + k2 * np.power(r_2, 2) + k3 * np.power(r_2, 3), (1, num_pts))
+        _xy = np.multiply(x[0, :], x[1, :])
+        dxx = 2.0 * p1 * _xy + p2 * (r_2 + 2.0 * np.power(x[0, :], 2))
+        dxy = p1 * (r_2 + 2.0 * np.power(x[1, :], 2)) + 2.0 * p2 * _xy
         delta_x = np.row_stack((dxx, dxy))
 
         # Compute relative change (to enable early termination)
@@ -308,14 +308,11 @@ def comp_distortion_oulu(xd, k):  # pragma: no cover
         magnitude_x2 = np.sum(np.power(x, 2), axis=0)
         change = np.divide(magnitude_delta2, magnitude_x2)
 
-        # delta_x = [ ...
-        #     2   * p1 * x(1,:).*x(2,:) + p2 * (r_2 + 2   * x(1,:).^2);...
-        #     p1 * (r_2 + 2   * x(2,:).^2         ) + 2   * p2 * x(1,:).*x(2,:)];
         x = np.divide(xd - delta_x, np.row_stack((k_radial, k_radial)))
-        # x = (xd - delta_x)./(ones(2,1)*k_radial);
         # Stop early if there is no major improvement:
         if np.max(change) < 1e-5:
             break
+        iteration += 1
     return x
 
 
@@ -323,7 +320,7 @@ def get_groundplane_to_image_homography(P):
     """Given the 3x4 camera projection matrix P, returns the homography
     mapping ground plane points onto the image plane."""
     P = P.astype(np.float64)
-    return P[:, [0,1,3]]
+    return P[:, [0, 1, 3]]
 
 
 def get_image_to_groundplane_homography(P):

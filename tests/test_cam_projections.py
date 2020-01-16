@@ -54,7 +54,7 @@ def test_apply_transformation():
     x = apply_transformation(T3d, 2*np.ones((1, 1), dtype=np.uint8))
     assert x.shape[0] == 3 and x.shape[1] == 1
     assert x.dtype == np.float64
-    expected = 2*T3d[:,0] + T3d[:,1]
+    expected = 2*T3d[:, 0] + T3d[:, 1]
     assert np.all(expected.reshape(x.shape) == pytest.approx(x))
 
     with pytest.raises(ValueError):
@@ -140,18 +140,19 @@ def test_P():
         for c in range(P.shape[1]):
             assert P[r, c] == pytest.approx(dot(K[r, :], Rt[:, c]))
 
+
 def test_shift_points_along_viewing_rays():
     invalid_pts = [
         np.float32(3),
         np.float64([17]),
         np.ones((2, )),
         np.ones((4, 1)),
-        np.ones((1,3))
+        np.ones((1, 3))
     ]
     for ip in invalid_pts:
         with pytest.raises(ValueError):
             shift_points_along_viewing_rays(ip, 10)
-    
+
     pts = np.random.rand(3, 42) * 23
     pts_dh = apply_dehomogenization(pts)
     for d in (23.7, np.random.rand(1, pts.shape[1])):
