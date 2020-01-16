@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from vito.imvis import pseudocolor, color_by_id, exemplary_colors
 from vito import colormaps
 
@@ -24,6 +25,15 @@ def test_pseudocolor():
         for r in range(data.shape[0]):
             for c in range(data.shape[1]):
                 assert_color_equal(pc[r, c, :], cm[0])
+
+
+def test_colormap_by_name():
+    cm = colormaps.by_name('HSV')
+    assert cm == colormaps.colormap_hsv_rgb
+    cm = colormaps.by_name('HSV', return_rgb=False)
+    assert cm == colormaps.colormap_hsv_bgr
+    with pytest.raises(KeyError):
+        colormaps.by_name('foo')
 
 
 def test_color_by_id():
