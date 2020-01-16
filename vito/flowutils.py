@@ -15,7 +15,7 @@ def floread(filename):
     Adapted from https://stackoverflow.com/a/28016469/400948
     """
     if sys.byteorder != 'little':
-        raise RuntimeError('Current .flo support requires little-endian architecture!')
+        raise RuntimeError('Current .flo support requires little-endian architecture!')  # pragma: no cover
 
     if filename is None:
         return None

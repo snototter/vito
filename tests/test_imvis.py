@@ -4,9 +4,12 @@ from vito.imvis import pseudocolor, color_by_id, exemplary_colors
 from vito import colormaps
 
 
-def assert_color_equal(a, b):
+def assert_color_equal(a, b, flip=False):
     for c in range(3):
-        assert a[c] == b[c]
+        if flip:
+            assert a[c] == b[2-c]
+        else:
+            assert a[c] == b[c]
 
 
 def test_pseudocolor():
@@ -58,3 +61,5 @@ def test_color_by_id():
     assert_color_equal(color_by_id(nc-1), exemplary_colors[-1])
     assert_color_equal(color_by_id(-1), exemplary_colors[-1])
     assert_color_equal(color_by_id(-3), exemplary_colors[-3])
+    assert_color_equal(color_by_id(nc-1, flip_channels=True), exemplary_colors[-1], flip=True)
+    assert_color_equal(color_by_id(-3, flip_channels=True), exemplary_colors[-3], flip=True)

@@ -210,6 +210,8 @@ def test_apply_on_bboxes():
 
 
 def test_np2mem():
+    assert memory_file2ndarray(None) is None
+
     shapes = [(20, 128), (32, 64, 3), (64, 32, 3)]
     for s in shapes:
         if isinstance(s, tuple):
@@ -230,9 +232,9 @@ def test_np2mem():
 
 
 def test_roi():
-    assert roi(np.zeros((3, 3)), None) == None
-    assert roi(np.zeros((3, 3)), [1, 2, 3, None]) == None
-    assert roi(None, [1, 2, 3, 4]) == None
+    assert roi(np.zeros((3, 3)), None) is None
+    assert roi(np.zeros((3, 3)), [1, 2, 3, None]) is None
+    assert roi(None, [1, 2, 3, 4]) is None
     invalid = roi(np.zeros((3, 3), dtype=np.uint8), [1, 1, 0, 1])
     assert invalid.shape[0] == 1 and invalid.shape[1] == 0
     invalid = roi(np.zeros((3, 3), dtype=np.uint8), [1, 1, 1, 0])

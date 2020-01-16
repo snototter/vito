@@ -154,7 +154,7 @@ def is_tool(name):
         from shutil import which
         return which(name) is not None
     else:
-        return in_ospath(name)
+        return in_ospath(name)  # pragma: no cover
 
 
 def safe_shell_output(*args):
