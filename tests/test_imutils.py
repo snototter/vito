@@ -173,9 +173,7 @@ def test_apply_on_bboxes():
 
     # Exemplary functions
     def _set(img, value):
-        print(img.shape)
         img[:] = value
-        print('changed to', img.shape)
         return img
 
     def _set255(img):
