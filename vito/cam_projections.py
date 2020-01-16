@@ -36,10 +36,8 @@ def dot(a,b):
         for i in range(a.shape[0]):
             sum += a[i] * b[i]
         return sum
-    elif las == 1 or lbs == 1:
-        return np.dot(a, b)
     else:
-        raise ValueError('Parameter shape mismatch')
+        return np.dot(a, b)
 
 
 def apply_transformation(T, pts):
@@ -53,7 +51,10 @@ def apply_transformation(T, pts):
     ndim = T.shape[1]
     # Add homogeneous coordinate if necessary
     if pts.shape[0] == ndim-1:
-        npts = pts.shape[1]
+        if pts.ndim == 1:
+            npts = 1
+        else:
+            npts = pts.shape[1]
         pts  = np.row_stack((pts, np.ones((1,npts), np.float64)))
 
     # Dimension check
@@ -77,8 +78,13 @@ def apply_dehomogenization(pts):
     """Computes the dehomogeneous points, i.e. dividing by the last dimension.
     :param pts: DxN points
     :returns: (D-1)xN dehomogeneous points
+
+    This will issue a RuntimeWarning if the last dimension is 0. The 
+    corresponding division result will be set to nan.
+    If you're aware of this, you can suppress the warnings, see:
+    https://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
     """
-    return pts[:-1,:] / pts[-1,:]
+    return np.divide(pts[:-1,:], pts[-1,:])
 
 
 def shift_points_along_viewing_rays(pts, distance):
@@ -99,6 +105,7 @@ def shift_points_along_viewing_rays(pts, distance):
         shifted = np.row_stack((np.multiply(pts[:-1,:] / pts[-1,:], distance),
             distance))
     return shifted
+
 
 def P_from_K_R_t(K, R, t):
     """Returns the 3x4 projection matrix P = K [R | t]."""
@@ -249,7 +256,7 @@ def normalize_image_coordinates_with_distortion(K, dist_coeff, pixel_coords):
     return np.row_stack((xn, np.ones((1,npts), dtype=np.float64)))
 
 
-def comp_distortion_oulu(xd, k):
+def comp_distortion_oulu(xd, k):  # pragma: no cover
     """Compensates for radial and tangential distortion. Model From Oulu
     university. This code is a Python port from Bouguet's toolbox, namely
     comp_distortion_oulu.m. We use the same/similar variable names."""
@@ -288,14 +295,6 @@ def comp_distortion_oulu(xd, k):
     return x
 
 
-def get_projection_matrix(K, R, t):
-    """Returns the 3x4 camera projection matrix: P = K * [R | t]"""
-    K = K.astype(np.float64)
-    R = R.astype(np.float64)
-    t = t.astype(np.float64)
-    return matmul(K, np.column_stack((R, t)))
-
-
 def get_groundplane_to_image_homography(P):
     """Given the 3x4 camera projection matrix P, returns the homography
     mapping ground plane points onto the image plane."""
@@ -307,5 +306,3 @@ def get_image_to_groundplane_homography(P):
     """Given the 3x4 camera projection matrix P, returns the homography
     mapping image plane points onto the ground plane."""
     return np.linalg.inv(get_groundplane_to_image_homography(P))
-
-
