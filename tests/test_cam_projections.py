@@ -4,7 +4,10 @@ from vito.cam_projections import dot, apply_transformation, \
     apply_projection, P_from_K_R_t, project_world_to_image_K_Rt, \
     project_world_to_image_K_R_t, project_world_to_image_K_R_C, \
     project_world_to_image_with_distortion_K_Rt, \
-    get_groundplane_to_image_homography
+    project_world_to_image_with_distortion_K_R_t, \
+    project_world_to_image_with_distortion_K_R_C, \
+    get_groundplane_to_image_homography, shift_points_along_viewing_rays, \
+    apply_dehomogenization, C_from_Rt, C_from_R_t
 
 
 def test_dot():
@@ -22,11 +25,21 @@ def test_dot():
         dot(np.array([]), np.zeros((20,)))
     with pytest.raises(ValueError):
         dot(np.zeros((13,)), np.array([]))
+    assert dot(np.float32(3), np.float64(7)) == 21
+    assert dot(np.float32(3), np.float64([7])) == 21
+    assert dot(np.float32([3]), np.float64([7])) == 21
 
 
 def test_apply_transformation():
     T2d = np.random.rand(2, 2)
     T3d = np.random.rand(3, 2)
+
+    with pytest.raises(ValueError):
+        x = apply_transformation(T2d, np.int32(2))
+    x = apply_transformation(T2d, np.int32([17]))
+    assert x.shape[0] == 2 and x.shape[1] == 1
+    expected = 17 * T2d[:, 0] + T2d[:, 1]
+    assert np.all(x == expected.reshape(x.shape))
 
     x = apply_transformation(T2d, np.ones((2, 1)))
     assert x.shape[0] == 2 and x.shape[1] == 1
@@ -70,11 +83,35 @@ def test_apply_projection():
     # 3D-2D projection can also be done via:
     y = project_world_to_image_K_Rt(np.eye(3, 3), T, np.zeros((3, 1)))
     assert np.all(y == x)
-    z = project_world_to_image_K_R_t(np.eye(3, 3), T[:, :3], T[:, -1], np.zeros((3, 1)))
+    # Now, try difference project_world_to_image functions:
+    pts = np.random.rand(3, 17)
+    K = np.diag(np.random.rand(3)) * 92
+    K[2, 2] = 1
+    R = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+    t = np.random.rand(3, 1)
+    Rt = np.column_stack((R, t))
+    y = project_world_to_image_K_Rt(K, Rt, pts)
+    z = project_world_to_image_K_R_t(K, R, t, pts)
     assert np.all(z == y)
+    # Or even abusing the projection with(out) distortion
     no_distortion = project_world_to_image_with_distortion_K_Rt(
-        np.eye(3, 3), T, np.zeros((5, 1)), np.zeros((3, 1)))
-    assert np.all(no_distortion == z)
+        K, Rt, np.zeros((5, 1)), pts)
+    assert np.all(no_distortion == pytest.approx(z))
+    # Again, above is the same as:
+    no_distortion = project_world_to_image_with_distortion_K_R_t(
+        K, R, t, np.zeros((5, 1)), pts)
+    assert np.all(no_distortion == pytest.approx(z))
+    # ... and also:
+    no_distortion = project_world_to_image_with_distortion_K_R_C(
+        K, R, C_from_R_t(R, t), np.zeros((5, 1)), pts)
+    assert np.all(no_distortion == pytest.approx(z))
+    # ... it doesn't matter whether we use C_from_R_t or C_from_Rt:
+    no_distortion = project_world_to_image_with_distortion_K_R_C(
+        K, R, C_from_Rt(Rt), np.zeros((5, 1)), pts)
+    assert np.all(no_distortion == pytest.approx(z))
+    # Finally, they're all the same as:
+    tmp = project_world_to_image_K_R_C(K, R, C_from_Rt(Rt), pts)
+    assert np.all(tmp == z)
 
     H = get_groundplane_to_image_homography(T)
     assert H.shape[0] == 3 and H.shape[1] == 3
@@ -103,6 +140,31 @@ def test_P():
         for c in range(P.shape[1]):
             assert P[r, c] == pytest.approx(dot(K[r, :], Rt[:, c]))
 
-# project_world_to_image_K_Rt(K, Rt, world_pts)
-# project_world_to_image_K_R_t
-# TODO project_world_to_image_K_R_C
+def test_shift_points_along_viewing_rays():
+    invalid_pts = [
+        np.float32(3),
+        np.float64([17]),
+        np.ones((2, )),
+        np.ones((4, 1)),
+        np.ones((1,3))
+    ]
+    for ip in invalid_pts:
+        with pytest.raises(ValueError):
+            shift_points_along_viewing_rays(ip, 10)
+    
+    pts = np.random.rand(3, 42) * 23
+    pts_dh = apply_dehomogenization(pts)
+    for d in (23.7, np.random.rand(1, pts.shape[1])):
+        shifted = shift_points_along_viewing_rays(pts, d)
+        expected_x = np.multiply(np.asarray(d), pts_dh[0, :])
+        expected_y = np.multiply(np.asarray(d), pts_dh[1, :])
+        assert np.all(expected_x == shifted[0, :])
+        assert np.all(expected_y == shifted[1, :])
+        assert np.all(shifted[2, :] == d)
+
+    with pytest.raises(ValueError):
+        shift_points_along_viewing_rays(pts, np.random.rand(1, pts.shape[1] - 1))
+    with pytest.raises(ValueError):
+        shift_points_along_viewing_rays(pts, np.random.rand(1, pts.shape[1] + 1))
+    with pytest.raises(ValueError):
+        shift_points_along_viewing_rays(pts, np.random.rand(2, 3))

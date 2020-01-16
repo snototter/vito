@@ -46,6 +46,8 @@ def apply_transformation(T, pts):
     :param pts: DxN or (D-1)xN data points to transform. If dimension is D-1,
         a homogeneous dimension will be added.
     """
+    if pts.ndim == 0:
+        raise ValueError('Input coordinates must be DxN or (D-1)xN, not scalar.')
     T = T.astype(np.float64)
     pts = pts.astype(np.float64)
     ndim = T.shape[1]
@@ -92,6 +94,8 @@ def shift_points_along_viewing_rays(pts, distance):
     used with 3xN pts: x and y coordinates will be computed, such that
     z=distance; distance can be a scalar or a 1xN array
     """
+    if pts.ndim != 2 or pts.shape[0] != 3:
+        raise ValueError('Input coordinates must be of shape 3xN.')
     pts = pts.astype(np.float64)
     num_pts = pts.shape[1]
     # Leverage similar triangles
@@ -113,6 +117,26 @@ def P_from_K_R_t(K, R, t):
     R = R.astype(np.float64)
     t = t.astype(np.float64)
     return matmul(K, np.column_stack((R, t)))
+
+
+def t_from_R_C(R, C):
+    """Returns the 3x1 translation vector t = -RC."""
+    return -matmul(R, C)
+
+
+def C_from_R_t(R, t):
+    """Returns the origin of the coordinate system, C = -R't."""
+    return -matmul(np.transpose(R), t)
+
+
+def C_from_Rt(Rt):
+    """Returns the origin of the coordinate system, C = -R't."""
+    return C_from_R_t(Rt[:, :3], Rt[:, 3])
+
+
+def Rt_from_R_C(R, C):
+    """Returns the 3x4 extrinsics [R | t], where t = -RC."""
+    return np.column_stack((R, t_from_R_C(R, C)))
 
 
 def project_world_to_image_K_Rt(K, Rt, world_pts):
@@ -150,7 +174,7 @@ def project_world_to_image_K_R_C(K, R, C, world_pts):
     """
     R = R.astype(np.float64)
     C = C.astype(np.float64)
-    Rt = np.column_stack((R, -matmul(R,C)))
+    Rt = Rt_from_R_C(R, C)
     return project_world_to_image_K_Rt(K, Rt, world_pts)
 
 
