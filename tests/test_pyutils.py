@@ -159,6 +159,7 @@ def test_log_nsec(capsys):
 
 
 def test_version():
+    # Ensure that tests fail upon major API change
     import vito
     assert compare_version_strings(vito.__version__, "1.0") > 0
-    
+    assert compare_version_strings(vito.__version__, "2") < 0
