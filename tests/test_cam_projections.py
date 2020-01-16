@@ -189,3 +189,4 @@ def test_shift_points_along_viewing_rays():
         shift_points_along_viewing_rays(pts, np.random.rand(1, pts.shape[1] + 1))
     with pytest.raises(ValueError):
         shift_points_along_viewing_rays(pts, np.random.rand(2, 3))
+#TODO test projections with distortions (works in practice, but unit tests are only for D=[0])
