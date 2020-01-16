@@ -104,7 +104,7 @@ def colorize_uv(
     return vis
 
 
-def colorize_flow(flow, max_val=None, return_rgb=True, epsilon=1e-5):
+def colorize_flow(flow, max_val=None, return_rgb=True):
     """
     Returns the widely used flow visualization.
 
@@ -116,7 +116,6 @@ def colorize_flow(flow, max_val=None, return_rgb=True, epsilon=1e-5):
     :param max_val:    float, if not None, flow values will be clipped to
                        the range [0, max_val].
     :param return_rgb: bool, set to False if you work with BGR images.
-    :param epsilon:    small value to prevent division-by-zero.
     :return:  HxWx3 uint8 numpy ndarray.
     """
     # Sanity check
@@ -132,7 +131,8 @@ def colorize_flow(flow, max_val=None, return_rgb=True, epsilon=1e-5):
     # Normalize flow
     rad = np.sqrt(np.square(u) + np.square(v))
     rad_max = np.max(rad)
-    u = u / (rad_max + epsilon)
-    v = v / (rad_max + epsilon)
+    if rad_max > 0:    
+        u = u / rad_max
+        v = v / rad_max
 
     return colorize_uv(u, v, return_rgb)

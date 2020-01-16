@@ -187,3 +187,5 @@ def overlay(img1, img2, weight1, mask1=None):
         # idx = np.where(mask1 > 0)
         # out[idx] = weight1 * img1[idx] + (1. - weight1) * img2[idx]
     return (scale2 * out).astype(target_dtype)
+
+#TODO once vitocpp is available, add convenience wrappers similar to pvt

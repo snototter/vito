@@ -156,3 +156,9 @@ def test_log_nsec(capsys):
     log_nsec('override', 0)
     captured = capsys.readouterr()
     assert captured.out == 'override\n'
+
+
+def test_version():
+    import .. as vito
+    assert compare_version_strings(vito.__version__, "1.0") > 0
+    
