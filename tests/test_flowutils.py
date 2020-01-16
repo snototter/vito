@@ -49,9 +49,9 @@ def test_flosave(tmp_path):
     # Try saving an array of invalid shape as flow
     invalid = [
         np.zeros((3,), dtype=np.int32),
-        np.zeros((15,1), dtype=np.uint8),
-        np.ones((10,2), dtype=np.float32),
-        np.zeros((20,30,1), dtype=np.float32),
+        np.zeros((15, 1), dtype=np.uint8),
+        np.ones((10, 2), dtype=np.float32),
+        np.zeros((20, 30, 1), dtype=np.float32),
         np.ones((4, 7, 3), dtype=np.float64)
     ]
     for i in invalid:
@@ -68,9 +68,9 @@ def test_colorize():
     # Try invalid inputs
     invalid = [
         np.zeros((3,), dtype=np.int32),
-        np.zeros((15,1), dtype=np.uint8),
-        np.ones((10,2), dtype=np.float32),
-        np.zeros((20,30,1), dtype=np.float32),
+        np.zeros((15, 1), dtype=np.uint8),
+        np.ones((10, 2), dtype=np.float32),
+        np.zeros((20, 30, 1), dtype=np.float32),
         np.ones((4, 7, 3), dtype=np.float64)
     ]
     for i in invalid:
@@ -85,19 +85,19 @@ def test_colorize():
     for ex in examples:
         cf = colorize_flow(ex, max_val=None)
         assert np.all(cf[:] == 255)
-    
+
     cf = colorize_flow(np.ones((10, 10, 2), dtype=np.float32))
-    assert np.all(cf[:,:,0] == 255)
-    assert np.all(cf[:,:,1] == 114)
-    assert np.all(cf[:,:,2] == 0)
+    assert np.all(cf[:, :, 0] == 255)
+    assert np.all(cf[:, :, 1] == 114)
+    assert np.all(cf[:, :, 2] == 0)
     cf = colorize_flow(np.ones((10, 10, 2), dtype=np.float32), return_rgb=False)
-    assert np.all(cf[:,:,2] == 255)
-    assert np.all(cf[:,:,1] == 114)
-    assert np.all(cf[:,:,0] == 0)
+    assert np.all(cf[:, :, 2] == 255)
+    assert np.all(cf[:, :, 1] == 114)
+    assert np.all(cf[:, :, 0] == 0)
     cf = colorize_flow(-np.ones((10, 10, 2), dtype=np.float32))
-    assert np.all(cf[:,:,0] == 0)
-    assert np.all(cf[:,:,1] == 52)
-    assert np.all(cf[:,:,2] == 255)
+    assert np.all(cf[:, :, 0] == 0)
+    assert np.all(cf[:, :, 1] == 52)
+    assert np.all(cf[:, :, 2] == 255)
     # max_val should clip values into [0, max_val]
     cf = colorize_flow(-np.ones((10, 10, 2), dtype=np.float32), max_val=0)
     assert np.all(cf[:] == 255)
