@@ -51,7 +51,7 @@ except:
 def imread(filename, flip_channels=False, **kwargs):
     """Load an image (using PIL) into a NumPy array.
     Multi-channel images are returned as RGB unless you set flip_channels=True.
-    
+
     Optional kwargs will be passed on to PIL's Image.convert(). Thus, you can
     specifiy PIL's loading 'mode', e.g. 'RGB' for color, 'RGBA' for a
     transparent image and 'L' for grayscale.
@@ -65,7 +65,7 @@ def imread(filename, flip_channels=False, **kwargs):
     # https://pythonhosted.org/pypng/ex.html#reading
     # For now, PIL provides all we need
     image = np.asarray(Image.open(filename).convert(**kwargs))
-    
+
     if flip_channels:
         return flip_layers(image)
     else:

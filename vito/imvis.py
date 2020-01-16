@@ -10,10 +10,11 @@ from . import imutils
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
+    import pytest
 
     # Disable coverage report as testing this automatically would be hardly feasible
     @pytest.mark.no_cover
-    def imshow(img_np, title="Image", flip_channels=False, wait_ms=10):
+    def imshow(img_np, title="Image", flip_channels=False, wait_ms=-1):
         """
         Convenience 1-liner to display image and wait for key input.
 

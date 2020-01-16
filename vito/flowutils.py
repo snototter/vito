@@ -131,7 +131,7 @@ def colorize_flow(flow, max_val=None, return_rgb=True):
     # Normalize flow
     rad = np.sqrt(np.square(u) + np.square(v))
     rad_max = np.max(rad)
-    if rad_max > 0:    
+    if rad_max > 0:
         u = u / rad_max
         v = v / rad_max
 
