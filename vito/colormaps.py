@@ -14,7 +14,7 @@ colormap_names = [
 
 def by_name(colormap_name, return_rgb=True):
     cmn = colormap_name.lower()
-    if cmn == 'gray' or cmn == 'grayscale':
+    if cmn == 'gray' or cmn == 'grayscale' or cmn == 'grey' or cmn == 'greyscale':
         return colormap_gray
     return globals()['colormap_{:s}_{:s}'.format(
             cmn,

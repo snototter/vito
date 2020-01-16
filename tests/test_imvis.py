@@ -32,6 +32,21 @@ def test_colormap_by_name():
     assert cm == colormaps.colormap_hsv_rgb
     cm = colormaps.by_name('HSV', return_rgb=False)
     assert cm == colormaps.colormap_hsv_bgr
+
+    cm = colormaps.by_name('turbo')
+    assert cm == colormaps.colormap_turbo_rgb
+    cm = colormaps.by_name('TURBO', return_rgb=False)
+    assert cm == colormaps.colormap_turbo_bgr
+
+    cm = colormaps.by_name('gray')
+    assert cm == colormaps.colormap_gray
+    cm = colormaps.by_name('grayscale', return_rgb=False)
+    assert cm == colormaps.colormap_gray
+    cm = colormaps.by_name('grey')
+    assert cm == colormaps.colormap_gray
+    cm = colormaps.by_name('greyscale', return_rgb=False)
+    assert cm == colormaps.colormap_gray
+
     with pytest.raises(KeyError):
         colormaps.by_name('foo')
 
