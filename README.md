@@ -8,11 +8,6 @@ Python utilities for common computer vision tasks.
 The goal of this package is to provide a lightweight package helping you with standard/recurring image manipulation tasks.
 
 
-## Dependencies
-* `numpy`
-* `Pillow`
-
-
 ## Examples
 * Pseudocoloring:
 ```python
@@ -47,6 +42,11 @@ depth = imutils.imread('depth.png')
 colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
 imvis.imshow(colorized)
 ```
+
+
+## Dependencies
+* `numpy`
+* `Pillow`
 
 
 ## Changelog
@@ -90,6 +90,7 @@ imvis.imshow(colorized)
 * `0.0.1`
   * Initial public release.
   * Contains common python/language and camera projection utils.
+
 
 ## TODO List
 * anonymization utils
