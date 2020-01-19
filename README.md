@@ -21,7 +21,7 @@ The goal of this package is to provide a lightweight package helping you with st
   imvis.imshow(colorized)
   ```
   Example visualizations: colorization via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
-  ![Pseudocoloring Example](./examples/visualizations/example-pseudocolor.jpg)
+  ![Pseudocoloring Example](./examples/visualizations/example-pseudocolor.png)
 * Optical flow:
   ```python
   from vito import flowutils
