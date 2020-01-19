@@ -15,27 +15,29 @@ The goal of this package is to provide a lightweight package helping you with st
 
 ## Examples
 * Pseudocoloring:
-```python
-from vito import imutils
-from vito import imvis
+  ```python
+  from vito import imutils
+  from vito import imvis
 
-# Load a single-channel image
-peaks = imutils.imread('peaks.png', mode='L')
-# Colorize it
-colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_parula_rgb)
-imvis.imshow(colorized)
-```
+  # Load a single-channel image
+  peaks = imutils.imread('peaks.png', mode='L')
+  # Colorize it
+  colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_viridis_rgb)
+  imvis.imshow(colorized)
+  ```
+  Example visualizations: colorization via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
+  ![Pseudocoloring Example](./examples/visualizations/example-pseudocolor.jpg)
 * Optical flow:
-```python
-from vito import flowutils
-from vito import imvis
+  ```python
+  from vito import flowutils
+  from vito import imvis
 
-# Load optical flow file
-flow = flowutils.floread('color_wheel.flo')
-# Colorize it
-colorized = flowutils.colorize_flow(flow)
-imvis.imshow(colorized)
-```
+  # Load optical flow file
+  flow = flowutils.floread('color_wheel.flo')
+  # Colorize it
+  colorized = flowutils.colorize_flow(flow)
+  imvis.imshow(colorized)
+  ```
 * Depth image stored as 16-bit PNG:
 ```python
 from vito import imread
