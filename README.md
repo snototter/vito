@@ -9,16 +9,23 @@ The goal of this package is to provide a lightweight package helping you with st
 
 
 ## Examples
-* **Pseudocoloring:**
+* **Pseudocoloring:** Standard monochrome image and 16-bit depth image.
   ```python
   from vito import imutils
   from vito import imvis
 
-  # Load a single-channel image
+  # Load a single-channel image (data.dtype will be numpy.uint8)
   peaks = imutils.imread('peaks.png', mode='L')
   # Colorize it
   colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_viridis_rgb)
   imvis.imshow(colorized)
+
+  # Load 16-bit depth stored as PNG (data.dtype will be numpy.int32)
+  depth = imutils.imread('depth.png')
+  # Colorize it
+  colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
+  imvis.imshow(colorized)
+
   ```
   Example visualizations: colorization via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
   ![Pseudocoloring Example](./examples/visualizations/example-pseudocolor.png)
@@ -37,18 +44,13 @@ The goal of this package is to provide a lightweight package helping you with st
   ![Optical Flow Example](./examples/visualizations/example-flowvis.png)
 * **Pixelation:**
   ```python
-  TODO apply_on_bboxes + pixelate/blur
-  ```
-* **Depth image stored as 16-bit PNG:**
-  ```python
-  from vito import imread
+  from vito import anonymization
+  from vito import imutils
   from vito import imvis
 
-  # Load 16-bit depth (will be of type np.int32)
-  depth = imutils.imread('depth.png')
-  # Colorize it
-  colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
-  imvis.imshow(colorized)
+  img = imutils.imread('faces.jpg')
+  face_rects = [(l0, t0, w0, h0), (l1, t1, w1, h1), ... ]
+  TODO apply_on_bboxes + pixelate/blur
   ```
 * For more examples (or if you prefer having a simple GUI to change visualization/analyse your data), see also the [**iminspect**](https://pypi.org/project/iminspect) package (which uses `vito` under the hood).
 
