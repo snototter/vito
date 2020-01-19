@@ -70,7 +70,7 @@ The goal of this package is to provide a lightweight package helping you with st
   * Additional tests and minor improvements (potential bug fixes, especially for edge case inputs).
   * Ensure default image I/O parametrization always returns/saves/loads color images as RGB (even if OpenCV is available/used on your system).
 * `1.0.1`
-  * Fix colorizing boolean masks (where mask[:] = True or mask[:] = False).
+  * Fix colorizing boolean masks (where `mask[:] = True` or `mask[:] = False`).
 * `1.0.0`
   * Rename flow package to `flowutils`.
 * `0.3.2`
