@@ -9,7 +9,7 @@ The goal of this package is to provide a lightweight package helping you with st
 
 
 ## Examples
-* Pseudocoloring:
+* *Pseudocoloring:*
   ```python
   from vito import imutils
   from vito import imvis
@@ -22,7 +22,7 @@ The goal of this package is to provide a lightweight package helping you with st
   ```
   Example visualizations: colorization via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
   ![Pseudocoloring Example](./examples/visualizations/example-pseudocolor.png)
-* Optical flow:
+* *Optical flow:*
   ```python
   from vito import flowutils
   from vito import imvis
@@ -33,17 +33,23 @@ The goal of this package is to provide a lightweight package helping you with st
   colorized = flowutils.colorize_flow(flow)
   imvis.imshow(colorized)
   ```
+  Examplary visualization: Optical flow (standard color wheel visualization) and corresponding RGB frame for one frame of the [MPI Sintel Flow](http://sintel.is.tue.mpg.de) dataset.
+  ![Optical Flow Example](./examples/visualizations/example-flowvis.png)
 * Depth image stored as 16-bit PNG:
-```python
-from vito import imread
-from vito import imvis
+  ```python
+  from vito import imread
+  from vito import imvis
 
-# Load 16-bit depth (will be of type np.int32)
-depth = imutils.imread('depth.png')
-# Colorize it
-colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
-imvis.imshow(colorized)
-```
+  # Load 16-bit depth (will be of type np.int32)
+  depth = imutils.imread('depth.png')
+  # Colorize it
+  colorized = imvis.pseudocolor(depth, limits=None, color_map=colormaps.colormap_turbo_rgb)
+  imvis.imshow(colorized)
+  ```
+* *Pixelation:*
+  ```python
+  TODO apply_on_bboxes + pixelate/blur
+  ```
 
 
 ## Dependencies
