@@ -2,7 +2,7 @@ import numpy as np
 import os
 import pytest
 from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
-    ndarray2memory_file, memory_file2ndarray, roi
+    ndarray2memory_file, memory_file2ndarray, roi, pad
 from vito.pyutils import safe_shell_output
 
 
@@ -267,3 +267,54 @@ def test_roi():
             else:
                 expected = x[t:b, l:r, :]
             assert np.all(expected[:] == roi_[:])
+
+
+def test_pad():
+    assert pad(None, 3) is None
+    data = np.random.randint(0, 255, (2, 3))
+    with pytest.raises(ValueError):
+        pad(data, 0)
+    with pytest.raises(ValueError):
+        pad(data, -17)
+    padded = pad(data, 1, color=None)
+    assert padded.shape[0] == data.shape[0] + 2
+    assert padded.shape[1] == data.shape[1] + 2
+    assert padded.ndim == 3 and padded.shape[2] == 4
+    assert np.all(padded[:, 0] == 0) and np.all(padded[0, :] == 0)
+    assert np.all(padded[1, 1:-1, 0] == data[0, :])
+    with pytest.raises(RuntimeError):
+        pad(np.dstack((data, data)), 1, None)
+    # Provide valid color as scalar and tuple
+    padded = pad(data, 2, color=3)
+    assert padded.shape[0] == data.shape[0] + 4
+    assert padded.shape[1] == data.shape[1] + 4
+    assert padded.ndim == data.ndim or (padded.ndim == 3 and padded.shape[2] == 1)
+    assert np.all(padded[:, 0] == 3) and np.all(padded[0, :] == 3)
+    assert np.all(padded[2:-2, 2:-2, 0] == data)
+    # ... tuple
+    padded = pad(data, 8, color=(200, 200, 200))
+    assert padded.shape[0] == data.shape[0] + 16
+    assert padded.shape[1] == data.shape[1] + 16
+    assert padded.ndim == data.ndim or (padded.ndim == 3 and padded.shape[2] == 1)
+    assert np.all(padded[:, 0] == 200) and np.all(padded[0, :] == 200)
+    assert np.all(padded[8:-8, 8:-8, 0] == data)
+    # Multi-channel image
+    data = np.random.randint(0, 255, (2, 3, 3))
+    color = np.random.randint(0, 255, (3,))
+    padded = pad(data, 1, color=color)
+    assert padded.shape[0] == data.shape[0] + 2
+    assert padded.shape[1] == data.shape[1] + 2
+    assert padded.ndim == data.ndim
+    for c in range(3):
+        assert np.all(padded[:, 0, c] == color[c]) and np.all(padded[0, :, c] == color[c])
+        assert np.all(padded[1:-1, 1:-1, c] == data[:, :, c])
+    # ... 4-channel        
+    data = np.random.randint(0, 255, (2, 3, 4))
+    color = np.random.randint(0, 255, (4,))
+    padded = pad(data, 1, color=color)
+    assert padded.shape[0] == data.shape[0] + 2
+    assert padded.shape[1] == data.shape[1] + 2
+    assert padded.ndim == data.ndim and padded.shape[2] == 4
+    for c in range(3):
+        assert np.all(padded[:, 0, c] == color[c]) and np.all(padded[0, :, c] == color[c])
+        assert np.all(padded[1:-1, 1:-1, c] == data[:, :, c])

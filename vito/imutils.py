@@ -152,3 +152,43 @@ def roi(image_np, rect):
     if len(image_np.shape) == 2:
         return image_np[t:b, l:r]
     return image_np[t:b, l:r, :]
+
+
+def pad(image_np, border, color=None):
+    """Pad the image by 'border' pixels in each direction.
+
+    :param image_np: HxWxC numpy ndarray.
+    :param border: int > 0.
+    :param color: If None, border will be transparent.
+                  Otherwise, the border will be drawn in the
+                  corresponding color (RGB/BGR tuple or scalar).
+    :return: (H+2*border)x(W+2*border)xC or x4 numpy ndarray.
+    """
+    if image_np is None:
+        return None
+    if border < 1:
+        raise ValueError("Border must be > 0")
+    h, w = image_np.shape[:2]
+    c = image_np.shape[2] if image_np.ndim == 3 else 1
+    if color is None:
+        # RGB/BGR+A output
+        out = np.zeros((h + 2*border, w + 2*border, 4), dtype=image_np.dtype)
+        mask = np.ones((h, w), dtype=image_np.dtype)
+        out[border:-border, border:-border, 3] = mask
+        if c in [1, 3, 4]:
+            for i in range(max(3, c)):
+                out[border:-border, border:-border, i] = image_np if c == 1 else image_np[:, :, i]
+            return out
+        else:
+            raise RuntimeError("Invalid input shape, only 1, 3 or 4 channel images are supported!")
+    else:
+        out = np.zeros((h + 2*border, w + 2*border, c), dtype=image_np.dtype)
+        if isinstance(color, (list, tuple, np.ndarray)):
+            for i in range(c):
+                out[:, :, i] = 0 if i >= len(color) else color[i]
+        else:
+            out[:] = color
+        for i in range(c):
+            out[border:-border, border:-border, i] = image_np if c == 1 else image_np[:, :, i]
+        return out
+
