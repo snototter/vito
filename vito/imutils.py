@@ -191,4 +191,3 @@ def pad(image_np, border, color=None):
         for i in range(c):
             out[border:-border, border:-border, i] = image_np if c == 1 else image_np[:, :, i]
         return out
-

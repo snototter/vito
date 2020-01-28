@@ -308,7 +308,7 @@ def test_pad():
     for c in range(3):
         assert np.all(padded[:, 0, c] == color[c]) and np.all(padded[0, :, c] == color[c])
         assert np.all(padded[1:-1, 1:-1, c] == data[:, :, c])
-    # ... 4-channel        
+    # ... 4-channel
     data = np.random.randint(0, 255, (2, 3, 4))
     color = np.random.randint(0, 255, (4,))
     padded = pad(data, 1, color=color)
