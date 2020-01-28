@@ -61,6 +61,8 @@ The goal of this package is to provide a lightweight package helping you with st
 
 
 ## Changelog
+* `1.1.1`
+  * Maximum alpha channel value derived from data type.
 * `1.1.0`
   * Added padding functionality.
 * `1.0.4`
