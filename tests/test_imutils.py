@@ -32,6 +32,9 @@ def test_imread():
     for fn in ['', 'a-non-existing.file']:
         with pytest.raises(FileNotFoundError):
             imread(fn)
+    # Forget the keyword to be passed on to PIL
+    with pytest.raises(ValueError):
+        imread(os.path.join(exdir, 'flamingo.jpg'), 'RGB')
     # Load RGB JPG
     img = imread(os.path.join(exdir, 'flamingo.jpg'))
     assert img.ndim == 3 and img.shape[2] == 3
