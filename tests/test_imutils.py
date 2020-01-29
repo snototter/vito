@@ -2,7 +2,7 @@ import numpy as np
 import os
 import pytest
 from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
-    ndarray2memory_file, memory_file2ndarray, roi, pad
+    ndarray2memory_file, memory_file2ndarray, roi, pad, rgb2gray
 from vito.pyutils import safe_shell_output
 
 
@@ -321,3 +321,17 @@ def test_pad():
     for c in range(3):
         assert np.all(padded[:, 0, c] == color[c]) and np.all(padded[0, :, c] == color[c])
         assert np.all(padded[1:-1, 1:-1, c] == data[:, :, c])
+
+
+def test_rgb2gray():
+    x = np.zeros((2, 3, 4), dtype=np.uint8)
+    frgb = [0.2989, 0.5870, 0.1140]
+    fbgr = frgb[::-1]
+    for c in range(3):
+        y = x.copy()
+        y[:, :, c] = 255
+        g = rgb2gray(y, False)
+        assert g.ndim == 2 or (g.ndim == 3 and g.shape[2] == 1)
+        assert np.all(g[:] == np.uint8(frgb[c]*255.0))
+        g = rgb2gray(y, True)
+        assert np.all(g[:] == np.uint8(fbgr[c]*255.0))

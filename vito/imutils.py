@@ -25,6 +25,17 @@ def flip_layers(nparray):
     return nparray
 
 
+def rgb2gray(nparray, is_bgr=False):
+    """
+    Convert RGB image to grayscale using L = 0.2989 R + 0.5870 G + 0.1140 B.
+    """
+    if is_bgr:
+        return np.dot(nparray[..., :3], [0.1140, 0.5870, 0.2989]).astype(nparray.dtype)
+    else:
+        return np.dot(nparray[..., :3], [0.2989, 0.5870, 0.1140]).astype(nparray.dtype)
+    
+
+
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
