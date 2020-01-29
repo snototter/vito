@@ -187,7 +187,7 @@ def pad(image_np, border, color=None):
         # RGB/BGR+A output
         out = np.zeros((h + 2*border, w + 2*border, 4), dtype=image_np.dtype)
         mask = np.zeros((h, w), dtype=image_np.dtype)
-        mask[:] = np.iinfo(image_np.dtype).max
+        mask[border:-border, border:-border] = np.iinfo(image_np.dtype).max
         out[border:-border, border:-border, 3] = mask
         if c in [1, 3, 4]:
             for i in range(max(3, c)):
