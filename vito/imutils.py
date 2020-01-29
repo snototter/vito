@@ -60,6 +60,8 @@ def imread(filename, flip_channels=False, **kwargs):
         return None
     if not os.path.exists(filename):
         raise FileNotFoundError('Image %s does not exist' % filename)
+    if not isinstance(flip_channels, bool):
+        raise ValueError('Parameter "flip_channels" must be boolean - you probably forgot the keyword.')
     # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
     # bit depths, we should look into using pypng, see documentation at
     # https://pythonhosted.org/pypng/ex.html#reading
