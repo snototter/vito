@@ -7,6 +7,9 @@ from vito.pyutils import safe_shell_output
 
 
 def test_flip_layers():
+    # Invalid input gracefully handled
+    assert flip_layers(None) is None
+
     # Single channel image
     x = np.random.rand(3, 3)
     xf = flip_layers(x)
@@ -182,6 +185,8 @@ def test_apply_on_bboxes():
     def _set255(img):
         return _set(img, 255)
 
+    assert apply_on_bboxes(None, boxes, _set255) is None
+
     # No kwargs:
     r1 = apply_on_bboxes(x1, boxes, _set255).copy()
     assert np.all(r1 == e255[:, :, 0])
@@ -212,6 +217,7 @@ def test_apply_on_bboxes():
 
 def test_np2mem():
     assert memory_file2ndarray(None) is None
+    assert ndarray2memory_file(None) is None
 
     shapes = [(20, 128), (32, 64, 3), (64, 32, 3)]
     for s in shapes:
@@ -324,6 +330,7 @@ def test_pad():
 
 
 def test_rgb2gray():
+    assert rgb2gray(None) is None
     x = np.zeros((2, 3, 4), dtype=np.uint8)
     frgb = [0.2989, 0.5870, 0.1140]
     fbgr = frgb[::-1]

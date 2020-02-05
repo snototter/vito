@@ -16,6 +16,8 @@ def flip_layers(nparray):
     Flip RGB to BGR image data (numpy ndarray).
     Also accepts rgbA/bgrA and single channel images without crashing.
     """
+    if nparray is None:
+        return None
     if len(nparray.shape) == 3:
         if nparray.shape[2] == 4:
             # We got xyzA, make zyxA
@@ -29,6 +31,8 @@ def rgb2gray(nparray, is_bgr=False):
     """
     Convert RGB image to grayscale using L = 0.2989 R + 0.5870 G + 0.1140 B.
     """
+    if nparray is None:
+        return None
     if is_bgr:
         return np.dot(nparray[..., :3], [0.1140, 0.5870, 0.2989]).astype(nparray.dtype)
     else:
@@ -88,6 +92,8 @@ def imread(filename, flip_channels=False, **kwargs):
 def ndarray2memory_file(np_data, format='png'):
     """Convert numpy (image) array to ByteIO stream.
     Useful to stream an image via sockets."""
+    if np_data is None:
+        return None
     img = Image.fromarray(np_data)
     img_memory_file = io.BytesIO()
     img.save(img_memory_file, format)
@@ -135,6 +141,8 @@ def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
     :return: numpy ndarray, a copy of the input image after applying the given
              function on each (valid) bounding box
     """
+    if image_np is None:
+        return None
     # Ensure the image is writeable
     image_np = image_np.copy()
     # Prevent invalid memory access

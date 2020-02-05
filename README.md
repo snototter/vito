@@ -61,6 +61,8 @@ The goal of this package is to provide a lightweight package helping you with st
 
 
 ## Changelog
+* `1.1.4`
+  * Explicitly handle `None` inputs to `imutils`.
 * `1.1.3`
   * Fix transparent borders when padding.
 * `1.1.2`
