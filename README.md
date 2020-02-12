@@ -28,7 +28,7 @@ The goal of this package is to provide a lightweight package helping you with st
 
   ```
   Example visualizations: colorization via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
-  ![Pseudocoloring Example](./examples/visualizations/example-pseudocolor.png)
+  ![Pseudocoloring Example](https://github.com/snototter/vito/raw/master/examples/visualizations/example-pseudocolor.png)
 * **Optical flow:**
   ```python
   from vito import flowutils
@@ -41,7 +41,7 @@ The goal of this package is to provide a lightweight package helping you with st
   imvis.imshow(colorized)
   ```
   Examplary visualization: Optical flow (standard color wheel visualization) and corresponding RGB frame for one frame of the [MPI Sintel Flow](http://sintel.is.tue.mpg.de) dataset.
-  ![Optical Flow Example](./examples/visualizations/example-flowvis.png)
+  ![Optical Flow Example](https://github.com/snototter/vito/raw/master/examples/visualizations/example-flowvis.png)
 * **Pixelation:**
   ```python
   from vito import anonymization
