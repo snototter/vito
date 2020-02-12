@@ -164,7 +164,6 @@ def project_world_to_image_K_R_t(K, R, t, world_pts):
     return project_world_to_image_K_Rt(K, Rt, world_pts)
 
 
-# TODO test
 def project_world_to_image_K_R_C(K, R, C, world_pts):
     """Project 3D world points onto the image plane, assuming you already
     calibrated your cameras and rectified your images.
@@ -221,7 +220,6 @@ def project_world_to_image_with_distortion_K_Rt(K, Rt, dist_coeff, coords):
     return apply_projection(K, coords_corrected)
 
 
-# TODO this is not tested
 def project_world_to_image_with_distortion_K_R_C(K, R, C, dist_coeff, coords):
     """Project 3D world points onto the image plane, compensating for the lens
     distortion. See project_world_to_image_with_distortion_K_Rt()
@@ -232,7 +230,6 @@ def project_world_to_image_with_distortion_K_R_C(K, R, C, dist_coeff, coords):
     return project_world_to_image_with_distortion_K_Rt(K, Rt, dist_coeff, coords)
 
 
-# TODO test
 def project_world_to_image_with_distortion_K_R_t(K, R, t, dist_coeff, coords):
     """Project 3D world points onto the image plane, compensating for the lens
     distortion. See project_world_to_image_with_distortion_K_Rt()
