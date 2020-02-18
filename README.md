@@ -1,5 +1,6 @@
 # vito - Vision Tools
 [![View on PyPI](https://badge.fury.io/py/vito.svg)](https://pypi.org/project/vito)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/vito.svg)](https://pypi.org/project/vito)
 [![Build Status](https://travis-ci.com/snototter/vito.svg?branch=master)](https://travis-ci.com/snototter/vito)
 [![Coverage Status](https://coveralls.io/repos/github/snototter/vito/badge.svg?branch=master)](https://coveralls.io/github/snototter/vito?branch=master)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
