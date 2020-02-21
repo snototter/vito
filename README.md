@@ -8,6 +8,7 @@
 Python utilities for common computer vision tasks.
 The goal of this package is to provide a lightweight package helping you with standard/recurring image manipulation tasks.
 
+More advanced functionality is provided by the [`vcp/vitocpp`](https://github.com/snototter/vitocpp) library, which is a C++ implementation with Python 3 bindings. These bindings of `vcp` partially build upon `vito`.
 
 ## Examples
 * **Pseudocoloring:** 
