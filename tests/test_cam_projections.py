@@ -9,7 +9,8 @@ from vito.cam_projections import dot, apply_transformation, \
     get_groundplane_to_image_homography, shift_points_along_viewing_rays, \
     apply_dehomogenization, C_from_Rt, C_from_R_t, \
     get_image_to_groundplane_homography, \
-    normalize_image_coordinates, normalize_image_coordinates_with_distortion
+    normalize_image_coordinates, normalize_image_coordinates_with_distortion, \
+    compare_rotation_matrices, rot3d
 
 
 def test_dot():
@@ -189,4 +190,11 @@ def test_shift_points_along_viewing_rays():
         shift_points_along_viewing_rays(pts, np.random.rand(1, pts.shape[1] + 1))
     with pytest.raises(ValueError):
         shift_points_along_viewing_rays(pts, np.random.rand(2, 3))
-#TODO test projections with distortions (works in practice, but unit tests are only for D=[0])
+
+
+def test_compare_rotation_matrices():
+    assert compare_rotation_matrices(np.eye(3, 3), np.eye(3, 3)) == 0
+    assert compare_rotation_matrices(np.eye(3, 3), rot3d(10, 0, 0)) == pytest.approx(np.deg2rad(10))
+    assert compare_rotation_matrices(np.eye(3, 3), rot3d(0, 45, 0)) == pytest.approx(np.deg2rad(45))
+    assert compare_rotation_matrices(np.eye(3, 3), rot3d(0, 0, -30)) == pytest.approx(np.deg2rad(30))
+    assert compare_rotation_matrices(np.eye(3, 3), rot3d(45, 45, 0)) == pytest.approx(np.deg2rad(62.7994296))

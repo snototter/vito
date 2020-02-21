@@ -324,3 +324,52 @@ def get_image_to_groundplane_homography(P):
     """Given the 3x4 camera projection matrix P, returns the homography
     mapping image plane points onto the ground plane."""
     return np.linalg.inv(get_groundplane_to_image_homography(P))
+
+
+def rotx3d(theta):
+    """3D rotation matrix, x-axis, angle in radians."""
+    ct = np.cos(theta)
+    st = np.sin(theta)
+    return np.array([
+        [1.0, 0.0, 0.0],
+        [0.0, ct, -st],
+        [0.0, st, ct]], dtype=np.float64)
+
+
+def roty3d(theta):
+    """3D rotation matrix, y-axis, angle in radians."""
+    ct = np.cos(theta)
+    st = np.sin(theta)
+    return np.array([
+        [ct, 0.0, st],
+        [0.0, 1.0, 0.0],
+        [-st, 0.0, ct]], dtype=np.float64)
+
+
+def rotz3d(theta):
+    """3D rotation matrix, z-axis, angle in radians."""
+    ct = np.cos(theta)
+    st = np.sin(theta)
+    return np.array([
+        [ct, -st, 0.0],
+        [st, ct, 0.0],
+        [0.0, 0.0, 1.0]], dtype=np.float64)
+
+
+def rot3d(deg_x, deg_y, deg_z):
+    """Returns the 3D rotation matrix in ZYX (i.e. yaw-pitch-roll) order."""
+    Rx = rotx3d(np.deg2rad(deg_x))
+    Ry = roty3d(np.deg2rad(deg_y))
+    Rz = rotz3d(np.deg2rad(deg_z))
+    R = matmul(Rx, matmul(Ry, Rz))
+    return R
+
+
+def compare_rotation_matrices(R1, R2):
+    """Returns the rotation ange (radians) between two 3x3 rotation matrices."""
+    # Compute rotation matrix R_1-->2 as R1' * R2
+    r_12 = matmul(np.transpose(R1), R2)
+    # Compute the axis-angle representation using
+    # trace(R_12) = 1 + 2*cos(theta) and return the
+    # angle as rotation error/deviation.
+    return np.arccos((np.trace(r_12) - 1.0) / 2.0)
