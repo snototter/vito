@@ -62,6 +62,8 @@ The goal of this package is to provide a lightweight package helping you with st
 
 
 ## Changelog
+* `1.1.5`
+  * Extend projection utils.
 * `1.1.4`
   * Explicitly handle `None` inputs to `imutils`.
 * `1.1.3`
