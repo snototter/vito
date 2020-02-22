@@ -367,7 +367,19 @@ def test_pixelate():
 
 def test_gaussian_blur():
     assert gaussian_blur(None) is None
-    #TODO test
+    exdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'examples')
+    img = imread(os.path.join(exdir, 'flamingo.jpg'))
+    res1 = gaussian_blur(img, 3)
+    res2 = gaussian_blur(img, 15)
+    assert res1.shape == img.shape
+    assert res2.shape == img.shape
+    # We use PIL's ImageFilter module, so just resort to a simple sanity
+    # check, i.e. whether blurring the image with a larger kernel degrades
+    # its visual quality more than using a smaller kernel.
+    diff1 = np.sqrt(np.sum((img - res1)**2))
+    diff2 = np.sqrt(np.sum((img - res2)**2))
+    assert diff1 > 0
+    assert diff2 > diff1
 
 
 def test_set_to():

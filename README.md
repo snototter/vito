@@ -121,8 +121,3 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 * `0.0.1`
   * Initial public release.
   * Contains common python/language and camera projection utils.
-
-
-## TODO List
-* anonymization utils
-* augmentation
