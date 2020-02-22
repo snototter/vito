@@ -349,7 +349,20 @@ def test_pixelate():
     assert pixelate(None) is None
     with pytest.raises(ValueError):
         pixelate(np.zeros((17, 12)), 0, -1)
-    #TODO test
+    x = np.random.randint(0, 255, (3, 10), dtype=np.uint8)
+    res = pixelate(x)
+    assert res.shape == x.shape
+    assert np.all(res[:, :5] == res[0, 0])
+    assert np.all(res[:, 5:] == res[-1, -1])
+
+    x = np.random.randint(0, 255, (3, 12), dtype=np.uint8)
+    res = pixelate(x)
+    assert res.shape == x.shape
+    # If the image size is not a multiple of the block size,
+    # the blocks will be slightly larger (to avoid having small
+    # -- recognizable -- blocks at the border)
+    assert np.all(res[:, :6] == res[0, 0])
+    assert np.all(res[:, 6:] == res[-1, -1])
 
 
 def test_gaussian_blur():

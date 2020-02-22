@@ -215,7 +215,7 @@ def pad(image_np, border, color=None):
             out[border:-border, border:-border, i] = image_np if c == 1 else image_np[:, :, i]
         return out
 
-# TODO test
+
 def pixelate(image_np, block_width=5, block_height=-1):
     """
     Pixelate the image into blocks of size WxH.
