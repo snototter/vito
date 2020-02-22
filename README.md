@@ -46,14 +46,16 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
   ![Optical Flow Example](https://github.com/snototter/vito/raw/master/examples/visualizations/example-flowvis.png)
 * **Pixelation:**
   ```python
-  from vito import anonymization
   from vito import imutils
   from vito import imvis
 
-  img = imutils.imread('faces.jpg')
-  face_rects = [(l0, t0, w0, h0), (l1, t1, w1, h1), ... ]
-  TODO apply_on_bboxes + pixelate/blur
+  img = imutils.imread('homer.png')
+  rects = [(80, 50, 67, 84), (257, 50, 82, 75)]  # (Left, Top, Width, Height)
+  anon = imutils.apply_on_bboxes(img, rects, imutils.pixelate)
+  imvis.imshow(anon)
   ```
+  Exemplary visualization: Anonymization example using `imutils.apply_on_bboxes()` as shown above, with Gaussian blur kernel (`imutils.gaussian_blur()`, left) and pixelation (`imutils.pixelate()`, right), respectively.
+  ![Anonymization Example](https://github.com/snototter/vito/raw/master/examples/visualizations/example-anon.png)
 * For more examples (or if you prefer having a simple GUI to change visualization/analyse your data), see also the [**iminspect**](https://pypi.org/project/iminspect) package (which uses `vito` under the hood).
 
 
@@ -63,6 +65,9 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* `1.2.0`
+  * Add pixelation functionality for anonymization via `imutils`.
+  * Add Gaussian blur to `imutils`.
 * `1.1.5`
   * Extend projection utils.
 * `1.1.4`

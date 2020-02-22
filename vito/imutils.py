@@ -9,6 +9,7 @@ import io
 import os
 import numpy as np
 from PIL import Image
+from PIL import ImageFilter
 
 
 def flip_layers(nparray):
@@ -130,7 +131,7 @@ def is_valid_bbox(rect):
     return rect[0] >= 0 and rect[1] >= 0 and rect[2] > 0 and rect[3] > 0
 
 
-def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
+def apply_on_bboxes(image_np, bboxes, func, *args, **func_kwargs):
     """Applies the function func (which returns a modified image) on each
     bounding box. Takes care of proper clipping, roi extraction and copying
     back the results.
@@ -152,7 +153,7 @@ def apply_on_bboxes(image_np, bboxes, func, **func_kwargs):
     for bb in bboxes:
         l, t, w, h = bb
         roi = image_np[t:t+h, l:l+w]
-        image_np[t:t+h, l:l+w] = func(roi, **func_kwargs)
+        image_np[t:t+h, l:l+w] = func(roi, *args, **func_kwargs)
     return image_np
 
 
@@ -213,3 +214,51 @@ def pad(image_np, border, color=None):
         for i in range(c):
             out[border:-border, border:-border, i] = image_np if c == 1 else image_np[:, :, i]
         return out
+
+# TODO test
+def pixelate(image_np, block_width=5, block_height=-1):
+    """
+    Pixelate the image into blocks of size WxH.
+    If H is -1, then H=W. Otherwise, rectangular blocks will
+    be used (unless W is negative, in which case W=H will be used).
+    """
+    if image_np is None:
+        return None
+    if block_width < 1 and block_height < 1:
+        raise ValueError("Either block width or height must be >= 1")
+    block_width = block_height if block_width < 1 else block_width
+    block_height = block_width if block_height < 1 else block_height
+    resized_height = max(1, image_np.shape[0] // block_height)
+    resized_width = max(1, image_np.shape[1] // block_width)
+    pixelized_roi = Image.fromarray(image_np) \
+        .resize((resized_width, resized_height), resample=Image.NEAREST) \
+        .resize((image_np.shape[1], image_np.shape[0]), resample=Image.NEAREST)
+    return np.asarray(pixelized_roi)
+
+
+# TODO test
+def gaussian_blur(image_np, radius=15):
+    """Blurs the image using a Gaussian kernel with the given radius."""
+    if image_np is None:
+        return None
+    img = Image.fromarray(image_np).filter(
+        ImageFilter.GaussianBlur(radius=radius))
+    return np.asarray(img)
+
+
+def set_to(image_np, value):
+    """Sets the image pixels to the given value."""
+    if image_np is None or value is None:
+        return None
+    if isinstance(value, tuple):
+        channels = 1 if image_np.ndim < 3 else image_np.shape[2]
+        if len(value) < channels:
+            raise ValueError('Input value has less entries than image channels.')
+        if channels == 1:
+            image_np[:] = value[0]
+        else:
+            for ch in range(channels):
+                image_np[:, :, ch] = value[ch]
+    else:
+        image_np[:] = value
+    return image_np

@@ -2,7 +2,8 @@ import numpy as np
 import os
 import pytest
 from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
-    ndarray2memory_file, memory_file2ndarray, roi, pad, rgb2gray
+    ndarray2memory_file, memory_file2ndarray, roi, pad, rgb2gray, \
+    pixelate, gaussian_blur, set_to
 from vito.pyutils import safe_shell_output
 
 
@@ -202,15 +203,15 @@ def test_apply_on_bboxes():
     assert r3.dtype == np.uint8
 
     # With kwargs
-    r1 = apply_on_bboxes(x1, boxes, _set, value=42)
+    r1 = apply_on_bboxes(x1, boxes, _set, 42)
     assert np.all(r1 == e42[:, :, 0])
     assert r1.dtype == np.uint8
 
-    r2 = apply_on_bboxes(x2, boxes, _set, value=42)
+    r2 = apply_on_bboxes(x2, boxes, _set, 42)
     assert np.all(r2 == e42)
     assert r2.dtype == np.int32
 
-    r3 = apply_on_bboxes(x3, boxes, _set, value=42)
+    r3 = apply_on_bboxes(x3, boxes, _set, 42)
     assert np.all(r3 == e42)
     assert r3.dtype == np.uint8
 
@@ -342,3 +343,43 @@ def test_rgb2gray():
         assert np.all(g[:] == np.uint8(frgb[c]*255.0))
         g = rgb2gray(y, True)
         assert np.all(g[:] == np.uint8(fbgr[c]*255.0))
+
+
+def test_pixelate():
+    assert pixelate(None) is None
+    with pytest.raises(ValueError):
+        pixelate(np.zeros((17, 12)), 0, -1)
+    #TODO test
+
+
+def test_gaussian_blur():
+    assert gaussian_blur(None) is None
+    #TODO test
+
+
+def test_set_to():
+    assert set_to(None, 3) is None
+    assert set_to(np.zeros((2, 3)), None) is None
+
+    # Test scalar
+    res = set_to(np.zeros((2,)), 13)
+    assert np.all(res[:] == 13) and res.shape == (2,)
+    res = set_to(np.zeros((17, 12), dtype=np.uint8), 200)
+    assert np.all(res[:] == 200) and res.shape == (17, 12)
+    res = set_to(np.zeros((17, 12, 4), dtype=np.int32), -123)
+    assert np.all(res[:] == -123) and res.shape == (17, 12, 4)
+
+    # Test tuple
+    with pytest.raises(ValueError):
+        set_to(np.zeros((2, 3)), ())
+    res = set_to(np.zeros((2,)), (13, 74, 99))
+    assert np.all(res[:] == 13) and res.shape == (2,)
+    res = set_to(np.zeros((3, 5), dtype=np.uint8), (78,))
+    assert np.all(res[:] == 78) and res.shape == (3, 5)
+    with pytest.raises(ValueError):
+        set_to(np.zeros((17, 12, 4), dtype=np.int32), (1, 2, 3))
+    val = (-123, 77, -23, 2**10)
+    res = set_to(np.zeros((5, 6, 4), dtype=np.int32), val)
+    assert res.shape == (5, 6, 4)
+    for ch in range(res.shape[2]):
+        assert np.all(res[:, :, ch] == val[ch])
