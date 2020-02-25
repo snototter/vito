@@ -13,6 +13,8 @@ def assert_color_equal(a, b, flip=False):
 
 
 def test_pseudocolor():
+    assert pseudocolor(None) is None
+
     data = np.array([[0, 1, 2], [255, 42, 0]], dtype=np.uint8)
     for cm in [colormaps.colormap_parula_rgb, colormaps.colormap_jet_rgb,
             colormaps.colormap_magma_rgb, colormaps.colormap_gray]:
@@ -32,6 +34,13 @@ def test_pseudocolor():
     data = np.random.rand(3, 7, 2)
     with pytest.raises(ValueError):
         _ = pseudocolor(data)
+    
+    data = np.array([0, 255], dtype=np.uint8)
+    cm = colormaps.colormap_hot_bgr
+    pc = pseudocolor(data, limits=[0, 255], color_map=cm)
+    assert pc.shape == (2, 1, 3)
+    assert_color_equal(pc[0, 0, :], cm[0])
+    assert_color_equal(pc[1, 0, :], cm[-1])
 
     data = np.zeros((2, 3, 1), dtype=np.uint8)
     data[0, 0] = 20
@@ -63,6 +72,20 @@ def test_pseudocolor():
     assert_color_equal(pc[0, 0, :], cm[0])
     assert_color_equal(pc[1, 0, :], cm[0])
     assert_color_equal(pc[1, 2, :], cm[0])
+
+    # Test invalid inputs
+    assert pseudocolor(np.array([np.nan, np.inf, np.NINF]), limits=None) is None
+    pc = pseudocolor(np.array([np.nan, 255, 0]), limits=None, color_map=cm)
+    assert pc.shape == (3, 1, 3)
+    assert_color_equal(pc[0, 0, :], cm[0])
+    assert_color_equal(pc[1, 0, :], cm[-1])
+    assert_color_equal(pc[2, 0, :], cm[0])
+
+    pc = pseudocolor(np.array([np.inf, 1024, 188]), limits=None, color_map=cm)
+    assert pc.shape == (3, 1, 3)
+    assert_color_equal(pc[0, 0, :], cm[0])
+    assert_color_equal(pc[1, 0, :], cm[-1])
+    assert_color_equal(pc[2, 0, :], cm[0])
 
 
 def test_colormap_by_name():

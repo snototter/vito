@@ -89,6 +89,7 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_r
     Return a HxWx3 pseudocolored representation of the input matrix.
 
     :param values: A single channel, HxW or HxWx1 numpy ndarray.
+        NaN or Inf values will be colorized by color_map[0].
     :param limits: [min, max] to clip the input values. If limits is None or
         any of min/max is None, the corresponding limits will be computed from
         the input values.
@@ -97,17 +98,26 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_r
     :return: a HxWx3 colorized representation.
     """
     # Sanity checks
-    if len(values.shape) > 2:
-        if values.shape[2] > 1:
+    if values is None:
+        return None
+
+    if values.ndim != 2:
+        if values.ndim > 3 or (values.ndim == 3 and values.shape[2] > 1):
             raise ValueError('Input to pseudocoloring must be a single channel data matrix, shaped (H,W) or (H,W,1)!')
-        values = values.reshape((values.shape[0], values.shape[1]))
+        values = values.reshape((values.shape[0], values.shape[1] if values.ndim > 2 else 1))
+    
+    valid = np.isfinite(values)
+    if not np.any(valid):
+        return None
 
     if limits is None:
-        limits = [np.min(values[:]), np.max(values[:])]
+        limits = [np.min(values[valid]), np.max(values[valid])]
     if limits[0] is None:
-        limits[0] = np.min(values[:])
+        limits[0] = np.min(values[valid])
     if limits[1] is None:
-        limits[1] = np.max(values[:])
+        limits[1] = np.max(values[valid])
+    
+    values[np.logical_not(valid)] = limits[0]
 
     values = values.astype(np.float64)
     lut = np.asarray(color_map)
