@@ -65,6 +65,8 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* `1.2.1`
+  * Explicitly handle invalid (NaN and infinite) inputs to `pseudocolor()`.
 * `1.2.0`
   * Add pixelation functionality for anonymization via `imutils`.
   * Add Gaussian blur to `imutils`.
