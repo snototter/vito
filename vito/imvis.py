@@ -100,6 +100,7 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_r
     # Sanity checks
     if values is None:
         return None
+    values = values.copy()
 
     if values.ndim != 2:
         if values.ndim > 3 or (values.ndim == 3 and values.shape[2] > 1):

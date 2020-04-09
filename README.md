@@ -65,6 +65,8 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* `1.2.2`
+  * Use explicit copies in `pseudocolor()` to prevent immutable assignment destination errors.
 * `1.2.1`
   * Explicitly handle invalid (NaN and infinite) inputs to `pseudocolor()`.
 * `1.2.0`
