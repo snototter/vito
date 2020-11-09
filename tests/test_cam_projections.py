@@ -42,7 +42,8 @@ def test_apply_transformation():
     x = apply_transformation(T2d, np.int32([17]))
     assert x.shape[0] == 2 and x.shape[1] == 1
     expected = 17 * T2d[:, 0] + T2d[:, 1]
-    assert np.all(x == expected.reshape(x.shape))
+    assert x[0, 0] == pytest.approx(expected[0])
+    assert x[1, 0] == pytest.approx(expected[1])
 
     x = apply_transformation(T2d, np.ones((2, 1)))
     assert x.shape[0] == 2 and x.shape[1] == 1
