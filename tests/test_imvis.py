@@ -17,7 +17,7 @@ def test_pseudocolor():
 
     data = np.array([[0, 1, 2], [255, 42, 0]], dtype=np.uint8)
     for cm in [colormaps.colormap_parula_rgb, colormaps.colormap_jet_rgb,
-            colormaps.colormap_magma_rgb, colormaps.colormap_gray]:
+               colormaps.colormap_magma_rgb, colormaps.colormap_gray]:
         pc = pseudocolor(data, limits=None, color_map=cm)
         assert np.all(pc[0, 0, :] == pc[1, 2, :])
         assert_color_equal(pc[0, 1, :], cm[1])
@@ -34,7 +34,7 @@ def test_pseudocolor():
     data = np.random.rand(3, 7, 2)
     with pytest.raises(ValueError):
         _ = pseudocolor(data)
-    
+
     data = np.array([0, 255], dtype=np.uint8)
     cm = colormaps.colormap_hot_bgr
     pc = pseudocolor(data, limits=[0, 255], color_map=cm)
@@ -120,7 +120,7 @@ def test_sample_colormap():
 
     with pytest.raises(ValueError):
         colormaps.sample('Turbo', -1)
-    
+
     with pytest.raises(ValueError):
         colormaps.sample('Turbo', 1)
 
@@ -160,7 +160,7 @@ def test_sample_colormap():
     oversampled = colormaps.sample('turbo', 1024)
     cm = colormaps.colormap_turbo_rgb
     check_oversampled(oversampled, 1024, cm)
-    
+
     oversampled = colormaps.sample('turbo', 1025, return_rgb=False)
     cm = colormaps.colormap_turbo_bgr
     check_oversampled(oversampled, 1025, cm)
