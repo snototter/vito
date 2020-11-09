@@ -67,6 +67,7 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 ## Changelog
 * `1.2.3`
   * Support sampling from colormaps.
+  * Adjust tests to updated PIL version.
 * `1.2.2`
   * Use explicit copies in `pseudocolor()` to prevent immutable assignment destination errors.
 * `1.2.1`
