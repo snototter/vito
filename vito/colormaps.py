@@ -13,6 +13,8 @@ colormap_names = [
 
 
 def by_name(colormap_name, return_rgb=True):
+    if colormap_name is None:
+        return None
     cmn = colormap_name.lower()
     if cmn == 'gray' or cmn == 'grayscale' or cmn == 'grey' or cmn == 'greyscale':
         return colormap_gray
@@ -20,6 +22,22 @@ def by_name(colormap_name, return_rgb=True):
             cmn,
             'rgb' if return_rgb else 'bgr'
         )]
+
+
+def sample(colormap_name, N, return_rgb=True):
+    """Returns N uniformly spread colors from the given colormap (specified by its name).
+    For example, to sample 10 uniformly spaced colors from HSV: colors = sample('hsv', 10)
+    """
+    cmap = by_name(colormap_name, return_rgb=return_rgb)
+    if N < 2:
+        raise ValueError('N must be > 1')
+    step_size = len(cmap) / float(N) if N > len(cmap) else len(cmap) / float(N-1)
+    # indices = np.floor(np.linspace(0, len(cmap), num=N, endpoint=False)).astype(np.int)
+    indices = np.floor(np.arange(0, len(cmap), step_size)).astype(np.int)
+    print('FOO1        ', colormap_name, step_size, len(cmap), indices[0:10])
+    print('FOO2        ', colormap_name, step_size, len(cmap), indices[-10:])
+    
+    return [cmap[idx] for idx in indices]
 
 
 def make_flow_color_wheel():

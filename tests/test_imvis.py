@@ -108,8 +108,52 @@ def test_colormap_by_name():
     cm = colormaps.by_name('greyscale', return_rgb=False)
     assert cm == colormaps.colormap_gray
 
+    assert colormaps.by_name(None) is None
+
     with pytest.raises(KeyError):
         colormaps.by_name('foo')
+
+
+def test_sample_colormap():
+    with pytest.raises(KeyError):
+        colormaps.sample('Bar', 3)
+
+    with pytest.raises(ValueError):
+        colormaps.sample('Turbo', -1)
+    
+    with pytest.raises(ValueError):
+        colormaps.sample('Turbo', 1)
+
+    with pytest.raises(ValueError):
+        colors = colormaps.sample('turbo', 0)
+
+    colors = colormaps.sample('Turbo', 3)
+    assert len(colors) == 3
+    # Check all colors
+    cm = colormaps.colormap_turbo_rgb
+    assert_color_equal(colors[0], cm[0])
+    assert_color_equal(colors[1], cm[127])
+    assert_color_equal(colors[2], cm[255])
+
+    colors = colormaps.sample('temperature', 4, return_rgb=False)
+    assert len(colors) == 4
+    cm = colormaps.colormap_temperature_bgr
+    assert_color_equal(colors[0], cm[0])
+    assert_color_equal(colors[1], cm[85])
+    assert_color_equal(colors[2], cm[170])
+    assert_color_equal(colors[3], cm[255])
+
+    colors = colormaps.sample('HSV', 256)
+    assert len(colors) == 256
+    assert all([colors[i] == colormaps.colormap_hsv_rgb[i] for i in range(len(colors))])
+
+    oversampled = colormaps.sample('turbo', 1024)
+    cm = colormaps.colormap_turbo_rgb
+    assert len(oversampled) == 1024
+    for i in range(256):
+        for j in range(4):
+            print('Compare i,j', i, j)
+            assert_color_equal(oversampled[i*4+j], cm[i])
 
 
 def test_color_by_id():
