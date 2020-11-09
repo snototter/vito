@@ -146,7 +146,7 @@ def test_imsave(tmp_path):
     imsave(out_fn, img_in)
     _, finfo = safe_shell_output('file', out_fn)
     assert (finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit colormap, non-interlaced' or
-        finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit grayscale, non-interlaced')
+            finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit grayscale, non-interlaced')
     img_out = imread(out_fn, mode='L').astype(np.bool)
     assert img_out.ndim == 2 or img_out.shape[2] == 1
     assert np.all(img_in[:] == img_out[:])
@@ -222,10 +222,7 @@ def test_np2mem():
 
     shapes = [(20, 128), (32, 64, 3), (64, 32, 3)]
     for s in shapes:
-        if isinstance(s, tuple):
-            x = (255.0 * np.random.rand(*s)).astype(np.uint8)
-        else:
-            x = (255.0 * np.random.rand(s)).astype(np.uint8)
+        x = (255.0 * np.random.randint(0, 255, s)).astype(np.uint8)
         mfpng = ndarray2memory_file(x, format='png')
         y = memory_file2ndarray(mfpng)
         assert np.all(x[:] == y[:])
@@ -234,9 +231,12 @@ def test_np2mem():
         mfjpg = ndarray2memory_file(x, format='jpeg')
         y = memory_file2ndarray(mfjpg)
         assert not np.all(x[:] == y[:])
-    # PIL assumes a 2D image and performs no checking:
-    with pytest.raises(IndexError):
-        _ = ndarray2memory_file(np.random.rand(3).astype(np.uint8))
+    # Newer PIL versions can also work with 1D data:
+    x = np.random.randint(0, 255, 3).astype(np.uint8)
+    mf1d = ndarray2memory_file(x)
+    y = memory_file2ndarray(mf1d)
+    assert y.shape[0] == 3 and y.shape[1] == 1
+    assert y[0, 0] == x[0] and y[1, 0] == x[1] and y[2, 0] == x[2]
 
 
 def test_roi():
