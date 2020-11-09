@@ -65,8 +65,8 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
-* Upcoming `1.2.3`
-  * Support explicit sampling from colormaps.
+* `1.2.3`
+  * Support sampling from colormaps.
 * `1.2.2`
   * Use explicit copies in `pseudocolor()` to prevent immutable assignment destination errors.
 * `1.2.1`

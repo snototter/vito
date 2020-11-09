@@ -147,13 +147,27 @@ def test_sample_colormap():
     assert len(colors) == 256
     assert all([colors[i] == colormaps.colormap_hsv_rgb[i] for i in range(len(colors))])
 
+    def check_oversampled(O, L, CM):
+        assert len(O) == L
+        num_reps = int(L / len(CM))
+        for reps in range(num_reps):
+            for e in range(len(CM)):
+                assert_color_equal(O[reps*len(CM)+e], CM[e])
+        num_rem = L % len(CM)
+        for e in range(num_rem):
+            assert_color_equal(O[num_reps*len(CM)+e], CM[e])
+
     oversampled = colormaps.sample('turbo', 1024)
     cm = colormaps.colormap_turbo_rgb
-    assert len(oversampled) == 1024
-    for i in range(256):
-        for j in range(4):
-            print('Compare i,j', i, j)
-            assert_color_equal(oversampled[i*4+j], cm[i])
+    check_oversampled(oversampled, 1024, cm)
+    
+    oversampled = colormaps.sample('turbo', 1025, return_rgb=False)
+    cm = colormaps.colormap_turbo_bgr
+    check_oversampled(oversampled, 1025, cm)
+
+    oversampled = colormaps.sample('turbo', 751, return_rgb=False)
+    cm = colormaps.colormap_turbo_bgr
+    check_oversampled(oversampled, 751, cm)
 
 
 def test_color_by_id():
