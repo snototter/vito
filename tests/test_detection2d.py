@@ -1,4 +1,4 @@
-import pytest
+# import pytest
 import numpy as np
 from vito.detection2d import BoundingBox, iou
 
@@ -28,7 +28,6 @@ def test_bbox_init():
 
 def test_bbox_conversion():
     bb = BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4))
-    
     assert BoundingBox.from_rect_repr(bb.to_rect_repr()) == bb
     assert BoundingBox.from_corner_repr(bb.to_corner_repr()) == bb
     assert BoundingBox.from_centroid_repr(bb.to_centroid_repr()) == bb
