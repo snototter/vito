@@ -65,6 +65,11 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* Upcoming `1.2.4`
+  * Common representations and utilities for 2D object detection via the `detection2d` module.
+    * `Detection` class to encapsulate object detections.
+    * `BoundingBox` class to work with axis-aligned bounding boxes.
+  * A common `Target` class to encapsulate tracked targets via the `tracking` module.
 * `1.2.3`
   * Support sampling from colormaps.
   * Adjust tests to updated PIL version.
