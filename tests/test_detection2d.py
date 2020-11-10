@@ -59,3 +59,11 @@ def test_bbox_iou():
     assert bb1.iou(bb2) == 0.5
     bb1.width = 45
     assert bb1.iou(bb2) == 1/3
+
+
+def test_bbox_area():
+    bb = BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4))
+    assert bb.area() == bb.width * bb.height
+    bb.width = 0
+    bb.height = 1
+    assert bb.area() == 0

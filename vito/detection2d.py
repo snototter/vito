@@ -38,6 +38,8 @@ def iou(bbox1, bbox2):
 
 
 class BoundingBox(SimpleNamespace):
+    """Axis-aligned bounding box."""
+
     @classmethod
     def from_corner_repr(cls, corner_repr):
         """Returns a BoundingBox from the 4-element argument corner_repr = [xmin, ymin, xmax, ymax]."""
@@ -87,6 +89,8 @@ class BoundingBox(SimpleNamespace):
         return [self.left, self.top, self.width, self.height]
     
     def iou(self, other):
-        if other is None:
-            return 0.0
-        return iou(self.to_rect_repr(), other.to_rect_repr())
+        """Returns the intersection over union."""
+        return iou(self.to_rect_repr(), other)
+
+    def area(self):
+        return self.width * self.height
