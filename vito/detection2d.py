@@ -94,3 +94,27 @@ class BoundingBox(SimpleNamespace):
 
     def area(self):
         return self.width * self.height
+
+#TODO add common label mappings
+# CLASSES_VOC 07-12
+# background
+# aeroplane
+# bicycle
+# bird
+# boat
+# bottle
+# bus
+# car
+# cat
+# chair
+# cow
+# diningtable
+# dog
+# horse
+# motorbike
+# person
+# pottedplant
+# sheep
+# sofa
+# train
+# tvmonitor
