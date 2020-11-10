@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from vito.detection2d import BoundingBox
+from vito.detection2d import BoundingBox, iou
 
 
 def test_bbox_init():
@@ -34,3 +34,28 @@ def test_bbox_conversion():
     assert BoundingBox.from_centroid_repr(bb.to_centroid_repr()) == bb
     assert BoundingBox.from_minmax_repr(bb.to_minmax_repr()) == bb
 
+
+def test_bbox_iou():
+    bb = BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4))
+    # Ensure w/h > 0
+    bb.width += 1
+    bb.height += 1
+    # Input checks
+    assert iou(None, bb) == 0.0
+    assert iou(bb, None) == 0.0
+    assert iou(None, None) == 0.0
+    assert bb.iou(None) == 0.0
+    assert bb.iou(bb) == iou(bb, bb)
+    assert bb.iou(bb) == 1.0
+    bb1 = BoundingBox.from_rect_repr([-10, -5, 7, 3])
+    assert bb.iou(bb1) == 0.0
+    assert bb1.iou(bb) == 0.0
+    assert iou(bb1, bb) == 0.0
+    bb2 = BoundingBox.from_rect_repr([-3, -3, 1, 2])
+    assert bb1.iou(bb2) == 0.0
+
+    bb1 = BoundingBox.from_rect_repr([10, 20, 30, 40])
+    bb2 = BoundingBox.from_rect_repr([25, 20, 15, 40])
+    assert bb1.iou(bb2) == 0.5
+    bb1.width = 45
+    assert bb1.iou(bb2) == 1/3
