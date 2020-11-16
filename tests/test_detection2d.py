@@ -1,6 +1,7 @@
-# import pytest
+import pytest
 import numpy as np
-from vito.detection2d import BoundingBox, Detection, Size, iou, filter_detection_classes
+from vito.detection2d import BoundingBox, Detection, Size, iou, filter_detection_classes,\
+    label_lookup_coco, class_id_lookup_coco, label_lookup_voc07, class_id_lookup_voc07
 
 
 def test_size():
@@ -10,6 +11,7 @@ def test_size():
     assert sz1.area() == 1800
     assert sz1.width == 30
     assert sz1.height == 60
+
 
 def test_bbox_init():
     bb = BoundingBox.from_corner_repr([0, 0, 2, 4])
@@ -114,3 +116,34 @@ def test_detection2d():
     assert len(ls) == 0
     ls = filter_detection_classes(dets, -2)
     assert len(ls) == 0
+
+
+def test_coco_labels():
+    with pytest.raises(ValueError):
+        class_id_lookup_coco('foobar')
+    with pytest.raises(ValueError):
+        class_id_lookup_coco(None)
+    assert class_id_lookup_coco('Person') == 1
+    assert class_id_lookup_coco('toothbrush') == 90
+
+    with pytest.raises(ValueError):
+        label_lookup_coco(-1)
+    assert label_lookup_coco(1) == 'person'
+    assert label_lookup_coco(2) == 'bicycle'
+    assert label_lookup_coco(90) == 'toothbrush'
+
+
+def test_voc07_labels():
+    with pytest.raises(ValueError):
+        class_id_lookup_voc07('foobar')
+    with pytest.raises(ValueError):
+        class_id_lookup_voc07(None)
+    assert class_id_lookup_voc07('Person') == 15
+    assert class_id_lookup_voc07('background') == 0
+    assert class_id_lookup_voc07('cow') == 10
+
+    with pytest.raises(ValueError):
+        label_lookup_voc07(-1)
+    assert label_lookup_voc07(1) == 'aeroplane'
+    assert label_lookup_voc07(10) == 'cow'
+    assert label_lookup_voc07(20) == 'tvmonitor'
