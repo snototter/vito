@@ -43,6 +43,36 @@ def test_bbox_conversion():
     assert BoundingBox.from_centroid_repr(bb.to_centroid_repr()) == bb
     assert BoundingBox.from_minmax_repr(bb.to_minmax_repr()) == bb
 
+    sz = Size(bb.width, bb.height)
+    bb_rel = bb.to_rect_repr(sz)
+    assert bb_rel[2] == 1
+    assert bb_rel[3] == 1
+
+    bb = BoundingBox.from_rect_repr([10, 70, 50, 140])
+    bb_rel = bb.to_rect_repr(Size(100, 210))
+    assert bb_rel[0] == 0.1
+    assert bb_rel[1] == pytest.approx(1/3)
+    assert bb_rel[2] == 0.5
+    assert bb_rel[3] == pytest.approx(2/3)
+
+    bb_rel = bb.to_corner_repr(Size(200, 210))
+    assert bb_rel[0] == 0.05  # xmin
+    assert bb_rel[1] == pytest.approx(1/3) # ymin
+    assert bb_rel[2] == 0.30  # xmax
+    assert bb_rel[3] == 1  # ymax
+
+    bb_rel = bb.to_minmax_repr(Size(100, 210))
+    assert bb_rel[0] == 0.1  # xmin
+    assert bb_rel[1] == 0.6 # xmax
+    assert bb_rel[2] == pytest.approx(1/3)  # ymin
+    assert bb_rel[3] == 1  # ymax
+
+    bb_rel = bb.to_centroid_repr(Size(200, 210))
+    assert bb_rel[0] == 0.175  # cx
+    assert bb_rel[1] == pytest.approx(2/3)  # cy
+    assert bb_rel[2] == 0.25  # w
+    assert bb_rel[3] == pytest.approx(2/3)  # h
+
 
 def test_bbox_iou():
     bb = BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4))
@@ -126,6 +156,9 @@ def test_coco_labels():
     assert class_id_lookup_coco('Person') == 1
     assert class_id_lookup_coco('toothbrush') == 90
 
+    det = Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    assert label_lookup_coco(det) == 'bicycle'
+
     with pytest.raises(ValueError):
         label_lookup_coco(-1)
     assert label_lookup_coco(1) == 'person'
@@ -138,6 +171,10 @@ def test_voc07_labels():
         class_id_lookup_voc07('foobar')
     with pytest.raises(ValueError):
         class_id_lookup_voc07(None)
+
+    det = Detection(3, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    assert label_lookup_voc07(det) == 'bird'
+
     assert class_id_lookup_voc07('Person') == 15
     assert class_id_lookup_voc07('background') == 0
     assert class_id_lookup_voc07('cow') == 10

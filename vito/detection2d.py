@@ -118,24 +118,51 @@ class BoundingBox(SimpleNamespace):
     def __init__(self, left, top, width, height):
         super().__init__(left=left, top=top, width=width, height=height)
 
-    def to_corner_repr(self):
-        """Returns [xmin, ymin, xmax, ymax]."""
-        return [self.left, self.top, self.left + self.width, self.top + self.height]
+    def to_corner_repr(self, img_size=None):
+        """
+        Returns [xmin, ymin, xmax, ymax] as absolute values.
+        If img_size is not None, the coordinates will be scaled by the image
+        dimension, i.e. in the range [0, 1].
+        """
+        if img_size is None:
+            return [self.left, self.top, self.left + self.width, self.top + self.height]
+        else:
+            return [self.left / img_size.width, self.top / img_size.height,
+                    (self.left + self.width) / img_size.width,
+                    (self.top + self.height) / img_size.height]
 
-    def to_minmax_repr(self):
-        """Returns [xmin, xmax, ymin, ymax]."""
-        corner = self.to_corner_repr()
+    def to_minmax_repr(self, img_size=None):
+        """
+        Returns [xmin, xmax, ymin, ymax] as absolute values.
+        If img_size is not None, values will be given relative to the (image) size.
+        """
+        corner = self.to_corner_repr(img_size=img_size)
         return [corner[0], corner[2], corner[1], corner[3]]
 
-    def to_centroid_repr(self):
-        """Returns [center_x, center_y, width, height]."""
+    def to_centroid_repr(self, img_size=None):
+        """
+        Returns [center_x, center_y, width, height] as absolute values.
+        If img_size is not None, values will be given relative to the (image) size.
+        """
         cx = self.left + self.width/2
         cy = self.top + self.height/2
-        return [cx, cy, self.width, self.height]
+        if img_size is None:
+            return [cx, cy, self.width, self.height]
+        else:
+            return [cx / img_size.width, cy / img_size.height,
+                    self.width / img_size.width, self.height / img_size.height]
 
-    def to_rect_repr(self):
-        """Returns [xmin, ymin, width, height]."""
-        return [self.left, self.top, self.width, self.height]
+    def to_rect_repr(self, img_size=None):
+        """
+        Returns [xmin, ymin, width, height] in absolute values.
+        If img_size is not None, the representation will be given
+        relative to the (image) size.
+        """
+        if img_size is None:
+            return [self.left, self.top, self.width, self.height]
+        else:
+            return [self.left / img_size.width, self.top / img_size.height,
+                    self.width / img_size.width, self.height / img_size.height]
 
     def iou(self, other):
         """Returns the intersection over union."""
@@ -232,9 +259,13 @@ CATEGORIES_COCO = {
 
 
 def label_lookup_coco(c):
-    """Returns the class label (string) for the given COCO class ID."""
-    if c in CATEGORIES_COCO:
-        return CATEGORIES_COCO[c]
+    """Returns the class label (string) for the given COCO class ID (or detection)."""
+    if isinstance(c, Detection):
+        cid = c.class_id
+    else:
+        cid = c
+    if cid in CATEGORIES_COCO:
+        return CATEGORIES_COCO[cid]
     raise ValueError()
 
 
@@ -272,9 +303,13 @@ CATEGORIES_VOC07 = {
 
 
 def label_lookup_voc07(c):
-    """Returns the class label (string) for the given VOC07-12 class ID."""
-    if c in CATEGORIES_VOC07:
-        return CATEGORIES_VOC07[c]
+    """Returns the class label (string) for the given VOC07-12 class ID or detection."""
+    if isinstance(c, Detection):
+        cid = c.class_id
+    else:
+        cid = c
+    if cid in CATEGORIES_VOC07:
+        return CATEGORIES_VOC07[cid]
     raise ValueError()
 
 
