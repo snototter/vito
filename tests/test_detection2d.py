@@ -1,7 +1,15 @@
 # import pytest
 import numpy as np
-from vito.detection2d import BoundingBox, iou
+from vito.detection2d import BoundingBox, Detection, Size, iou
 
+
+def test_size():
+    sz1 = Size.from_hw(60, 30)
+    sz2 = Size.from_wh(30, 60)
+    assert sz1 == sz2
+    assert sz1.area() == 1800
+    assert sz1.width == 30
+    assert sz1.height == 60
 
 def test_bbox_init():
     bb = BoundingBox.from_corner_repr([0, 0, 2, 4])
@@ -66,3 +74,14 @@ def test_bbox_area():
     bb.width = 0
     bb.height = 1
     assert bb.area() == 0
+
+
+def test_detection2d():
+    d1 = Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    d2 = Detection("person", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 1e7)
+
+    assert d1.class_id == 2
+    assert d1.score == 0.5
+    assert d2.class_id == 'person'
+    assert d2.score == 1e7
+

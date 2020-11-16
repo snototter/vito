@@ -37,6 +37,28 @@ def iou(bbox1, bbox2):
     return 0.0  # pragma: no cover
 
 
+class Size(SimpleNamespace):
+    @classmethod
+    def from_hw(cls, height, width):
+        return cls(width, height)
+
+    @classmethod
+    def from_wh(cls, width, height):
+        return cls(width, height)
+
+    def __init__(self, width, height):
+        super().__init__(width=width, height=height)
+
+    def area(self):
+        return self.width * self.height
+
+
+class Detection(SimpleNamespace):
+    """Axis-aligned bounding box with object class ID and detection confidence/score."""
+    def __init__(self, class_id, bounding_box, score):
+        super().__init__(class_id=class_id, bounding_box=bounding_box, score=score)
+
+
 class BoundingBox(SimpleNamespace):
     """Axis-aligned bounding box."""
 
