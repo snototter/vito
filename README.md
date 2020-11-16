@@ -65,6 +65,9 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* Upcoming `1.3.1`
+  * Relative `BoundingBox` representation.
+  * TODO `tracking` module
 * `1.3.0`
   * Common representations and utilities for 2D object detection via the `detection2d` module.
     * `Detection` class to encapsulate object detections.
