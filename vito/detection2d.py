@@ -37,6 +37,11 @@ def iou(bbox1, bbox2):
     return 0.0  # pragma: no cover
 
 
+def filter_detection_classes(detections, class_filter):
+    """TODO doc"""
+    return [d for d in detections if d.is_class(class_filter)]
+
+
 class Size(SimpleNamespace):
     @classmethod
     def from_hw(cls, height, width):
@@ -58,6 +63,13 @@ class Detection(SimpleNamespace):
     def __init__(self, class_id, bounding_box, score):
         super().__init__(class_id=class_id, bounding_box=bounding_box, score=score)
 
+    def is_class(self, class_filter):
+        """TODO doc class_filter can be a list of sIDs, labels or a single ID/label"""
+        if isinstance(class_filter, list):
+            return any([self.class_id == c for c in class_filter])
+        else:
+            return self.class_id == class_filter
+        
 
 class BoundingBox(SimpleNamespace):
     """Axis-aligned bounding box."""

@@ -1,6 +1,6 @@
 # import pytest
 import numpy as np
-from vito.detection2d import BoundingBox, Detection, Size, iou
+from vito.detection2d import BoundingBox, Detection, Size, iou, filter_detection_classes
 
 
 def test_size():
@@ -84,3 +84,33 @@ def test_detection2d():
     assert d1.score == 0.5
     assert d2.class_id == 'person'
     assert d2.score == 1e7
+
+    dets = [
+        d1, d2,
+        Detection(20, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection("car", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection("person", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection("person", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    ]
+    ls = filter_detection_classes(dets, 2)
+    assert len(ls) == 2
+    # Filtering should keep the original order
+    assert ls[0] == d1
+
+    ls = filter_detection_classes(dets, "car")
+    assert len(ls) == 1
+    assert ls[0].class_id == 'car'
+
+    ls = filter_detection_classes(dets, ["person", 2])
+    assert len(ls) == 5
+    assert ls[0] == d1
+    assert ls[1] == d2
+    assert ls[2].class_id == 2
+    assert ls[3].class_id == 'person'
+    assert ls[4].class_id == 'person'
+
+    ls = filter_detection_classes(dets, [])
+    assert len(ls) == 0
+    ls = filter_detection_classes(dets, -2)
+    assert len(ls) == 0
