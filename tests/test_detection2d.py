@@ -84,4 +84,3 @@ def test_detection2d():
     assert d1.score == 0.5
     assert d2.class_id == 'person'
     assert d2.score == 1e7
-

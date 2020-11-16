@@ -65,7 +65,7 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
-* Upcoming `1.2.4`
+* Upcoming `1.3.0`
   * Common representations and utilities for 2D object detection via the `detection2d` module.
     * `Detection` class to encapsulate object detections.
     * `BoundingBox` class to work with axis-aligned bounding boxes.
