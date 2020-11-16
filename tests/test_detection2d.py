@@ -156,6 +156,9 @@ def test_coco_labels():
     assert class_id_lookup_coco('Person') == 1
     assert class_id_lookup_coco('toothbrush') == 90
 
+    det = Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    assert label_lookup_coco(det) == 'bicycle'
+
     with pytest.raises(ValueError):
         label_lookup_coco(-1)
     assert label_lookup_coco(1) == 'person'
@@ -168,6 +171,10 @@ def test_voc07_labels():
         class_id_lookup_voc07('foobar')
     with pytest.raises(ValueError):
         class_id_lookup_voc07(None)
+
+    det = Detection(3, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    assert label_lookup_voc07(det) == 'bird'
+
     assert class_id_lookup_voc07('Person') == 15
     assert class_id_lookup_voc07('background') == 0
     assert class_id_lookup_voc07('cow') == 10

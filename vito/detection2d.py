@@ -259,9 +259,13 @@ CATEGORIES_COCO = {
 
 
 def label_lookup_coco(c):
-    """Returns the class label (string) for the given COCO class ID."""
-    if c in CATEGORIES_COCO:
-        return CATEGORIES_COCO[c]
+    """Returns the class label (string) for the given COCO class ID (or detection)."""
+    if isinstance(c, Detection):
+        cid = c.class_id
+    else:
+        cid = c
+    if cid in CATEGORIES_COCO:
+        return CATEGORIES_COCO[cid]
     raise ValueError()
 
 
@@ -299,9 +303,13 @@ CATEGORIES_VOC07 = {
 
 
 def label_lookup_voc07(c):
-    """Returns the class label (string) for the given VOC07-12 class ID."""
-    if c in CATEGORIES_VOC07:
-        return CATEGORIES_VOC07[c]
+    """Returns the class label (string) for the given VOC07-12 class ID or detection."""
+    if isinstance(c, Detection):
+        cid = c.class_id
+    else:
+        cid = c
+    if cid in CATEGORIES_VOC07:
+        return CATEGORIES_VOC07[cid]
     raise ValueError()
 
 
