@@ -3,7 +3,10 @@ from types import SimpleNamespace
 
 
 def iou(bbox1, bbox2):
-    """Compute intersection over union for the two bounding boxes given in rect representation: [left, top, width, height]."""
+    """
+    Computes the intersection over union for the two bounding boxes
+    given in rect representation: [left, top, width, height].
+    """
     if bbox1 is None or bbox2 is None:
         return 0.0
     if isinstance(bbox1, BoundingBox):
@@ -35,6 +38,52 @@ def iou(bbox1, bbox2):
     if union_area > 0.0:
         return intersection_area / union_area
     return 0.0  # pragma: no cover
+
+
+def filter_detection_classes(detections, class_filter):
+    """
+    Returns the filtered list of detections that satisfy the given 'class_filter'.
+
+    detections:     A list of Detection instances.
+
+    class_filter:   Either 1) a list of object class IDs or labels
+                    or 2) a single object class ID or label.
+    """
+    return [d for d in detections if d.is_class(class_filter)]
+
+
+class Size(SimpleNamespace):
+    @classmethod
+    def from_hw(cls, height, width):
+        return cls(width, height)
+
+    @classmethod
+    def from_wh(cls, width, height):
+        return cls(width, height)
+
+    def __init__(self, width, height):
+        super().__init__(width=width, height=height)
+
+    def area(self):
+        return self.width * self.height
+
+
+class Detection(SimpleNamespace):
+    """Axis-aligned bounding box with object class ID and detection confidence/score."""
+    def __init__(self, class_id, bounding_box, score):
+        super().__init__(class_id=class_id, bounding_box=bounding_box, score=score)
+
+    def is_class(self, class_filter):
+        """
+        Checks if this instance satisfies the given 'class_filter'.
+
+        class_filter:  Either 1) a list of object class IDs or labels
+                        or 2) a single object class ID or label.
+        """
+        if isinstance(class_filter, list):
+            return any([self.class_id == c for c in class_filter])
+        else:
+            return self.class_id == class_filter
 
 
 class BoundingBox(SimpleNamespace):
@@ -95,26 +144,142 @@ class BoundingBox(SimpleNamespace):
     def area(self):
         return self.width * self.height
 
-# TODO add common label mappings
-# CLASSES_VOC 07-12
-# background
-# aeroplane
-# bicycle
-# bird
-# boat
-# bottle
-# bus
-# car
-# cat
-# chair
-# cow
-# diningtable
-# dog
-# horse
-# motorbike
-# person
-# pottedplant
-# sheep
-# sofa
-# train
-# tvmonitor
+
+# Object categories from MS COCO
+CATEGORIES_COCO = {
+    0: 'background',
+    1: 'person',
+    2: 'bicycle',
+    3: 'car',
+    4: 'motorcycle',
+    5: 'airplane',
+    6: 'bus',
+    7: 'train',
+    8: 'truck',
+    9: 'boat',
+    10: 'traffic light',
+    11: 'fire hydrant',
+    13: 'stop sign',
+    14: 'parking meter',
+    15: 'bench',
+    16: 'bird',
+    17: 'cat',
+    18: 'dog',
+    19: 'horse',
+    20: 'sheep',
+    21: 'cow',
+    22: 'elephant',
+    23: 'bear',
+    24: 'zebra',
+    25: 'giraffe',
+    27: 'backpack',
+    28: 'umbrella',
+    31: 'handbag',
+    32: 'tie',
+    33: 'suitcase',
+    34: 'frisbee',
+    35: 'skis',
+    36: 'snowboard',
+    37: 'sports ball',
+    38: 'kite',
+    39: 'baseball bat',
+    40: 'baseball glove',
+    41: 'skateboard',
+    42: 'surfboard',
+    43: 'tennis racket',
+    44: 'bottle',
+    46: 'wine glass',
+    47: 'cup',
+    48: 'fork',
+    49: 'knife',
+    50: 'spoon',
+    51: 'bowl',
+    52: 'banana',
+    53: 'apple',
+    54: 'sandwich',
+    55: 'orange',
+    56: 'broccoli',
+    57: 'carrot',
+    58: 'hot dog',
+    59: 'pizza',
+    60: 'donut',
+    61: 'cake',
+    62: 'chair',
+    63: 'couch',
+    64: 'potted plant',
+    65: 'bed',
+    67: 'dining table',
+    70: 'toilet',
+    72: 'tv',
+    73: 'laptop',
+    74: 'mouse',
+    75: 'remote',
+    76: 'keyboard',
+    77: 'cell phone',
+    78: 'microwave',
+    79: 'oven',
+    80: 'toaster',
+    81: 'sink',
+    82: 'refrigerator',
+    84: 'book',
+    85: 'clock',
+    86: 'vase',
+    87: 'scissors',
+    88: 'teddy bear',
+    89: 'hair drier',
+    90: 'toothbrush'
+}
+
+
+def label_lookup_coco(c):
+    """Returns the class label (string) for the given COCO class ID."""
+    if c in CATEGORIES_COCO:
+        return CATEGORIES_COCO[c]
+    raise ValueError()
+
+
+def class_id_lookup_coco(label):
+    """Returns the class ID (integer) for the given COCO label."""
+    if label is None:
+        raise ValueError()
+    return list(CATEGORIES_COCO.keys())[list(CATEGORIES_COCO.values()).index(label.lower())]
+
+
+# Object categories from PASCAL VOC 2007-2012
+CATEGORIES_VOC07 = {
+    0: "background",
+    1: "aeroplane",
+    2: "bicycle",
+    3: "bird",
+    4: "boat",
+    5: "bottle",
+    6: "bus",
+    7: "car",
+    8: "cat",
+    9: "chair",
+    10: "cow",
+    11: "diningtable",
+    12: "dog",
+    13: "horse",
+    14: "motorbike",
+    15: "person",
+    16: "pottedplant",
+    17: "sheep",
+    18: "sofa",
+    19: "train",
+    20: "tvmonitor"
+}
+
+
+def label_lookup_voc07(c):
+    """Returns the class label (string) for the given VOC07-12 class ID."""
+    if c in CATEGORIES_VOC07:
+        return CATEGORIES_VOC07[c]
+    raise ValueError()
+
+
+def class_id_lookup_voc07(label):
+    """Returns the class ID (integer) for the given VOC07-12 label."""
+    if label is None:
+        raise ValueError()
+    return list(CATEGORIES_VOC07.keys())[list(CATEGORIES_VOC07.values()).index(label.lower())]

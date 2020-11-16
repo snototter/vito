@@ -1,6 +1,16 @@
-# import pytest
+import pytest
 import numpy as np
-from vito.detection2d import BoundingBox, iou
+from vito.detection2d import BoundingBox, Detection, Size, iou, filter_detection_classes,\
+    label_lookup_coco, class_id_lookup_coco, label_lookup_voc07, class_id_lookup_voc07
+
+
+def test_size():
+    sz1 = Size.from_hw(60, 30)
+    sz2 = Size.from_wh(30, 60)
+    assert sz1 == sz2
+    assert sz1.area() == 1800
+    assert sz1.width == 30
+    assert sz1.height == 60
 
 
 def test_bbox_init():
@@ -66,3 +76,74 @@ def test_bbox_area():
     bb.width = 0
     bb.height = 1
     assert bb.area() == 0
+
+
+def test_detection2d():
+    d1 = Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    d2 = Detection("person", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 1e7)
+
+    assert d1.class_id == 2
+    assert d1.score == 0.5
+    assert d2.class_id == 'person'
+    assert d2.score == 1e7
+
+    dets = [
+        d1, d2,
+        Detection(20, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection("car", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection("person", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5),
+        Detection("person", BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
+    ]
+    ls = filter_detection_classes(dets, 2)
+    assert len(ls) == 2
+    # Filtering should keep the original order
+    assert ls[0] == d1
+
+    ls = filter_detection_classes(dets, "car")
+    assert len(ls) == 1
+    assert ls[0].class_id == 'car'
+
+    ls = filter_detection_classes(dets, ["person", 2])
+    assert len(ls) == 5
+    assert ls[0] == d1
+    assert ls[1] == d2
+    assert ls[2].class_id == 2
+    assert ls[3].class_id == 'person'
+    assert ls[4].class_id == 'person'
+
+    ls = filter_detection_classes(dets, [])
+    assert len(ls) == 0
+    ls = filter_detection_classes(dets, -2)
+    assert len(ls) == 0
+
+
+def test_coco_labels():
+    with pytest.raises(ValueError):
+        class_id_lookup_coco('foobar')
+    with pytest.raises(ValueError):
+        class_id_lookup_coco(None)
+    assert class_id_lookup_coco('Person') == 1
+    assert class_id_lookup_coco('toothbrush') == 90
+
+    with pytest.raises(ValueError):
+        label_lookup_coco(-1)
+    assert label_lookup_coco(1) == 'person'
+    assert label_lookup_coco(2) == 'bicycle'
+    assert label_lookup_coco(90) == 'toothbrush'
+
+
+def test_voc07_labels():
+    with pytest.raises(ValueError):
+        class_id_lookup_voc07('foobar')
+    with pytest.raises(ValueError):
+        class_id_lookup_voc07(None)
+    assert class_id_lookup_voc07('Person') == 15
+    assert class_id_lookup_voc07('background') == 0
+    assert class_id_lookup_voc07('cow') == 10
+
+    with pytest.raises(ValueError):
+        label_lookup_voc07(-1)
+    assert label_lookup_voc07(1) == 'aeroplane'
+    assert label_lookup_voc07(10) == 'cow'
+    assert label_lookup_voc07(20) == 'tvmonitor'
