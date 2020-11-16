@@ -3,7 +3,10 @@ from types import SimpleNamespace
 
 
 def iou(bbox1, bbox2):
-    """Compute intersection over union for the two bounding boxes given in rect representation: [left, top, width, height]."""
+    """
+    Computes the intersection over union for the two bounding boxes
+    given in rect representation: [left, top, width, height].
+    """
     if bbox1 is None or bbox2 is None:
         return 0.0
     if isinstance(bbox1, BoundingBox):
@@ -38,7 +41,14 @@ def iou(bbox1, bbox2):
 
 
 def filter_detection_classes(detections, class_filter):
-    """TODO doc"""
+    """
+    Returns the filtered list of detections that satisfy the given 'class_filter'.
+
+    detections:     A list of Detection instances.
+
+    class_filter:   Either 1) a list of object class IDs or labels
+                    or 2) a single object class ID or label.
+    """
     return [d for d in detections if d.is_class(class_filter)]
 
 
@@ -64,7 +74,12 @@ class Detection(SimpleNamespace):
         super().__init__(class_id=class_id, bounding_box=bounding_box, score=score)
 
     def is_class(self, class_filter):
-        """TODO doc class_filter can be a list of sIDs, labels or a single ID/label"""
+        """
+        Checks if this instance satisfies the given 'class_filter'.
+
+        class_filter:  Either 1) a list of object class IDs or labels
+                        or 2) a single object class ID or label.
+        """
         if isinstance(class_filter, list):
             return any([self.class_id == c for c in class_filter])
         else:
