@@ -84,7 +84,7 @@ class Detection(SimpleNamespace):
             return any([self.class_id == c for c in class_filter])
         else:
             return self.class_id == class_filter
-        
+
 
 class BoundingBox(SimpleNamespace):
     """Axis-aligned bounding box."""
