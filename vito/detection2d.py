@@ -318,3 +318,32 @@ def class_id_lookup_voc07(label):
     if label is None:
         raise ValueError()
     return list(CATEGORIES_VOC07.keys())[list(CATEGORIES_VOC07.values()).index(label.lower())]
+
+
+class LabelMap(object):
+    @classmethod
+    def from_map(cls, label_map, name=None):
+        return cls(label_map, name)
+    
+    @classmethod
+    def from_list(cls, label_list, name=None):
+        lm = { i: lbl for i,lbl in enumerate(label_list) }
+        return cls(lm, name)
+    
+    def __init__(self, label_map, name):
+        self.label_map = label_map
+        self.name = name
+    
+    def label(self, c):
+        if isinstance(c, Detection):
+            cid = c.class_id
+        else:
+            cid = c
+        if cid in self.label_map:
+            return self.label_map[cid]
+        raise ValueError()
+
+    def class_id(self, lbl):
+        if label is None:
+            raise ValueError()
+        return list(self.label_map.keys())[list(self.label_map.values()).index(label.lower())]

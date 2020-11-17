@@ -65,6 +65,8 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* Upcoming
+  * Support custom label maps in `detection2d` module.
 * `1.3.1`
   * Relative `BoundingBox` representation.
   * Support label lookup for `Detection` instances directly.
