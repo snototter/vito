@@ -319,7 +319,8 @@ def class_id_lookup_voc07(label):
         raise ValueError()
     return list(CATEGORIES_VOC07.keys())[list(CATEGORIES_VOC07.values()).index(label.lower())]
 
-
+# TODO encapsulate coco/voc via
+# LabelMapVOC = LabelMap.from_map(...)
 class LabelMap(object):
     @classmethod
     def from_map(cls, label_map, name=None):
@@ -344,6 +345,6 @@ class LabelMap(object):
         raise ValueError()
 
     def class_id(self, lbl):
-        if label is None:
+        if lbl is None:
             raise ValueError()
-        return list(self.label_map.keys())[list(self.label_map.values()).index(label.lower())]
+        return list(self.label_map.keys())[list(self.label_map.values()).index(lbl.lower())]
