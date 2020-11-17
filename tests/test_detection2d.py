@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from vito.detection2d import BoundingBox, Detection, Size, iou, filter_detection_classes,\
-    label_lookup_coco, class_id_lookup_coco, label_lookup_voc07, class_id_lookup_voc07
+    LabelMapVOC07, LabelMapCOCO, LabelMap
 
 
 def test_size():
@@ -150,37 +150,40 @@ def test_detection2d():
 
 def test_coco_labels():
     with pytest.raises(ValueError):
-        class_id_lookup_coco('foobar')
+        LabelMapCOCO.class_id('foobar')
     with pytest.raises(ValueError):
-        class_id_lookup_coco(None)
-    assert class_id_lookup_coco('Person') == 1
-    assert class_id_lookup_coco('toothbrush') == 90
+        LabelMapCOCO.class_id(None)
+    assert LabelMapCOCO.class_id('Person') == 1
+    assert LabelMapCOCO.class_id('toothbrush') == 90
 
     det = Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
-    assert label_lookup_coco(det) == 'bicycle'
+    assert LabelMapCOCO.label(det) == 'bicycle'
 
     with pytest.raises(ValueError):
-        label_lookup_coco(-1)
-    assert label_lookup_coco(1) == 'person'
-    assert label_lookup_coco(2) == 'bicycle'
-    assert label_lookup_coco(90) == 'toothbrush'
+        LabelMapCOCO.label(-1)
+    assert LabelMapCOCO.label(1) == 'person'
+    assert LabelMapCOCO.label(2) == 'bicycle'
+    assert LabelMapCOCO.label(90) == 'toothbrush'
 
 
 def test_voc07_labels():
+    lbl_list = LabelMapVOC07.label_map.values()
+    lm = LabelMap.from_list(lbl_list)
+
     with pytest.raises(ValueError):
-        class_id_lookup_voc07('foobar')
+        lm.class_id('foobar')
     with pytest.raises(ValueError):
-        class_id_lookup_voc07(None)
+        lm.class_id(None)
 
     det = Detection(3, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
-    assert label_lookup_voc07(det) == 'bird'
+    assert lm.label(det) == 'bird'
 
-    assert class_id_lookup_voc07('Person') == 15
-    assert class_id_lookup_voc07('background') == 0
-    assert class_id_lookup_voc07('cow') == 10
+    assert lm.class_id('Person') == 15
+    assert lm.class_id('background') == 0
+    assert lm.class_id('cow') == 10
 
     with pytest.raises(ValueError):
-        label_lookup_voc07(-1)
-    assert label_lookup_voc07(1) == 'aeroplane'
-    assert label_lookup_voc07(10) == 'cow'
-    assert label_lookup_voc07(20) == 'tvmonitor'
+        lm.label(-1)
+    assert lm.label(1) == 'aeroplane'
+    assert lm.label(10) == 'cow'
+    assert lm.label(20) == 'tvmonitor'

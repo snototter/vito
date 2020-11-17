@@ -258,24 +258,6 @@ CATEGORIES_COCO = {
 }
 
 
-def label_lookup_coco(c):
-    """Returns the class label (string) for the given COCO class ID (or detection)."""
-    if isinstance(c, Detection):
-        cid = c.class_id
-    else:
-        cid = c
-    if cid in CATEGORIES_COCO:
-        return CATEGORIES_COCO[cid]
-    raise ValueError()
-
-
-def class_id_lookup_coco(label):
-    """Returns the class ID (integer) for the given COCO label."""
-    if label is None:
-        raise ValueError()
-    return list(CATEGORIES_COCO.keys())[list(CATEGORIES_COCO.values()).index(label.lower())]
-
-
 # Object categories from PASCAL VOC 2007-2012
 CATEGORIES_VOC07 = {
     0: "background",
@@ -302,32 +284,17 @@ CATEGORIES_VOC07 = {
 }
 
 
-def label_lookup_voc07(c):
-    """Returns the class label (string) for the given VOC07-12 class ID or detection."""
-    if isinstance(c, Detection):
-        cid = c.class_id
-    else:
-        cid = c
-    if cid in CATEGORIES_VOC07:
-        return CATEGORIES_VOC07[cid]
-    raise ValueError()
-
-
-def class_id_lookup_voc07(label):
-    """Returns the class ID (integer) for the given VOC07-12 label."""
-    if label is None:
-        raise ValueError()
-    return list(CATEGORIES_VOC07.keys())[list(CATEGORIES_VOC07.values()).index(label.lower())]
-
 # TODO encapsulate coco/voc via
 # LabelMapVOC = LabelMap.from_map(...)
 class LabelMap(object):
     @classmethod
     def from_map(cls, label_map, name=None):
+        """Creates a label map from a dictionary of { class_id : label }."""
         return cls(label_map, name)
     
     @classmethod
     def from_list(cls, label_list, name=None):
+        """Creates a label map from a list of category labels."""
         lm = { i: lbl for i,lbl in enumerate(label_list) }
         return cls(lm, name)
     
@@ -336,6 +303,7 @@ class LabelMap(object):
         self.name = name
     
     def label(self, c):
+        """Returns the class label (string) for the given class ID or Detection instance 'c'."""
         if isinstance(c, Detection):
             cid = c.class_id
         else:
@@ -345,6 +313,13 @@ class LabelMap(object):
         raise ValueError()
 
     def class_id(self, lbl):
+        """Returns the class ID (integer) for the given label (string)."""
         if lbl is None:
             raise ValueError()
         return list(self.label_map.keys())[list(self.label_map.values()).index(lbl.lower())]
+
+
+LabelMapVOC07 = LabelMap.from_map(CATEGORIES_VOC07)
+
+
+LabelMapCOCO = LabelMap.from_map(CATEGORIES_COCO)
