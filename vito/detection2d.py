@@ -88,6 +88,7 @@ class Detection(SimpleNamespace):
     def scale(self, scale_x, scale_y=None):
         """Scale the bounding box."""
         self.bounding_box.scale(scale_x, scale_y)
+        return self
 
 
 class BoundingBox(SimpleNamespace):

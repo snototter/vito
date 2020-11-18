@@ -148,13 +148,14 @@ def test_detection2d():
     assert len(ls) == 0
 
     d1 = Detection(2, BoundingBox.from_rect_repr([17, 3, 40, 10]), 0.5)
-    d1.scale(3)
+    d2 = d1.scale(3)
     assert d1.class_id == 2
     assert d1.score == 0.5
     assert d1.bounding_box.left == 51
     assert d1.bounding_box.width == 120
     assert d1.bounding_box.top == 9
     assert d1.bounding_box.height == 30
+    assert d2 == d1
 
     d1.scale(0.5, 2)
     assert d1.class_id == 2
