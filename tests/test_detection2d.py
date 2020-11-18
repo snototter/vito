@@ -147,6 +147,23 @@ def test_detection2d():
     ls = filter_detection_classes(dets, -2)
     assert len(ls) == 0
 
+    d1 = Detection(2, BoundingBox.from_rect_repr([17, 3, 40, 10]), 0.5)
+    d1.scale(3)
+    assert d1.class_id == 2
+    assert d1.score == 0.5
+    assert d1.bounding_box.left == 51
+    assert d1.bounding_box.width == 120
+    assert d1.bounding_box.top == 9
+    assert d1.bounding_box.height == 30
+
+    d1.scale(0.5, 2)
+    assert d1.class_id == 2
+    assert d1.score == 0.5
+    assert d1.bounding_box.left == 25.5
+    assert d1.bounding_box.width == 60
+    assert d1.bounding_box.top == 18
+    assert d1.bounding_box.height == 60
+
 
 def test_coco_labels():
     with pytest.raises(ValueError):

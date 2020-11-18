@@ -84,6 +84,10 @@ class Detection(SimpleNamespace):
             return any([self.class_id == c for c in class_filter])
         else:
             return self.class_id == class_filter
+    
+    def scale(self, scale_x, scale_y=None):
+        """Scale the bounding box."""
+        self.bounding_box.scale(scale_x, scale_y)
 
 
 class BoundingBox(SimpleNamespace):
@@ -117,6 +121,14 @@ class BoundingBox(SimpleNamespace):
 
     def __init__(self, left, top, width, height):
         super().__init__(left=left, top=top, width=width, height=height)
+
+    def scale(self, scale_x, scale_y=None):
+        if scale_y is None:
+            scale_y = scale_x
+        self.left *= scale_x
+        self.width *= scale_x
+        self.top *= scale_y
+        self.height *= scale_y
 
     def to_corner_repr(self, img_size=None):
         """
