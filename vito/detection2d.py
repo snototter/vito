@@ -84,39 +84,73 @@ class Detection(SimpleNamespace):
             return any([self.class_id == c for c in class_filter])
         else:
             return self.class_id == class_filter
+    
+    def scale(self, scale_x, scale_y=None):
+        """Scale the bounding box."""
+        self.bounding_box.scale(scale_x, scale_y)
+        return self
 
 
 class BoundingBox(SimpleNamespace):
     """Axis-aligned bounding box."""
 
     @classmethod
-    def from_corner_repr(cls, corner_repr):
-        """Returns a BoundingBox from the 4-element argument corner_repr = [xmin, ymin, xmax, ymax]."""
+    def from_corner_repr(cls, corner_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument corner_repr = [xmin, ymin, xmax, ymax].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
         xmin, ymin, xmax, ymax = corner_repr
         w, h = xmax - xmin, ymax - ymin
-        return cls(left=xmin, top=ymin, width=w, height=h)
+        return cls(left=xmin, top=ymin, width=w, height=h, img_size=img_size)
 
     @classmethod
-    def from_minmax_repr(cls, minmax_repr):
-        """Returns a BoundingBox from the 4-element argument minmax_repr = [xmin, xmax, ymin, ymax]."""
+    def from_minmax_repr(cls, minmax_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument minmax_repr = [xmin, xmax, ymin, ymax].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
         xmin, xmax, ymin, ymax = minmax_repr
         w, h = xmax - xmin, ymax - ymin
-        return cls(left=xmin, top=ymin, width=w, height=h)
+        return cls(left=xmin, top=ymin, width=w, height=h, img_size=img_size)
 
     @classmethod
-    def from_centroid_repr(cls, centroid_repr):
-        """Returns a BoundingBox from the 4-element argument centroid_repr = [cx, cy, w, h]."""
+    def from_centroid_repr(cls, centroid_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument centroid_repr = [cx, cy, w, h].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
         cx, cy, w, h = centroid_repr
         left, top = cx - w/2, cy - h/2
-        return cls(left=left, top=top, width=w, height=h)
+        return cls(left=left, top=top, width=w, height=h, img_size=img_size)
 
     @classmethod
-    def from_rect_repr(cls, rect_repr):
-        """Returns a BoundingBox from the 4-element argument rect_repr = [left, top, width, height]."""
-        return cls(left=rect_repr[0], top=rect_repr[1], width=rect_repr[2], height=rect_repr[3])
+    def from_rect_repr(cls, rect_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument rect_repr = [left, top, width, height].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
+        return cls(left=rect_repr[0], top=rect_repr[1], width=rect_repr[2], height=rect_repr[3], img_size=img_size)
 
-    def __init__(self, left, top, width, height):
+    def __init__(self, left, top, width, height, img_size=None):
+        if img_size is not None:
+            left *= img_size.width
+            width *= img_size.width
+            top *= img_size.height
+            height *= img_size.height
         super().__init__(left=left, top=top, width=width, height=height)
+
+    def scale(self, scale_x, scale_y=None):
+        if scale_y is None:
+            scale_y = scale_x
+        self.left *= scale_x
+        self.width *= scale_x
+        self.top *= scale_y
+        self.height *= scale_y
 
     def to_corner_repr(self, img_size=None):
         """
@@ -258,24 +292,6 @@ CATEGORIES_COCO = {
 }
 
 
-def label_lookup_coco(c):
-    """Returns the class label (string) for the given COCO class ID (or detection)."""
-    if isinstance(c, Detection):
-        cid = c.class_id
-    else:
-        cid = c
-    if cid in CATEGORIES_COCO:
-        return CATEGORIES_COCO[cid]
-    raise ValueError()
-
-
-def class_id_lookup_coco(label):
-    """Returns the class ID (integer) for the given COCO label."""
-    if label is None:
-        raise ValueError()
-    return list(CATEGORIES_COCO.keys())[list(CATEGORIES_COCO.values()).index(label.lower())]
-
-
 # Object categories from PASCAL VOC 2007-2012
 CATEGORIES_VOC07 = {
     0: "background",
@@ -302,19 +318,42 @@ CATEGORIES_VOC07 = {
 }
 
 
-def label_lookup_voc07(c):
-    """Returns the class label (string) for the given VOC07-12 class ID or detection."""
-    if isinstance(c, Detection):
-        cid = c.class_id
-    else:
-        cid = c
-    if cid in CATEGORIES_VOC07:
-        return CATEGORIES_VOC07[cid]
-    raise ValueError()
-
-
-def class_id_lookup_voc07(label):
-    """Returns the class ID (integer) for the given VOC07-12 label."""
-    if label is None:
+# TODO encapsulate coco/voc via
+# LabelMapVOC = LabelMap.from_map(...)
+class LabelMap(object):
+    @classmethod
+    def from_map(cls, label_map, name=None):
+        """Creates a label map from a dictionary of { class_id : label }."""
+        return cls(label_map, name)
+    
+    @classmethod
+    def from_list(cls, label_list, name=None):
+        """Creates a label map from a list of category labels."""
+        lm = { i: lbl for i,lbl in enumerate(label_list) }
+        return cls(lm, name)
+    
+    def __init__(self, label_map, name):
+        self.label_map = label_map
+        self.name = name
+    
+    def label(self, c):
+        """Returns the class label (string) for the given class ID or Detection instance 'c'."""
+        if isinstance(c, Detection):
+            cid = c.class_id
+        else:
+            cid = c
+        if cid in self.label_map:
+            return self.label_map[cid]
         raise ValueError()
-    return list(CATEGORIES_VOC07.keys())[list(CATEGORIES_VOC07.values()).index(label.lower())]
+
+    def class_id(self, lbl):
+        """Returns the class ID (integer) for the given label (string)."""
+        if lbl is None:
+            raise ValueError()
+        return list(self.label_map.keys())[list(self.label_map.values()).index(lbl.lower())]
+
+
+LabelMapVOC07 = LabelMap.from_map(CATEGORIES_VOC07)
+
+
+LabelMapCOCO = LabelMap.from_map(CATEGORIES_COCO)

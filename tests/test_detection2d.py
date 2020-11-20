@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from vito.detection2d import BoundingBox, Detection, Size, iou, filter_detection_classes,\
-    label_lookup_coco, class_id_lookup_coco, label_lookup_voc07, class_id_lookup_voc07
+    LabelMapVOC07, LabelMapCOCO, LabelMap
 
 
 def test_size():
@@ -34,6 +34,14 @@ def test_bbox_init():
 
     bb_rect = BoundingBox.from_rect_repr(bb_centroid.to_rect_repr())
     assert bb_corner == bb_rect
+
+
+def bb_approx_equal(a, b):
+    """Test if two bounding boxes are approximately equal (up to rounding precision)."""
+    assert a.left == pytest.approx(b.left)
+    assert a.top == pytest.approx(b.top)
+    assert a.width == pytest.approx(b.width)
+    assert a.height == pytest.approx(b.height)
 
 
 def test_bbox_conversion():
@@ -72,6 +80,11 @@ def test_bbox_conversion():
     assert bb_rel[1] == pytest.approx(2/3)  # cy
     assert bb_rel[2] == 0.25  # w
     assert bb_rel[3] == pytest.approx(2/3)  # h
+
+    with pytest.raises(AttributeError):
+        bb_abs = BoundingBox.from_centroid_repr(bb_rel, [100, 200])
+    bb_abs = BoundingBox.from_centroid_repr(bb_rel, Size(200, 210))
+    bb_approx_equal(bb_abs, bb)
 
 
 def test_bbox_iou():
@@ -147,40 +160,61 @@ def test_detection2d():
     ls = filter_detection_classes(dets, -2)
     assert len(ls) == 0
 
+    d1 = Detection(2, BoundingBox.from_rect_repr([17, 3, 40, 10]), 0.5)
+    d2 = d1.scale(3)
+    assert d1.class_id == 2
+    assert d1.score == 0.5
+    assert d1.bounding_box.left == 51
+    assert d1.bounding_box.width == 120
+    assert d1.bounding_box.top == 9
+    assert d1.bounding_box.height == 30
+    assert d2 == d1
+
+    d1.scale(0.5, 2)
+    assert d1.class_id == 2
+    assert d1.score == 0.5
+    assert d1.bounding_box.left == 25.5
+    assert d1.bounding_box.width == 60
+    assert d1.bounding_box.top == 18
+    assert d1.bounding_box.height == 60
+
 
 def test_coco_labels():
     with pytest.raises(ValueError):
-        class_id_lookup_coco('foobar')
+        LabelMapCOCO.class_id('foobar')
     with pytest.raises(ValueError):
-        class_id_lookup_coco(None)
-    assert class_id_lookup_coco('Person') == 1
-    assert class_id_lookup_coco('toothbrush') == 90
+        LabelMapCOCO.class_id(None)
+    assert LabelMapCOCO.class_id('Person') == 1
+    assert LabelMapCOCO.class_id('toothbrush') == 90
 
     det = Detection(2, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
-    assert label_lookup_coco(det) == 'bicycle'
+    assert LabelMapCOCO.label(det) == 'bicycle'
 
     with pytest.raises(ValueError):
-        label_lookup_coco(-1)
-    assert label_lookup_coco(1) == 'person'
-    assert label_lookup_coco(2) == 'bicycle'
-    assert label_lookup_coco(90) == 'toothbrush'
+        LabelMapCOCO.label(-1)
+    assert LabelMapCOCO.label(1) == 'person'
+    assert LabelMapCOCO.label(2) == 'bicycle'
+    assert LabelMapCOCO.label(90) == 'toothbrush'
 
 
 def test_voc07_labels():
+    lbl_list = LabelMapVOC07.label_map.values()
+    lm = LabelMap.from_list(lbl_list)
+
     with pytest.raises(ValueError):
-        class_id_lookup_voc07('foobar')
+        lm.class_id('foobar')
     with pytest.raises(ValueError):
-        class_id_lookup_voc07(None)
+        lm.class_id(None)
 
     det = Detection(3, BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4)), 0.5)
-    assert label_lookup_voc07(det) == 'bird'
+    assert lm.label(det) == 'bird'
 
-    assert class_id_lookup_voc07('Person') == 15
-    assert class_id_lookup_voc07('background') == 0
-    assert class_id_lookup_voc07('cow') == 10
+    assert lm.class_id('Person') == 15
+    assert lm.class_id('background') == 0
+    assert lm.class_id('cow') == 10
 
     with pytest.raises(ValueError):
-        label_lookup_voc07(-1)
-    assert label_lookup_voc07(1) == 'aeroplane'
-    assert label_lookup_voc07(10) == 'cow'
-    assert label_lookup_voc07(20) == 'tvmonitor'
+        lm.label(-1)
+    assert lm.label(1) == 'aeroplane'
+    assert lm.label(10) == 'cow'
+    assert lm.label(20) == 'tvmonitor'
