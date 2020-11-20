@@ -36,6 +36,14 @@ def test_bbox_init():
     assert bb_corner == bb_rect
 
 
+def bb_approx_equal(a, b):
+    """Test if two bounding boxes are approximately equal (up to rounding precision)."""
+    assert a.left == pytest.approx(b.left)
+    assert a.top == pytest.approx(b.top)
+    assert a.width == pytest.approx(b.width)
+    assert a.height == pytest.approx(b.height)
+
+
 def test_bbox_conversion():
     bb = BoundingBox.from_rect_repr(np.random.randint(0, 1e6, 4))
     assert BoundingBox.from_rect_repr(bb.to_rect_repr()) == bb
@@ -72,6 +80,11 @@ def test_bbox_conversion():
     assert bb_rel[1] == pytest.approx(2/3)  # cy
     assert bb_rel[2] == 0.25  # w
     assert bb_rel[3] == pytest.approx(2/3)  # h
+
+    with pytest.raises(AttributeError):
+        bb_abs = BoundingBox.from_centroid_repr(bb_rel, [100, 200])
+    bb_abs = BoundingBox.from_centroid_repr(bb_rel, Size(200, 210))
+    bb_approx_equal(bb_abs, bb)
 
 
 def test_bbox_iou():

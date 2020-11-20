@@ -95,32 +95,53 @@ class BoundingBox(SimpleNamespace):
     """Axis-aligned bounding box."""
 
     @classmethod
-    def from_corner_repr(cls, corner_repr):
-        """Returns a BoundingBox from the 4-element argument corner_repr = [xmin, ymin, xmax, ymax]."""
+    def from_corner_repr(cls, corner_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument corner_repr = [xmin, ymin, xmax, ymax].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
         xmin, ymin, xmax, ymax = corner_repr
         w, h = xmax - xmin, ymax - ymin
-        return cls(left=xmin, top=ymin, width=w, height=h)
+        return cls(left=xmin, top=ymin, width=w, height=h, img_size=img_size)
 
     @classmethod
-    def from_minmax_repr(cls, minmax_repr):
-        """Returns a BoundingBox from the 4-element argument minmax_repr = [xmin, xmax, ymin, ymax]."""
+    def from_minmax_repr(cls, minmax_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument minmax_repr = [xmin, xmax, ymin, ymax].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
         xmin, xmax, ymin, ymax = minmax_repr
         w, h = xmax - xmin, ymax - ymin
-        return cls(left=xmin, top=ymin, width=w, height=h)
+        return cls(left=xmin, top=ymin, width=w, height=h, img_size=img_size)
 
     @classmethod
-    def from_centroid_repr(cls, centroid_repr):
-        """Returns a BoundingBox from the 4-element argument centroid_repr = [cx, cy, w, h]."""
+    def from_centroid_repr(cls, centroid_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument centroid_repr = [cx, cy, w, h].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
         cx, cy, w, h = centroid_repr
         left, top = cx - w/2, cy - h/2
-        return cls(left=left, top=top, width=w, height=h)
+        return cls(left=left, top=top, width=w, height=h, img_size=img_size)
 
     @classmethod
-    def from_rect_repr(cls, rect_repr):
-        """Returns a BoundingBox from the 4-element argument rect_repr = [left, top, width, height]."""
-        return cls(left=rect_repr[0], top=rect_repr[1], width=rect_repr[2], height=rect_repr[3])
+    def from_rect_repr(cls, rect_repr, img_size=None):
+        """
+        Returns a BoundingBox from the 4-element argument rect_repr = [left, top, width, height].
+        If img_size is not None, the representation will be scaled by the image dimension,
+        i.e. img_size.width and img_size.height.
+        """
+        return cls(left=rect_repr[0], top=rect_repr[1], width=rect_repr[2], height=rect_repr[3], img_size=img_size)
 
-    def __init__(self, left, top, width, height):
+    def __init__(self, left, top, width, height, img_size=None):
+        if img_size is not None:
+            left *= img_size.width
+            width *= img_size.width
+            top *= img_size.height
+            height *= img_size.height
         super().__init__(left=left, top=top, width=width, height=height)
 
     def scale(self, scale_x, scale_y=None):
