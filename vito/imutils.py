@@ -40,10 +40,12 @@ def rgb2gray(nparray, is_bgr=False):
         return np.dot(nparray[..., :3], [0.2989, 0.5870, 0.1140]).astype(nparray.dtype)
     
 
-
+import logging
+__log_fx = print if len(logging.getLogger().handlers) == 0 else logging.getLogger().info 
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
+    __log_fx("vito.imutils will use OpenCV to save images via 'imsave'.")
 
     def imsave(filename, image, flip_channels=False):  # pragma: no cover
         """Store an image using OpenCV."""
@@ -54,6 +56,7 @@ try:
         else:
             cv2.imwrite(filename, image)
 except:
+    __log_fx("vito.imutils will use Pillow to save images via 'imsave' (OpenCV could not be loaded).")
     # Fall back to Pillow
     def imsave(filename, image, flip_channels=False):
         """Store an image using PIL/Pillow, optionally flipping layers, i.e. BGR -> RGB."""
