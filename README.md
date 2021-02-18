@@ -65,6 +65,10 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* `1.3.3`
+  * Prevent nan values caused by floating point precision issues in the `cam_projections` submodule.
+  * Remove the (empty) `tracking` submodule (to be added in a future release).
+  * Update the submodule list.
 * `1.3.2`
   * Support custom label maps in `detection2d` module.
   * Construct `BoundingBox`es from relative representations.

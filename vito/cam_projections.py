@@ -372,4 +372,6 @@ def compare_rotation_matrices(R1, R2):
     # Compute the axis-angle representation using
     # trace(R_12) = 1 + 2*cos(theta) and return the
     # angle as rotation error/deviation.
-    return np.arccos((np.trace(r_12) - 1.0) / 2.0)
+    # max(-1, min(1, ...) prevents nan values due to
+    # floating point precision.
+    return np.arccos(max(-1, min(1, (np.trace(r_12) - 1.0) / 2.0)))

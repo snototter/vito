@@ -4,7 +4,8 @@
 Python utility package for common computer vision tasks.
 """
 
-__all__ = ['cam_projections', 'colormaps', 'flowutils', 'imutils', 'imvis', 'pyutils']
+__all__ = ['cam_projections', 'colormaps', 'detection2d',
+           'flowutils', 'imutils', 'imvis', 'pyutils']
 __author__ = 'snototter'
 
 # Load version
