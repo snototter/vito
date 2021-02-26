@@ -65,6 +65,10 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* Upcoming `1.3.4`
+  * Extended input handling for `imutils` (support single channel input to rgb2gray)
+  * Aliases for some `imutils` functions
+  * Cleaning up TODO FIXME there were some typos!!!!!
 * `1.3.3`
   * Prevent nan values caused by floating point precision issues in the `cam_projections` submodule.
   * Remove the (empty) `tracking` submodule (to be added in a future release).

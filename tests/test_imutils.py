@@ -2,8 +2,8 @@ import numpy as np
 import os
 import pytest
 from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
-    ndarray2memory_file, memory_file2ndarray, roi, pad, rgb2gray, \
-    pixelate, gaussian_blur, set_to
+    ndarray2memory_file, memory_file2ndarray, roi, crop, pad, rgb2gray, \
+    grayscale, pixelate, gaussian_blur, set_to, ensure_c3
 from vito.pyutils import safe_shell_output
 
 
@@ -277,6 +277,8 @@ def test_roi():
             else:
                 expected = x[t:b, l:r, :]
             assert np.all(expected[:] == roi_[:])
+    # Ensure crop() is an alias to roi()
+    assert crop == roi
 
 
 def test_pad():
@@ -332,17 +334,40 @@ def test_pad():
 
 def test_rgb2gray():
     assert rgb2gray(None) is None
-    x = np.zeros((2, 3, 4), dtype=np.uint8)
-    frgb = [0.2989, 0.5870, 0.1140]
-    fbgr = frgb[::-1]
-    for c in range(3):
-        y = x.copy()
-        y[:, :, c] = 255
-        g = rgb2gray(y, False)
-        assert g.ndim == 2 or (g.ndim == 3 and g.shape[2] == 1)
-        assert np.all(g[:] == np.uint8(frgb[c]*255.0))
-        g = rgb2gray(y, True)
-        assert np.all(g[:] == np.uint8(fbgr[c]*255.0))
+    # Single channel input v1
+    x = np.random.randint(0, 255, size=(17, 23), dtype=np.uint8)
+    g = rgb2gray(x)
+    assert np.array_equal(x, g)
+    # Single channel input v2
+    x = np.random.randint(0, 255, size=(17, 23, 1), dtype=np.uint8)
+    g = rgb2gray(x)
+    assert np.array_equal(x, g)
+    # Single channel float
+    x = np.random.rand(17, 23).astype(np.float32)
+    g = rgb2gray(x)
+    assert np.array_equal(x, g)
+    # Cannot convert dual-channel to gray:
+    x = np.random.randint(0, 255, size=(15, 10, 2), dtype=np.uint8)
+    with pytest.raises(ValueError):
+        g = rgb2gray(x)
+    # RGB(A) input (uint8 and float32)
+    inputs = [np.zeros((2, 3, 3), dtype=np.uint8),
+              np.zeros((5, 17, 4), dtype=np.uint8),
+              np.zeros((23, 5, 3), dtype=np.float32),
+              np.zeros((18, 12, 4), dtype=np.float32)]
+    for x, scalar, cast in zip(inputs, [255.0, 255.0, 1.0, 1.0], [np.uint8, np.uint8, np.float32, np.float32]):
+        frgb = [0.2989, 0.5870, 0.1140]
+        fbgr = frgb[::-1]
+        for c in range(3):
+            y = x.copy()
+            y[:, :, c] = scalar
+            g = rgb2gray(y, False)
+            assert g.ndim == 2 or (g.ndim == 3 and g.shape[2] == 1)
+            assert np.all(g[:] == cast(frgb[c]*scalar))
+            g = rgb2gray(y, True)
+            assert np.all(g[:] == cast(fbgr[c]*scalar))
+    # Ensure grayscale is an alias to rgb2gray
+    assert grayscale == rgb2gray
 
 
 def test_pixelate():
@@ -408,3 +433,28 @@ def test_set_to():
     assert res.shape == (5, 6, 4)
     for ch in range(res.shape[2]):
         assert np.all(res[:, :, ch] == val[ch])
+
+
+def test_ensure_c3():
+    # Invalid inputs
+    assert ensure_c3(None) is None
+    for invalid in [np.zeros(17), np.ones((4, 3, 2)), np.zeros((2, 2, 5))]:
+        with pytest.raises(ValueError):
+            ensure_c3(invalid)
+    # Grayscale image (2-dim)
+    x = np.random.randint(0, 255, (20, 30))
+    c3 = ensure_c3(x)
+    assert c3.ndim == 3 and c3.shape[2] == 3
+    for c in range(3):
+        assert np.array_equal(x, c3[:, :, c])
+    # Grayscale image (3-dim, 1-channel)
+    x = np.random.randint(0, 255, (10, 5, 1))
+    c3 = ensure_c3(x)
+    assert c3.ndim == 3 and c3.shape[2] == 3
+    for c in range(3):
+        assert np.array_equal(x[:, :, 0], c3[:, :, c])
+    # RGB(A) inputs
+    for x in [np.random.randint(0, 255, (12, 23, 3)), np.random.randint(0, 255, (12, 23, 4))]:
+        c3 = ensure_c3(x)
+        assert c3.ndim == 3 and c3.shape[2] == 3
+        assert np.array_equal(x[:, :, :3], c3)

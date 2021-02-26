@@ -32,16 +32,43 @@ def flip_layers(nparray):
     return nparray
 
 
+def ensure_c3(nparray):
+    """
+    Ensures that the output image has 3 channels.
+    Valid inputs: monochrome, 3- and 4-channel images.
+    """
+    if nparray is None:
+        return None
+    if nparray.ndim == 2:
+        return np.repeat(nparray[:, :, np.newaxis], 3, axis=2)
+    if nparray.ndim == 3:
+        if nparray.shape[2] == 1:
+            return np.repeat(nparray[:, :, :], 3, axis=2)
+        elif nparray.shape[2] == 3:
+            return nparray
+        elif nparray.shape[2] == 4:
+            return nparray[:, :, :3]
+    raise ValueError("Invalid input to ensure_c3, input must be a 1-, 3- or 4-channel image.")
+
+
 def rgb2gray(nparray, is_bgr=False):
     """
     Convert RGB image to grayscale using L = 0.2989 R + 0.5870 G + 0.1140 B.
     """
     if nparray is None:
         return None
+    if nparray.ndim == 2 or (nparray.ndim == 3 and nparray.shape[2] == 1):
+        return nparray
+    if nparray.ndim == 3 and nparray.shape[2] == 2:
+        raise ValueError('Cannot convert a 2 channel input image to grayscale.')
     if is_bgr:
         return np.dot(nparray[..., :3], [0.1140, 0.5870, 0.2989]).astype(nparray.dtype)
     else:
         return np.dot(nparray[..., :3], [0.2989, 0.5870, 0.1140]).astype(nparray.dtype)
+
+
+# Alias for convenience
+grayscale = rgb2gray
 
 
 try:
@@ -181,6 +208,10 @@ def roi(image_np, rect):
     return image_np[t:b, l:r, :]
 
 
+# Alias for convenience
+crop = roi
+
+
 def pad(image_np, border, color=None):
     """Pad the image by 'border' pixels in each direction.
 
@@ -241,7 +272,6 @@ def pixelate(image_np, block_width=5, block_height=-1):
     return np.asarray(pixelized_roi)
 
 
-# TODO test
 def gaussian_blur(image_np, radius=15):
     """Blurs the image using a Gaussian kernel with the given radius."""
     if image_np is None:
