@@ -225,12 +225,12 @@ def test_np2mem():
         x = (255.0 * np.random.randint(0, 255, s)).astype(np.uint8)
         mfpng = ndarray2memory_file(x, format='png')
         y = memory_file2ndarray(mfpng)
-        assert np.all(x[:] == y[:])
+        assert np.array_equal(x, y)
         # Encode as JPG, this should decrease quality - at least we're not
         # able to decode the original input data
         mfjpg = ndarray2memory_file(x, format='jpeg')
         y = memory_file2ndarray(mfjpg)
-        assert not np.all(x[:] == y[:])
+        assert not np.array_equal(x, y)
     # Newer PIL versions can also work with 1D data:
     x = np.random.randint(0, 255, 3).astype(np.uint8)
     mf1d = ndarray2memory_file(x)

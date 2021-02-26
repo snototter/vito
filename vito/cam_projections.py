@@ -169,8 +169,8 @@ def project_world_to_image_K_R_C(K, R, C, world_pts):
     calibrated your cameras and rectified your images.
 
     Don't confuse C (3D position vector of the camera's optical center) and
-    t = -RC !!! If you have t, you'll want to use the other
-    project_world_to_image().
+    t = -RC !!! If you have t, you'll want to use
+    project_world_to_image_K_R_t().
     """
     R = R.astype(np.float64)
     C = C.astype(np.float64)
@@ -258,7 +258,9 @@ def normalize_image_coordinates_with_distortion(K, dist_coeff, pixel_coords):
     # We also use his variable names and naming conventions
     pixel_coords = pixel_coords.astype(np.float64)
     K = K.astype(np.float64)
-    alpha_c = K[0, 1] / K[0, 0]  # In Bouguet's toolbox, K[0,:] = [f_x, alpha_c * f_x, cc_x], alpha_c is the skew coefficient
+    # In Bouguet's toolbox, K[0,:] = [f_x, alpha_c * f_x, cc_x],
+    # alpha_c is the skew coefficient
+    alpha_c = K[0, 1] / K[0, 0]
     fc = (K[0, 0], K[1, 1])
     cc = (K[0, 2], K[1, 2])
     dist_coeff = dist_coeff.astype(np.float64)
@@ -366,7 +368,7 @@ def rot3d(deg_x, deg_y, deg_z):
 
 
 def compare_rotation_matrices(R1, R2):
-    """Returns the rotation ange (radians) between two 3x3 rotation matrices."""
+    """Returns the rotation angle (radians) between two 3x3 rotation matrices."""
     # Compute rotation matrix R_1-->2 as R1' * R2
     r_12 = matmul(np.transpose(R1), R2)
     # Compute the axis-angle representation using

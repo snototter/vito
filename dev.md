@@ -1,6 +1,7 @@
 # Collection of dev commands
 * Test and report line coverage:
   ```bash
+  pip install pytest-cov
   pytest --cov-config=tests/.coveragerc --cov=vito/
   ```
 * Linting:
