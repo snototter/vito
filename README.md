@@ -65,7 +65,7 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
-* Upcoming `1.3.5`
+* Upcoming `1.4.0`
   * Changed `imvis.overlay` to use a more intuitive signature.
   * Aliases for some `cam_projections` functions.
   * Spell-checked all files via `pyspelling`.
