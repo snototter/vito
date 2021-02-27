@@ -191,7 +191,7 @@ def overlay(img1, alpha1, img2, mask=None):
     elif img1.dtype in [np.float32, np.float64]:
         scale1 = 1.0
     else:
-        raise ValueError(f'Datatype {img1.dtype} is not supported')
+        raise ValueError('Datatype {} is not supported'.format(img1.dtype))
     img1 = img1.astype(np.float64) / scale1
 
     target_dtype = img2.dtype
@@ -200,7 +200,7 @@ def overlay(img1, alpha1, img2, mask=None):
     elif img2.dtype in [np.float32, np.float64]:
         scale2 = 1.0
     else:
-        raise ValueError(f'Datatype {img2.dtype} is not supported')
+        raise ValueError('Datatype {} is not supported'.format(img2.dtype))
     img2 = img2.astype(np.float64) / scale2
 
     if mask is None:

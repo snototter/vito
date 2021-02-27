@@ -275,7 +275,6 @@ def test_overlay():
                          np.zeros((imshape[0], imshape[1], 1), dtype=dt)]:
                 for maskval in [1, 255]:
                     mask[1, 1] = maskval
-                    # print(f'compute shape {imshape} with dtype {dt}')
                     out = overlay(img1, 0.2, img2, mask)
                     expval = np.uint8(255 * (0.2 * (img1[1, 1] / 255.0)\
                                       + 0.8 * (img2[1, 1] / 255.0)))

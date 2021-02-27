@@ -65,7 +65,9 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
-* Upcoming `1.4.0`
+* `1.4.1`
+  * Removes f-strings to fix compatibility for older python 3.5.
+* `1.4.0`
   * Changed `imvis.overlay` to use a more intuitive signature.
   * Aliases for some `cam_projections` functions.
   * Spell-checked all files via `pyspelling`.

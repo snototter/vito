@@ -56,7 +56,6 @@ ROI
 dtype
 dtypes
 Dimensionality
-f'compute
 imshape
 bgrA
 rgbA
