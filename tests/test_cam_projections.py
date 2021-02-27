@@ -10,7 +10,7 @@ from vito.cam_projections import dot, apply_transformation, \
     apply_dehomogenization, C_from_Rt, C_from_R_t, \
     get_image_to_groundplane_homography, \
     normalize_image_coordinates, normalize_image_coordinates_with_distortion, \
-    compare_rotation_matrices, rot3d
+    compare_rotation_matrices, rot3d, transform, project
 
 
 def test_dot():
@@ -34,6 +34,8 @@ def test_dot():
 
 
 def test_apply_transformation():
+    # Ensure alias is set up
+    assert transform == apply_transformation
     T2d = np.random.rand(2, 2)
     T3d = np.random.rand(3, 2)
 
@@ -70,6 +72,8 @@ def test_apply_transformation():
 
 
 def test_apply_projection():
+    # Ensure alias is set up
+    assert project == apply_projection
     T2d = np.random.rand(2, 2)
     x = apply_projection(T2d, 2*np.ones((2, 3)))
     assert x.shape[0] == 1 and x.shape[1] == 3

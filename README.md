@@ -29,7 +29,7 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
   imvis.imshow(colorized)
 
   ```
-  Exemplary visualizations: colorization via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
+  Exemplary visualizations: colorizing via the `turbo` rainbow colormap (left); same data reduced to 11 bins colorized using `viridis` (right). Input data is obtained from two translated and scaled Gaussian distributions.
   ![Pseudocoloring Example](https://github.com/snototter/vito/raw/master/examples/visualizations/example-pseudocolor.png)
 * **Optical flow:**
   ```python
@@ -54,9 +54,9 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
   anon = imutils.apply_on_bboxes(img, rects, imutils.pixelate)
   imvis.imshow(anon)
   ```
-  Exemplary visualization: Anonymization example using `imutils.apply_on_bboxes()` as shown above, with Gaussian blur kernel (`imutils.gaussian_blur()`, left) and pixelation (`imutils.pixelate()`, right), respectively.
+  Exemplary visualization: anonymization example using `imutils.apply_on_bboxes()` as shown above, with Gaussian blur kernel (`imutils.gaussian_blur()`, left) and pixelation (`imutils.pixelate()`, right), respectively.
   ![Anonymization Example](https://github.com/snototter/vito/raw/master/examples/visualizations/example-anon.png)
-* For more examples (or if you prefer having a simple GUI to change visualization/analyse your data), see also the [**iminspect**](https://pypi.org/project/iminspect) package (which uses `vito` under the hood).
+* For more examples (or if you prefer having a simple GUI to change visualization/analyze your data), see also the [**iminspect**](https://pypi.org/project/iminspect) package (which uses `vito` under the hood).
 
 
 ## Dependencies
@@ -65,6 +65,10 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* Upcoming `1.3.5`
+  * Changed `imvis.overlay` to use a more intuitive signature.
+  * Aliases for some `cam_projections` functions.
+  * Spell-checked all files via `pyspelling`.
 * `1.3.4`
   * Extended input handling for `imutils` (support single channel input to rgb2gray).
   * Aliases for some `imutils` functions.
@@ -132,7 +136,7 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 * `0.2.0`
   * Optical flow (Middlebury .flo format) I/O and visualization.
   * Support saving images.
-  * Colorization to visualize tracking results.
+  * Visualization utils for tracking results.
 * `0.1.1`
   * Changed supported python versions for legacy tests.
 * `0.1.0`

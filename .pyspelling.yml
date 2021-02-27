@@ -1,0 +1,33 @@
+matrix:
+- name: python
+  aspell:
+    lang: en
+    d: en_US
+  pipeline:
+  - pyspelling.filters.python:
+  - pyspelling.filters.context:
+      context_visible_first: true
+  - pyspelling.filters.url:
+  dictionary:
+    wordlists:
+    - .pyspelling.src-custom.txt
+  sources:
+  - examples/*.py
+  - tests/*.py
+  - setup.py
+  - vito/**/*.py
+- name: markdown
+  aspell:
+    lang: en
+    d: en_US
+  pipeline:
+  - pyspelling.filters.markdown:
+  - pyspelling.filters.html:
+  - pyspelling.filters.url:
+  dictionary:
+    wordlists:
+    - .pyspelling.en-custom.txt
+  sources:
+  - '**/*.md'
+  default_encoding: utf-8
+

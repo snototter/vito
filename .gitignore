@@ -3,6 +3,7 @@
 *.autosave
 *.venv*
 **/.vscode/*
+dictionary.dic
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

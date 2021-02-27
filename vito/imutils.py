@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image
 from PIL import ImageFilter
 
+
 # Use logging module (fallback to default print) to log imutils set up (e.g. OpenCV vs Pillow).
 __log_fx = print if len(logging.getLogger().handlers) == 0 else logging.getLogger().info
 
@@ -101,7 +102,7 @@ def imread(filename, flip_channels=False, **kwargs):
     Multi-channel images are returned as RGB unless you set flip_channels=True.
 
     Optional kwargs will be passed on to PIL's Image.convert(). Thus, you can
-    specifiy PIL's loading 'mode', e.g. 'RGB' for color, 'RGBA' for a
+    specify PIL's loading 'mode', e.g. 'RGB' for color, 'RGBA' for a
     transparent image and 'L' for grayscale.
     """
     if filename is None:
@@ -123,7 +124,7 @@ def imread(filename, flip_channels=False, **kwargs):
 
 
 def ndarray2memory_file(np_data, format='png'):
-    """Convert numpy (image) array to ByteIO stream.
+    """Convert numpy (image) array to io.BytesIO stream.
     Useful to stream an image via sockets."""
     if np_data is None:
         return None

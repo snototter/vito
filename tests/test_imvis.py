@@ -185,44 +185,44 @@ def test_overlay():
     img1 = np.zeros((3, 3), dtype=np.uint8)
     img2 = 255 * np.ones((3, 3), dtype=np.uint8)
     with pytest.raises(ValueError):
-        _ = overlay(img1, img2, -1)
+        _ = overlay(img1, -1, img2)
     with pytest.raises(ValueError):
-        _ = overlay(img1, img2, 1.1)
+        _ = overlay(img1, 1.1, img2)
 
     # Invalid/Incompatible layers
     with pytest.raises(ValueError):
-        _ = overlay(np.zeros((3, 3, 2)), np.zeros((3, 3, 1)), 0)
+        _ = overlay(np.zeros((3, 3, 2)), 0.5, np.zeros((3, 3, 1)))
 
     # Overlay same channels (but not 1- or 3-channel)
-    out = overlay(np.zeros((3, 3, 2)), np.ones((3, 3, 2)), 0.5)
+    out = overlay(np.zeros((3, 3, 2)), 0.5, np.ones((3, 3, 2)))
     assert np.all(out[:] == pytest.approx(0.5))
     assert out.ndim == 3 and out.shape[2] == 2
 
     # Overlay gray on gray
-    out = overlay(img1, img2, 1)
+    out = overlay(img1, 1, img2)
     assert np.all(img1[:] == out[:])
-    out = overlay(img1, img2, 0)
+    out = overlay(img1, 0, img2)
     assert np.all(img2[:] == out[:])
 
     # Overlay gray on color
     img1 = np.zeros((3, 3, 3), dtype=np.uint8)
-    out = overlay(img1, img2, 1)
+    out = overlay(img1, 1, img2)
     assert np.all(img1[:] == out[:])
-    out = overlay(img2, img1, 1)
+    out = overlay(img2, 1, img1)
     assert np.all(img2[:] == out[:])
     img2 = 255 * np.ones((3, 3, 1), dtype=np.uint8)
-    out = overlay(img1, img2, 0)
+    out = overlay(img1, 0, img2)
     assert np.all(img2[:] == out[:])
-    out = overlay(img2, img1, 1)
+    out = overlay(img2, 1, img1)
     assert np.all(img2[:] == out[:])
 
     # Overlay color on color
     img2 = 255 * np.ones((3, 3, 3), dtype=np.uint8)
-    out = overlay(img1, img2, 0)
+    out = overlay(img1, 0, img2)
     assert np.all(img2[:] == out[:])
-    out = overlay(img1, img2, 0.8)
+    out = overlay(img1, 0.8, img2)
     assert np.all(50 == out[:])
-    out = overlay(img1, img2, 0.2)
+    out = overlay(img1, 0.2, img2)
     assert np.all(204 == out[:])
 
     # Test different data type combination
@@ -248,36 +248,40 @@ def test_overlay():
         img1 = 255 * np.ones((10, 10, 3), dtype=dt1)
         for dt2 in data_types:
             img2 = 127 * np.ones((10, 10, 1), dtype=dt2)
-            out = overlay(img1, img2, 0.2)
+            out = overlay(img1, 0.2, img2)
             assert np.all(out[:] == expected_vals[dt1][dt2])
             assert out.dtype == dt2
 
     # Unsupported dtypes
     with pytest.raises(ValueError):
-        _ = overlay(np.zeros((3, 3), dtype=np.int32), img1, 0.7)
+        _ = overlay(np.zeros((3, 3), dtype=np.int32), 0.7, img1)
     with pytest.raises(ValueError):
-        _ = overlay(img1, np.zeros((3, 3), dtype=np.int32), 0.2)
+        _ = overlay(img1, 0.2, np.zeros((3, 3), dtype=np.int32))
 
-    # Test masking
+    # Test masked overlay
+    # Size mismatch
     with pytest.raises(ValueError):
-        _ = overlay(img1, img1, 0.1, np.ones((img1.shape[0]+1, img1.shape[1])))
+        _ = overlay(img1, 0.1, img1, np.ones((img1.shape[0]+1, img1.shape[1])))
+    # Dimensionality mismatch
+    with pytest.raises(ValueError):
+        _ = overlay(img1, 0.1, img1, np.ones((img1.shape[0], img1.shape[1], 3)))
     for imshape in [(2, 3), (2, 3, 1), (3, 4, 3)]:
         img1 = np.ones(imshape, dtype=np.uint8)
         if img1.ndim > 2:
             img1[:, :, 0] = 50
         img2 = 2 * img1
         for dt in [np.uint8, np.float32]:
-            for maskshape in [0, 1]:
-                if maskshape == 0:
-                    mask = np.zeros((imshape[0], imshape[1]), dtype=dt)
-                else:
-                    mask = np.zeros((imshape[0], imshape[1], 1), dtype=dt)
+            for mask in [np.zeros((imshape[0], imshape[1]), dtype=dt),
+                         np.zeros((imshape[0], imshape[1], 1), dtype=dt)]:
                 for maskval in [1, 255]:
                     mask[1, 1] = maskval
-                    out = overlay(img1, img2, 0.2, mask)
-                    expval = np.uint8(
-                            255 * (0.2 * (img1[1, 1] / 255.0) + 0.8 * (img2[1, 1] / 255.0)))
-                    assert np.all(out[:, 0] == img2[:, 0])
-                    assert np.all(out[:, 2] == img2[:, 2])
-                    assert np.all(out[0, :] == img2[0, :])
+                    # print(f'compute shape {imshape} with dtype {dt}')
+                    out = overlay(img1, 0.2, img2, mask)
+                    expval = np.uint8(255 * (0.2 * (img1[1, 1] / 255.0)\
+                                      + 0.8 * (img2[1, 1] / 255.0)))
+                    # Unmasked regions should be first image
+                    assert np.all(out[:, 0] == img1[:, 0])
+                    assert np.all(out[:, 2] == img1[:, 2])
+                    assert np.all(out[0, :] == img1[0, :])
+                    # Only masked regions should be blended
                     assert np.all(out[1, 1] == expval)

@@ -3,13 +3,20 @@
 """Handy visualization tools."""
 
 import numpy as np
+import logging
 
 from . import colormaps
 from . import imutils
 
+
+# Use logging module (fallback to default print) to log imutils set up (e.g. OpenCV vs Pillow).
+__log_fx = print if len(logging.getLogger().handlers) == 0 else logging.getLogger().info
+
+
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
+    __log_fx("vito.imvis will use OpenCV to display images via 'imshow'.")  # pragma: no cover
     
     def imshow(img_np, title="Image", flip_channels=False, wait_ms=-1):  # pragma: no cover
         """
@@ -18,7 +25,7 @@ try:
         :param img_np:    Should be provided as RGB, otherwise use flip_channels=True
         :param title:     Window title
         :param wait_ms:   cv2.waitKey() input
-        :param flip_channels: if you want to display a BGR image poperly, set this
+        :param flip_channels: if you want to display a BGR image properly, set this
                             to True
         :return: Pressed key or -1, i.e. cv2.waitKey() output
         """
@@ -30,6 +37,7 @@ try:
         return cv2.waitKey(wait_ms)
 except:
     from PIL import Image
+    __log_fx("vito.imvis will use Pillow to display images via 'imshow' (OpenCV could not be loaded).")  # pragma: no cover
 
     def imshow(img_np, title="Image", flip_channels=False, **kwargs):  # pragma: no cover
         """
@@ -43,7 +51,7 @@ except:
 
         :param img:    Should be provided as RGB, otherwise use flip_channels=True
         :param title:  Window title
-        :param flip_channels: if you want to display a BGR image poperly, set this
+        :param flip_channels: if you want to display a BGR image properly, set this
                             to True
         :return: -1 for compatibility reasons (the same return value as if you
                         used the OpenCV-based version and there was no key press)
@@ -136,15 +144,18 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_r
     return colorized
 
 
-def overlay(img1, img2, weight1, mask1=None):
-    """Overlay two images with alpha blending, s.t.
-    out = img1 * weight1 + img2 * (1-weight2).
-    Optionally, only overlays those parts of the image which are indicated by
-    non-zero mask1 pixels: out = blended if mask1 > 0, else img2
-    Output dtype will be the same as img2.dtype.
+def overlay(img1, alpha1, img2, mask=None):
+    """
+    Overlay two images with alpha blending, s.t.
+        out = img1 * alpha1 + img2 * (1-alpha1).
+    Optionally, only overlays those parts from img2 which are
+    indicated by non-zero mask pixels:
+        out = blended if mask > 0
+              img1 else
+    Output dtype will be the same as img1.dtype.
     Only float32, float64 and uint8 are supported.
     """
-    if weight1 < 0.0 or weight1 > 1.0:
+    if alpha1 < 0.0 or alpha1 > 1.0:
         raise ValueError('Weight factor must be in [0,1]')
 
     # Allow overlaying a grayscale image on top of a color image (and vice versa)
@@ -159,7 +170,7 @@ def overlay(img1, img2, weight1, mask1=None):
         channels2 = img2.shape[2]
 
     if channels1 != channels2 and not (channels1 == 1 or channels1 == 3):
-        raise ValueError('Can only extrapolate single channel image to the others dimension')
+        raise ValueError('Can only extrapolate single channel image to the other''s dimension')
 
     if channels1 == 1 and channels2 > 1:
         if img1.ndim == 2:
@@ -180,7 +191,7 @@ def overlay(img1, img2, weight1, mask1=None):
     elif img1.dtype in [np.float32, np.float64]:
         scale1 = 1.0
     else:
-        raise ValueError('Datatype {} not yet supported'.format(img1.dtype))
+        raise ValueError(f'Datatype {img1.dtype} is not supported')
     img1 = img1.astype(np.float64) / scale1
 
     target_dtype = img2.dtype
@@ -189,24 +200,22 @@ def overlay(img1, img2, weight1, mask1=None):
     elif img2.dtype in [np.float32, np.float64]:
         scale2 = 1.0
     else:
-        raise ValueError('Datatype {} not yet supported'.format(img2.dtype))
+        raise ValueError(f'Datatype {img2.dtype} is not supported')
     img2 = img2.astype(np.float64) / scale2
 
-    if mask1 is None:
-        out = weight1 * img1 + (1. - weight1) * img2
+    if mask is None:
+        out = alpha1 * img1 + (1. - alpha1) * img2
     else:
-        if mask1.shape[0] != img1.shape[0] or mask1.shape[1] != img1.shape[1] \
-                or (mask1.ndim > 2 and mask1.shape[2] != 1):
+        if mask.shape[0] != img1.shape[0] or mask.shape[1] != img1.shape[1] \
+                or (mask.ndim > 2 and mask.shape[2] != 1):
             raise ValueError('Mask must be 2D and of same width/height as inputs')
         if num_channels == 1:
-            img1 = np.where(mask1.reshape(img1.shape) > 0, img1, img2)
+            img2 = np.where(mask.reshape(img2.shape) > 0, img2, img1)
         else:
-            if mask1.ndim == 2:
-                _mask = np.repeat(mask1[:, :, np.newaxis], num_channels, axis=2)
+            if mask.ndim == 2:
+                _mask = np.repeat(mask[:, :, np.newaxis], num_channels, axis=2)
             else:
-                _mask = np.repeat(mask1[:, :], num_channels, axis=2)
-            img1 = np.where(_mask > 0, img1, img2)
-        out = weight1 * img1 + (1. - weight1) * img2
+                _mask = np.repeat(mask[:, :], num_channels, axis=2)
+            img2 = np.where(_mask > 0, img2, img1)
+        out = alpha1 * img1 + (1. - alpha1) * img2
     return (scale2 * out).astype(target_dtype)
-
-#TODO once vitocpp is available, add convenience wrappers similar to pvt

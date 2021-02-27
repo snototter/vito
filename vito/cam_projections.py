@@ -66,6 +66,10 @@ def apply_transformation(T, pts):
     return matmul(T, pts)
 
 
+# Alias
+transform = apply_transformation
+
+
 def apply_projection(P, pts):
     """Computes P*pts and returns the result after dehomogenization.
     :param P: MxD projection matrix
@@ -220,6 +224,10 @@ def project_world_to_image_with_distortion_K_Rt(K, Rt, dist_coeff, coords):
     return apply_projection(K, coords_corrected)
 
 
+# Alias for general projection
+project = apply_projection
+
+
 def project_world_to_image_with_distortion_K_R_C(K, R, C, dist_coeff, coords):
     """Project 3D world points onto the image plane, compensating for the lens
     distortion. See project_world_to_image_with_distortion_K_Rt()
@@ -274,12 +282,12 @@ def normalize_image_coordinates_with_distortion(K, dist_coeff, pixel_coords):
     x_distort = np.row_stack((xdx, xdy))
 
     # Third, compensate for lens distortion:
-    xn = comp_distortion_oulu(x_distort, dist_coeff)
+    xn = compute_distortion_oulu(x_distort, dist_coeff)
     npts = xn.shape[1]
     return np.row_stack((xn, np.ones((1, npts), dtype=np.float64)))
 
 
-def comp_distortion_oulu(xd, k):  # pragma: no cover
+def compute_distortion_oulu(xd, k):  # pragma: no cover
     """Compensates for radial and tangential distortion. Model From Oulu
     university. This code is a Python port from Bouguet's toolbox, namely
     comp_distortion_oulu.m. We use the same/similar variable names."""

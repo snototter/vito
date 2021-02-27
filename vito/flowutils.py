@@ -58,7 +58,7 @@ def flosave(filename, flow):
 def colorize_uv(
         u, v, return_rgb=True, colorwheel=colormaps.make_flow_color_wheel()):
     """
-    Returns the flow color wheel pseudocolorization of the given optical flow.
+    Colorizes the given optical flow using the flow color wheel.
     This function performs no normalization or sanity checks. Usually, you
     should prefer colorize_flow() instead!
 
