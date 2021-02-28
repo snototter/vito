@@ -65,6 +65,9 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* `1.5.0`
+  * Extends the `imutils` submodule (rotation and concatenation).
+  * Fix deprecation warnings with newer NumPy versions.
 * `1.4.1`
   * Removes f-strings to fix compatibility for older python 3.5.
 * `1.4.0`

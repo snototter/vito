@@ -141,14 +141,14 @@ def test_imsave(tmp_path):
     assert np.all(img_in[:] == img_out[:])
     ##########################################################################
     # Test 1-bit PNG (requires specifying the mode!)
-    img_in = imread(os.path.join(exdir, 'space-invader.png'), mode='L').astype(np.bool)  #FIXME deprecation warning in newer numpy vers
+    img_in = imread(os.path.join(exdir, 'space-invader.png'), mode='L').astype(bool)
     assert img_in.ndim == 2 or img_in.shape[2] == 1
-    assert img_in.dtype == np.bool
+    assert img_in.dtype == bool
     imsave(out_fn, img_in)
     _, finfo = safe_shell_output('file', out_fn)
     assert (finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit colormap, non-interlaced' or
             finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit grayscale, non-interlaced')
-    img_out = imread(out_fn, mode='L').astype(np.bool)  #FIXME deprecation warning in newer numpy vers
+    img_out = imread(out_fn, mode='L').astype(bool)
     assert img_out.ndim == 2 or img_out.shape[2] == 1
     assert np.all(img_in[:] == img_out[:])
 
