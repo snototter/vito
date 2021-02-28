@@ -305,22 +305,35 @@ def _make_stack_compatible(img1, img2, horizontal):
     """Returns two "compatible" images to be used for horizontal or vertical
     stacking, i.e. they'll have the correct size, same dtype and number of
     channels."""
+    # Check for compatible sizes
     if horizontal and img1.shape[0] != img2.shape[0]:
         raise ValueError('Images must have the same height for horizontal concatenation.')
     if not horizontal and img1.shape[1] != img2.shape[1]:
         raise ValueError('Images must have the same width for vertical concatenation.')
+    # Check data types
     if img1.dtype != img2.dtype:
         if img1.dtype.itemsize > img2.dtype.itemsize:
             img2 = img2.astype(img1.dtype)
         else:
             img1 = img1.astype(img2.dtype)
-    #TODO check layers and dtypes
+    # Same dimensionality
+    if img1.ndim < img2.ndim:
+        img1 = img1[:, :, np.newaxis]
+    elif img2.ndim < img1.ndim:
+        img2 = img2[:, :, np.newaxis]
+    # Check layers
+    if img1.ndim == 3 and img1.shape[2] != img2.shape[2]:
+        if img1.shape[2] == 1:
+            img1 = np.repeat(img1[:, :, :], img2.shape[2], axis=2)
+        elif img2.shape[2] == 1:
+            img2 = np.repeat(img2[:, :, :], img1.shape[2], axis=2)
+        else:
+            raise ValueError('If channels are different, one of the inputs must be single-channel.')
     return img1, img2
 
 
 def hstack(img1, img2):
     """Horizontally concatenates the two given images."""
-    #TODO test
     if img1 is None or img2 is None:
         return None
     img1, img2 = _make_stack_compatible(img1, img2, True)
@@ -329,7 +342,6 @@ def hstack(img1, img2):
 
 def vstack(img1, img2):
     """Vertically concatenates the two given images."""
-    #TODO test
     if img1 is None or img2 is None:
         return None
     img1, img2 = _make_stack_compatible(img1, img2, False)
@@ -338,7 +350,6 @@ def vstack(img1, img2):
 
 def concat(img1, img2, horizontal=True):
     """Concatenates the two given images either horizontally or vertically."""
-    #TODO test
     if horizontal:
         return hstack(img1, img2)
     else:

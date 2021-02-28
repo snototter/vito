@@ -488,12 +488,53 @@ def test_concat():
     assert np.array_equal(x, c[:, :x.shape[1]])
     assert np.array_equal(y, c[:, x.shape[1]:])
 
-    # ndim == 3, single channel
-    assert False
+    # ndim == 2 vs ndim == 3, single channel
+    x = np.random.randint(0, 255, (5, 2, 1), dtype=np.uint8)
+    y = np.random.randint(0, 255, (3, 2), dtype=np.int32)
+    c = concat(x, y, False)
+    assert c.dtype == y.dtype
+    assert c.ndim == 3 and c.shape[2] == 1
+    assert np.array_equal(x.astype(c.dtype), c[:x.shape[0], :, :])
+    assert np.array_equal(y[:, :], c[x.shape[0]:, :, 0])
+
+    # ndim == 2 vs ndim == 3, single vs multi-channel (compatible)
+    x = np.random.randint(0, 255, (5, 2), dtype=np.int32)
+    y = np.random.randint(0, 255, (3, 2, 4), dtype=np.uint8)
+    c = concat(x, y, False)
+    assert c.dtype == x.dtype
+    assert c.ndim == 3 and c.shape[2] == y.shape[2]
+    for l in range(c.shape[2]):
+        assert np.array_equal(x[:, :], c[:x.shape[0], :, l])
+    assert np.array_equal(y[:, :, :], c[x.shape[0]:, :, :])
+
     # ndim == 3, multi-channel
-    assert False
-    # ndim == 3, single-channel vs multi-channel (and vice versa)
-    #FIXME quite a lot to test
+    # --> Incompatible inputs
+    x = np.random.randint(0, 255, (5, 2, 2), dtype=np.uint8)
+    y = np.random.randint(0, 255, (3, 2, 3), dtype=np.int32)
+    with pytest.raises(ValueError):
+        concat(x, y, False)
+    # --> same number of channels
+    x = np.random.randint(0, 255, (6, 2, 3), dtype=np.uint64)
+    y = np.random.randint(0, 255, (6, 9, 3), dtype=np.int32)
+    c = concat(x, y, True)
+    assert c.dtype == x.dtype
+    assert np.array_equal(x, c[:, :x.shape[1], :])
+    assert np.array_equal(y, c[:, x.shape[1]:, :])
+    # --> different number of channels (but compatible)
+    x = np.random.randint(0, 255, (6, 2, 1), dtype=np.uint64)
+    y = np.random.randint(0, 255, (6, 9, 3), dtype=np.int32)
+    c = concat(x, y, True)
+    assert c.dtype == x.dtype
+    for l in range(3):
+        assert np.array_equal(x[:, :, 0], c[:, :x.shape[1], l])
+    assert np.array_equal(y.astype(c.dtype), c[:, x.shape[1]:])
+    # ... switch parameter order
+    c = concat(y, x, True)
+    assert c.dtype == x.dtype
+    assert np.array_equal(y.astype(c.dtype), c[:, :y.shape[1]])
+    for l in range(3):
+        assert np.array_equal(x[:, :, 0], c[:, y.shape[1]:, l])
+
 
 def test_noop():
     for x in [None, 1, 3.7, np.zeros((3, 2)), 'test']:
