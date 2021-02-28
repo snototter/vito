@@ -3,7 +3,8 @@ import os
 import pytest
 from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
     ndarray2memory_file, memory_file2ndarray, roi, crop, pad, rgb2gray, \
-    grayscale, pixelate, gaussian_blur, set_to, ensure_c3
+    grayscale, pixelate, gaussian_blur, set_to, ensure_c3, concat, \
+    rotate90, rotate180, rotate270
 from vito.pyutils import safe_shell_output
 
 
@@ -140,14 +141,14 @@ def test_imsave(tmp_path):
     assert np.all(img_in[:] == img_out[:])
     ##########################################################################
     # Test 1-bit PNG (requires specifying the mode!)
-    img_in = imread(os.path.join(exdir, 'space-invader.png'), mode='L').astype(np.bool)
+    img_in = imread(os.path.join(exdir, 'space-invader.png'), mode='L').astype(np.bool)  #FIXME deprecation warning in newer numpy vers
     assert img_in.ndim == 2 or img_in.shape[2] == 1
     assert img_in.dtype == np.bool
     imsave(out_fn, img_in)
     _, finfo = safe_shell_output('file', out_fn)
     assert (finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit colormap, non-interlaced' or
             finfo.split(':')[1].strip() == 'PNG image data, 200 x 149, 1-bit grayscale, non-interlaced')
-    img_out = imread(out_fn, mode='L').astype(np.bool)
+    img_out = imread(out_fn, mode='L').astype(np.bool)  #FIXME deprecation warning in newer numpy vers
     assert img_out.ndim == 2 or img_out.shape[2] == 1
     assert np.all(img_in[:] == img_out[:])
 
@@ -458,3 +459,18 @@ def test_ensure_c3():
         c3 = ensure_c3(x)
         assert c3.ndim == 3 and c3.shape[2] == 3
         assert np.array_equal(x[:, :, :3], c3)
+
+
+def test_concat():
+    # Invalid inputs
+    x = np.zeros((3,5))
+    y = np.ones((5,7))
+    assert concat(None, x, True) is None
+    assert concat(x, None, False) is None
+
+
+def test_rotation():
+    # Invalid inputs
+    assert rotate90(None) is None
+    assert rotate180(None) is None
+    assert rotate270(None) is None

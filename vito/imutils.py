@@ -298,3 +298,67 @@ def set_to(image_np, value):
     else:
         image_np[:] = value
     return image_np
+
+
+
+def _make_stack_compatible(img1, img2, horizontal):
+    """Returns two "compatible" images to be used for horizontal or vertical
+    stacking, i.e. they'll have the correct size, same dtype and number of
+    channels."""
+    if horizontal and img1.shape[0] != img2.shape[0]:
+        raise ValueError('Images must have the same height for horizontal concatenation.')
+    if not horizontal and img1.shape[1] != img2.shape[1]:
+        raise ValueError('Images must have the same width for vertical concatenation.')
+    #TODO check layers and dtypes
+    return img1, img2
+
+
+def hstack(img1, img2):
+    """Horizontally concatenates the two given images."""
+    #TODO test
+    if img1 is None or img2 is None:
+        return None
+    img1, img2 = _make_stack_compatible(img1, img2, True)
+    return np.hstack((img1, img2))
+
+
+def vstack(img1, img2):
+    """Vertically concatenates the two given images."""
+    #TODO test
+    if img1 is None or img2 is None:
+        return None
+    img1, img2 = _make_stack_compatible(img1, img2, False)
+    return np.vstack((img1, img2))
+
+
+def concat(img1, img2, horizontal=True):
+    """Concatenates the two given images either horizontally or vertically."""
+    #TODO test
+    if horizontal:
+        return hstack(img1, img2)
+    else:
+        return vstack(img1, img2)
+
+
+def rotate90(image_np):
+    """Rotates the given image by 90 degrees counter-clockwise."""
+    #TODO test
+    if image_np is None:
+        return None
+    return np.rot90(image_np)
+
+
+def rotate180(image_np):
+    """Rotates the given image by 180 degrees."""
+    #TODO test
+    if image_np is None:
+        return None
+    return np.fliplr(np.flipud(image_np))
+
+
+def rotate270(image_np):
+    """Rotates the given image by 270 degrees counter-clockwise."""
+    #TODO test
+    if image_np is None:
+        return None
+    return np.rot90(image_np, -1)

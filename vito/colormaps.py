@@ -35,7 +35,7 @@ def sample(colormap_name, N, return_rgb=True):
 
     if N <= len(cmap):
         # Truncate indices to get our intended behavior (e.g. 3 entries yields #0, #127, #255)
-        indices = np.floor(np.linspace(0, len(cmap)-1, num=min(len(cmap), N), endpoint=True)).astype(np.int)
+        indices = np.floor(np.linspace(0, len(cmap)-1, num=min(len(cmap), N), endpoint=True)).astype(np.int)  #FIXME deprecation warning in newer numpy vers
         return [cmap[idx] for idx in indices]
     else:
         # Repeat the colormap as often as needed
