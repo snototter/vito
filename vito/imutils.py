@@ -309,6 +309,11 @@ def _make_stack_compatible(img1, img2, horizontal):
         raise ValueError('Images must have the same height for horizontal concatenation.')
     if not horizontal and img1.shape[1] != img2.shape[1]:
         raise ValueError('Images must have the same width for vertical concatenation.')
+    if img1.dtype != img2.dtype:
+        if img1.dtype.itemsize > img2.dtype.itemsize:
+            img2 = img2.astype(img1.dtype)
+        else:
+            img1 = img1.astype(img2.dtype)
     #TODO check layers and dtypes
     return img1, img2
 
@@ -342,7 +347,6 @@ def concat(img1, img2, horizontal=True):
 
 def rotate90(image_np):
     """Rotates the given image by 90 degrees counter-clockwise."""
-    #TODO test
     if image_np is None:
         return None
     return np.rot90(image_np)
@@ -350,7 +354,6 @@ def rotate90(image_np):
 
 def rotate180(image_np):
     """Rotates the given image by 180 degrees."""
-    #TODO test
     if image_np is None:
         return None
     return np.fliplr(np.flipud(image_np))
@@ -358,7 +361,11 @@ def rotate180(image_np):
 
 def rotate270(image_np):
     """Rotates the given image by 270 degrees counter-clockwise."""
-    #TODO test
     if image_np is None:
         return None
     return np.rot90(image_np, -1)
+
+
+def noop(x):
+    """No-operation/identity function."""
+    return x

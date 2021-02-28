@@ -4,7 +4,7 @@ import pytest
 from vito.imutils import flip_layers, imread, imsave, apply_on_bboxes, \
     ndarray2memory_file, memory_file2ndarray, roi, crop, pad, rgb2gray, \
     grayscale, pixelate, gaussian_blur, set_to, ensure_c3, concat, \
-    rotate90, rotate180, rotate270
+    rotate90, rotate180, rotate270, noop
 from vito.pyutils import safe_shell_output
 
 
@@ -465,8 +465,42 @@ def test_concat():
     # Invalid inputs
     x = np.zeros((3,5))
     y = np.ones((5,7))
-    assert concat(None, x, True) is None
+    assert concat(None, y, True) is None
     assert concat(x, None, False) is None
+    with pytest.raises(ValueError):
+        concat(x, y, True)
+    with pytest.raises(ValueError):
+        concat(x, y, False)
+    
+    # ndim == 2, different dtype
+    x = np.random.randint(0, 255, (5, 17), dtype=np.uint8)
+    y = np.random.randint(0, 255, (5, 2), dtype=np.int32)
+    c = concat(x, y, True)
+    # The concatenation should have the "better" dtype of the two inputs
+    assert c.dtype == y.dtype
+    assert np.array_equal(x.astype(c.dtype), c[:, :x.shape[1]])
+    assert np.array_equal(y, c[:, x.shape[1]:])
+
+    # ndim == 2, same dtype
+    y = np.random.randint(0, 255, (5, 2), dtype=x.dtype)
+    c = concat(x, y, True)
+    assert c.dtype == x.dtype
+    assert np.array_equal(x, c[:, :x.shape[1]])
+    assert np.array_equal(y, c[:, x.shape[1]:])
+
+    # ndim == 3, single channel
+    assert False
+    # ndim == 3, multi-channel
+    assert False
+    # ndim == 3, single-channel vs multi-channel (and vice versa)
+    #FIXME quite a lot to test
+
+def test_noop():
+    for x in [None, 1, 3.7, np.zeros((3, 2)), 'test']:
+        if isinstance(x, np.ndarray):
+            assert np.array_equal(noop(x), x)
+        else:
+            assert noop(x) == x
 
 
 def test_rotation():
@@ -474,3 +508,45 @@ def test_rotation():
     assert rotate90(None) is None
     assert rotate180(None) is None
     assert rotate270(None) is None
+
+    for x in [np.array([[1, 2], [3, 4]], dtype=np.int32),
+              np.random.randint(0, 255, (2, 2, 1), dtype=np.uint8),
+              np.random.randint(0, 255, (2, 2, 3), dtype=np.uint8),
+              np.random.randint(0, 255, (2, 2, 3), dtype=np.int64)]:
+        if x.ndim == 2:
+            y = rotate90(x)
+            assert y[0, 0] == x[0, 1] and \
+                y[0, 1] == x[1, 1] and \
+                y[1, 0] == x[0, 0] and \
+                y[1, 1] == x[1, 0]
+
+            y = rotate180(x)
+            assert y[0, 0] == x[1, 1] and \
+                y[0, 1] == x[1, 0] and \
+                y[1, 0] == x[0, 1] and \
+                y[1, 1] == x[0, 0]
+
+            y = rotate270(x)
+            assert y[0, 0] == x[1, 0] and \
+                y[0, 1] == x[0, 0] and \
+                y[1, 0] == x[1, 1] and \
+                y[1, 1] == x[0, 1]
+        else:
+            for l in range(x.shape[2]):
+                y = rotate90(x)
+                assert y[0, 0, l] == x[0, 1, l] and \
+                    y[0, 1, l] == x[1, 1, l] and \
+                    y[1, 0, l] == x[0, 0, l] and \
+                    y[1, 1, l] == x[1, 0, l]
+
+                y = rotate180(x)
+                assert y[0, 0, l] == x[1, 1, l] and \
+                    y[0, 1, l] == x[1, 0, l] and \
+                    y[1, 0, l] == x[0, 1, l] and \
+                    y[1, 1, l] == x[0, 0, l]
+
+                y = rotate270(x)
+                assert y[0, 0, l] == x[1, 0, l] and \
+                    y[0, 1, l] == x[0, 0, l] and \
+                    y[1, 0, l] == x[1, 1, l] and \
+                    y[1, 1, l] == x[0, 1, l]
