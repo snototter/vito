@@ -65,6 +65,8 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* `1.5.1`
+  * Changed handling of `None` inputs for image concatenation/stacking.
 * `1.5.0`
   * Extends the `imutils` submodule (rotation, concatenation & noop).
   * Fix deprecation warnings with newer NumPy versions.

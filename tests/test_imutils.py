@@ -465,8 +465,13 @@ def test_concat():
     # Invalid inputs
     x = np.zeros((3,5))
     y = np.ones((5,7))
-    assert concat(None, y, True) is None
-    assert concat(x, None, False) is None
+    assert concat(None, None, True) is None
+    assert concat(None, None, False) is None
+    assert np.array_equal(concat(None, x, True), x)
+    assert np.array_equal(concat(None, x, False), x)
+    assert np.array_equal(concat(x, None, True), x)
+    assert np.array_equal(concat(x, None, False), x)
+
     with pytest.raises(ValueError):
         concat(x, y, True)
     with pytest.raises(ValueError):

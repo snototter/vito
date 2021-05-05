@@ -334,16 +334,20 @@ def _make_stack_compatible(img1, img2, horizontal):
 
 def hstack(img1, img2):
     """Horizontally concatenates the two given images."""
-    if img1 is None or img2 is None:
-        return None
+    if img1 is None:
+        return img2
+    if img2 is None:
+        return img1
     img1, img2 = _make_stack_compatible(img1, img2, True)
     return np.hstack((img1, img2))
 
 
 def vstack(img1, img2):
     """Vertically concatenates the two given images."""
-    if img1 is None or img2 is None:
-        return None
+    if img1 is None:
+        return img2
+    if img2 is None:
+        return img1
     img1, img2 = _make_stack_compatible(img1, img2, False)
     return np.vstack((img1, img2))
 
