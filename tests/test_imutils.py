@@ -273,6 +273,11 @@ def test_roi():
             r = max(0, min(x.shape[1], r))
             t = max(0, min(x.shape[0]-1, t))
             b = max(0, min(x.shape[0], b))
+            rw = r - l
+            rh = b - t
+            height, width = roi_.shape[:2]
+            assert rw == width
+            assert rh == height
             if x.ndim == 2:
                 expected = x[t:b, l:r]
             else:
