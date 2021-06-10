@@ -27,7 +27,7 @@ setuptools.setup(
     name="vito",
     version=loaded_vars['__version__'],
     author="snototter",
-    author_email="muspellr@gmail.com",
+    author_email="snototter@users.noreply.github.com",
     description="Lightweight utility package for common computer vision tasks.",
     long_description=long_description,
     long_description_content_type="text/markdown",
