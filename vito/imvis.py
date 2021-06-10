@@ -34,7 +34,10 @@ try:
         else:
             disp = img_np
         cv2.imshow(title, disp)
-        return cv2.waitKey(wait_ms)
+        if wait_ms == 0:
+            return -1
+        else:
+            return cv2.waitKey(wait_ms)
 except:
     from PIL import Image
     __log_fx("vito.imvis will use Pillow to display images via 'imshow' (OpenCV could not be loaded).")  # pragma: no cover
