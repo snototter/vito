@@ -95,7 +95,7 @@ def color_by_id(id, flip_channels=False):
     return col
 
 
-def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.colormap_parula_rgb):
+def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.viridis):
     """
     Return a HxWx3 pseudocolored representation of the input matrix.
 

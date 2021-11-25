@@ -65,8 +65,9 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
-* Upcoming
+* `1.5.2`
   * Changed `imshow` to skip waiting for user input if `wait_ms=0`.
+  * Added (RGB) colormap handles for convenience.
 * `1.5.1`
   * Changed handling of `None` inputs for image concatenation/stacking.
 * `1.5.0`

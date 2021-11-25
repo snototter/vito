@@ -16,7 +16,7 @@ def test_pseudocolor():
     assert pseudocolor(None) is None
 
     data = np.array([[0, 1, 2], [255, 42, 0]], dtype=np.uint8)
-    for cm in [colormaps.colormap_parula_rgb, colormaps.colormap_jet_rgb,
+    for cm in [colormaps.colormap_turbo_rgb, colormaps.colormap_autumn_bgr,
                colormaps.colormap_magma_rgb, colormaps.colormap_gray]:
         pc = pseudocolor(data, limits=None, color_map=cm)
         assert np.all(pc[0, 0, :] == pc[1, 2, :])
@@ -46,7 +46,7 @@ def test_pseudocolor():
     data[0, 0] = 20
     data[1, 2] = 10
     pc = pseudocolor(data, limits=None)
-    cm = colormaps.colormap_parula_rgb
+    cm = colormaps.viridis
     assert_color_equal(pc[0, 0, :], cm[-1])
     assert_color_equal(pc[1, 0, :], cm[0])
     assert_color_equal(pc[1, 2, :], cm[127])
