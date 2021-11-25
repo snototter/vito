@@ -1,7 +1,7 @@
 # vito - Vision Tools
 [![View on PyPI](https://badge.fury.io/py/vito.svg)](https://pypi.org/project/vito)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/vito.svg)](https://pypi.org/project/vito)
-[![Build Status](https://travis-ci.com/snototter/vito.svg?branch=master)](https://travis-ci.com/snototter/vito)
+[![Build Status](https://app.travis-ci.com/snototter/vito.svg?branch=master)](https://app.travis-ci.com/snototter/vito)
 [![Coverage Status](https://coveralls.io/repos/github/snototter/vito/badge.svg?branch=master)](https://coveralls.io/github/snototter/vito?branch=master)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
@@ -68,6 +68,7 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 * `1.5.2`
   * Changed `imshow` to skip waiting for user input if `wait_ms=0`.
   * Added (RGB) colormap handles for convenience.
+  * Drop support for deprecated Python version 3.5.
 * `1.5.1`
   * Changed handling of `None` inputs for image concatenation/stacking.
 * `1.5.0`
