@@ -65,6 +65,8 @@ More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/
 
 
 ## Changelog
+* Upcoming `1.5.3`
+  * Mute initial notification about `imshow` backend.
 * `1.5.2`
   * Changed `imshow` to skip waiting for user input if `wait_ms=0`.
   * Added (RGB) colormap handles for convenience.

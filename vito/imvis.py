@@ -9,14 +9,9 @@ from . import colormaps
 from . import imutils
 
 
-# Use logging module (fallback to default print) to log imutils set up (e.g. OpenCV vs Pillow).
-__log_fx = print if len(logging.getLogger().handlers) == 0 else logging.getLogger().info
-
-
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
-    __log_fx("vito.imvis will use OpenCV to display images via 'imshow'.")  # pragma: no cover
     
     def imshow(img_np, title="Image", flip_channels=False, wait_ms=-1):  # pragma: no cover
         """
@@ -40,7 +35,6 @@ try:
             return cv2.waitKey(wait_ms)
 except:
     from PIL import Image
-    __log_fx("vito.imvis will use Pillow to display images via 'imshow' (OpenCV could not be loaded).")  # pragma: no cover
 
     def imshow(img_np, title="Image", flip_channels=False, **kwargs):  # pragma: no cover
         """
