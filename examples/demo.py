@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # Load a single-channel image
     peaks = imutils.imread('peaks.png', mode='L')
     # Colorize it
-    colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_parula_rgb)
+    colorized = imvis.pseudocolor(peaks, limits=None, color_map=colormaps.colormap_viridis_rgb)
     imvis.imshow(colorized)
 
     # Load optical flow and visualize it
