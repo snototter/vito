@@ -6,9 +6,8 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/vito/blob/master/LICENSE?raw=true)
 
 Python utilities for common computer vision tasks.
-The goal of this package is to provide a lightweight package helping you with standard/recurring image manipulation tasks.
+The goal of this package is to provide a lightweight python-only package for very basic image manipulation tasks, optical flow handling, pseudocoloring and camera geometry.
 
-More advanced functionality is provided by [**vcp/vitocpp**](https://github.com/snototter/vitocpp), which is a C++ library with Python 3 bindings.
 
 ## Examples
 * **Pseudocoloring:** 
