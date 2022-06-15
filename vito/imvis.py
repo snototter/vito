@@ -4,10 +4,37 @@
 
 import numpy as np
 import logging
+from PIL import Image
 
 from . import colormaps
 from . import imutils
 
+
+
+def _pil_imshow(img_np, title="Image", flip_channels=False, **kwargs):  # pragma: no cover
+    """
+    Convenience 1-liner to display image. This implementation uses
+    PIL (which uses your OS default viewer).
+    'kwargs' will silently be ignored and are only provided to be
+    compatible with the OpenCV-based 'imshow' version (which will be
+    loaded in case 'cv2' is installed in your python workspace).
+
+    Note that the window usually doesn't block!
+
+    :param img:    Should be provided as RGB, otherwise use flip_channels=True
+    :param title:  Window title
+    :param flip_channels: if you want to display a BGR image properly, set this
+                        to True
+    :return: -1 for compatibility reasons (the same return value as if you
+                    used the OpenCV-based version and there was no key press)
+    """
+    if flip_channels:
+        disp = imutils.flip_layers(img_np)
+    else:
+        disp = img_np
+    im = Image.fromarray(disp)
+    im.show(title=title)
+    return -1
 
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
@@ -28,38 +55,21 @@ try:
             disp = imutils.flip_layers(img_np)
         else:
             disp = img_np
-        cv2.imshow(title, disp)
-        if wait_ms == 0:
-            return -1
-        else:
-            return cv2.waitKey(wait_ms)
+        try:
+            cv2.imshow(title, disp)
+            if wait_ms == 0:
+                return -1
+            else:
+                return cv2.waitKey(wait_ms)
+        except cv2.error:
+            # If opencv is installed headless, cv2.imshow will raise a
+            # cv2.error (couldn't find an easy way to check it before).
+            # Then, we change vito's imshow to the pillow fallback:
+            global imshow
+            imshow = _pil_imshow
+            imshow(img_np, title=title, flip_channels=flip_channels)
 except:
-    from PIL import Image
-
-    def imshow(img_np, title="Image", flip_channels=False, **kwargs):  # pragma: no cover
-        """
-        Convenience 1-liner to display image. This implementation uses
-        PIL (which uses your OS default viewer).
-        'kwargs' will silently be ignored and are only provided to be
-        compatible with the OpenCV-based 'imshow' version (which will be
-        loaded in case 'cv2' is installed in your python workspace).
-
-        Note that the window usually doesn't block!
-
-        :param img:    Should be provided as RGB, otherwise use flip_channels=True
-        :param title:  Window title
-        :param flip_channels: if you want to display a BGR image properly, set this
-                            to True
-        :return: -1 for compatibility reasons (the same return value as if you
-                        used the OpenCV-based version and there was no key press)
-        """
-        if flip_channels:
-            disp = imutils.flip_layers(img_np)
-        else:
-            disp = img_np
-        im = Image.fromarray(disp)
-        im.show(title=title)
-        return -1
+    imshow = _pil_imshow
 
 
 # Colors used to easily distinguish different IDs (e.g. when visualizing
