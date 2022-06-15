@@ -5,6 +5,7 @@ python:
   - "3.8"
 before_install:
   - pip install -U pip
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
   - pip install -U pytest
   - pip install -U pytest-cov
   - pip install -U coveralls
