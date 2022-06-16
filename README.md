@@ -64,6 +64,8 @@ The goal of this package is to provide a lightweight python-only package for ver
 
 
 ## Changelog
+* Upcoming `1.6.0`
+  * Remove deprecated functionality (workarounds for Python versions older than 3.6).
 * `1.5.3`
   * Mute initial notification about `imshow` backend.
   * Catch exception and adjust `imshow` backend if used with headless OpenCV.
