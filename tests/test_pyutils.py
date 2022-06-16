@@ -3,7 +3,7 @@ import datetime
 import pytest
 from vito.pyutils import compare_version_strings, slugify, find_first_index, \
     find_last_index, argsort, is_tool, date_str, check_positive_int, \
-    check_positive_real, safe_shell_output, in_ospath, tic, toc, ttoc, \
+    check_positive_real, safe_shell_output, tic, toc, ttoc, \
     toc_nsec, log_nsec
 
 
@@ -79,8 +79,6 @@ def test_date_str():
 def test_is_tool():
     assert is_tool('fooblablub') is False
     assert is_tool('dir') is True
-    assert in_ospath('fooblablub') is False
-    assert in_ospath('dir') is True
 
 
 def test_safe_shell_output():
@@ -109,6 +107,8 @@ def test_check_positive_real():
 def test_tictoc(capsys):
     import time
     tic()
+    # We should be able to immediately call toc:
+    toc()
     time.sleep(0.5)
     # Time into variable
     passed_ms = ttoc(seconds=False)
@@ -141,6 +141,9 @@ def test_tictoc(capsys):
     assert captured.out.startswith('[nsec] Elapsed time: ')
     assert captured.out.endswith(' s\n')
     assert captured.out.count('\n') == 1
+    # Call invalid timer
+    with pytest.raises(KeyError):
+        toc('no-such-timer')
 
 
 def test_log_nsec(capsys):
