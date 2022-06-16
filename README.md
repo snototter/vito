@@ -67,7 +67,11 @@ The goal of this package is to provide a lightweight python-only package for ver
 * Upcoming `1.6.0`
   * Remove deprecated functionality (workarounds for Python versions older than 3.6).
   * Add type hints and update documentation.
+  * Add parameter order check to `imsave` (that's the one thing I alwys mess up
+    when coding without IDE).
+  * `imsave` now creates the output directory structure if it did not exist.
   * TODO: Type hints and doc style for cam_projections, colormaps, det2d, flowutils
+  * TODO: flowutils: filenames should be str|pathlib.Path
 * `1.5.3`
   * Mute initial notification about `imshow` backend.
   * Catch exception and adjust `imshow` backend if used with headless OpenCV.

@@ -7,7 +7,8 @@
 
 import io
 import os
-from typing import Any, Sequence
+from pathlib import Path
+from typing import Any, Sequence, Union
 import numpy as np
 from PIL import Image
 from PIL import ImageFilter
@@ -73,20 +74,37 @@ def rgb2gray(
 grayscale = rgb2gray
 
 
+def __imsave_checks(
+        filename: Union[str, Path],
+        image: np.ndarray
+    ) -> None:
+    if not isinstance(filename, Path):
+        filename = Path(filename)
+    if not filename.exists():
+        filename.absolute().parents[0].mkdir(parents=True, exist_ok=True)
+    if not isinstance(image, np.ndarray):
+        raise TypeError(
+            f'Image is not a NumPy array, but `{type(image)}`. Check the'
+            'parameter order: (`filename`, `image`, `flip_channels`)!')
+
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
 
     def imsave(
-            filename: str,
+            filename: Union[str, Path],
             image: np.ndarray,
             flip_channels: bool = False
         ) -> None:  # pragma: no cover
         """Stores the image using OpenCV.
         
-        The output folder must already exist. If you have a BGR image, set
-        `flip_channels = True` to store it correctly.
+        This function *will create the output directory* if it does not
+        exist yet.
+        If you have a BGR image, set `flip_channels = True` to store it
+        correctly.
         """
+        __imsave_checks(filename, image)
+
         # To be compatible with the Pillow/PIL version (see below), we have to
         # invert the flip_channels flag.
         if not flip_channels:
@@ -96,15 +114,18 @@ try:
 except:
     # Fall back to Pillow
     def imsave(
-            filename: str,
+            filename: Union[str, Path],
             image: np.ndarray,
             flip_channels: bool = False
         ) -> None:
         """Stores the image using PIL/Pillow.
         
-        The output folder must already exist. If you have a BGR image, set
-        `flip_channels = True` to store it correctly.
+        This function *will create the output directory* if it does not
+        exist yet.
+        If you have a BGR image, set `flip_channels = True` to store it
+        correctly.
         """
+        __imsave_checks(filename, image)
         if flip_channels:
             im_np = flip_layers(image)
         else:
@@ -113,7 +134,7 @@ except:
 
 
 def imread(
-        filename: str,
+        filename: Union[str, Path],
         flip_channels: bool = False,
         **kwargs
     ) -> np.ndarray:
@@ -128,10 +149,13 @@ def imread(
     """
     if filename is None:
         return None
-    if not os.path.exists(filename):
-        raise FileNotFoundError('Image %s does not exist' % filename)
+    if not isinstance(filename, Path):
+        filename = Path(filename)
+    if not filename.exists() or not filename.is_file():
+        raise FileNotFoundError(f'Image `{filename}` does not exist')
     if not isinstance(flip_channels, bool):
-        raise ValueError('Parameter "flip_channels" must be boolean - you probably forgot the keyword.')
+        raise TypeError(f'Parameter `flip_channels` must be bool, not `{type(flip_channels)}` '
+            '- you probably forgot the keyword for the PIL **kwargs!')
     # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
     # bit depths, we should look into using pypng, see documentation at
     # https://pythonhosted.org/pypng/ex.html#reading

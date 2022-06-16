@@ -38,7 +38,7 @@ def test_imread():
         with pytest.raises(FileNotFoundError):
             imread(fn)
     # Forget the keyword to be passed on to PIL
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         imread(os.path.join(exdir, 'flamingo.jpg'), 'RGB')
     # Load RGB JPG
     img = imread(os.path.join(exdir, 'flamingo.jpg'))
@@ -96,6 +96,20 @@ def test_imsave(tmp_path):
     assert img_out.ndim == 3 and img_out.shape[2] == 3
     assert img_out.dtype == np.uint8
     assert np.all(img_in[:] == img_out[:])
+    ##########################################################################
+    # Test incorrect parameter order
+    with pytest.raises(TypeError):
+        imsave(img_in, out_fn)
+    # Test storing non-image data
+    with pytest.raises(TypeError):
+        imsave(out_fn, 'foo')
+    # Ensure that the output path is created
+    novel_folder = tmp_path / 'foo' / 'bar'
+    assert not novel_folder.exists()
+    novel_img_path = novel_folder / 'test.jpg'
+    imsave(novel_img_path, img_in)
+    assert novel_folder.exists()
+    assert novel_img_path.exists()
     ##########################################################################
     # Test RGB with flipping channels
     img_in = imread(os.path.join(exdir, 'flamingo.jpg'))
