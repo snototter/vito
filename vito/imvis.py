@@ -3,30 +3,32 @@
 """Handy visualization tools."""
 
 import numpy as np
-import logging
+import time
 from PIL import Image
 
-from . import colormaps
-from . import imutils
+from vito import colormaps, imutils
 
 
 
-def _pil_imshow(img_np, title="Image", flip_channels=False, **kwargs):  # pragma: no cover
+def _pil_imshow(
+        img_np : np.ndarray, title : str ="Image",
+        flip_channels : bool = False,
+        wait_ms : int = -1
+    ) -> int:  # pragma: no cover
     """
-    Convenience 1-liner to display image. This implementation uses
+    Convenience 1-liner to display an image. This implementation uses
     PIL (which uses your OS default viewer).
-    'kwargs' will silently be ignored and are only provided to be
-    compatible with the OpenCV-based 'imshow' version (which will be
-    loaded in case 'cv2' is installed in your python workspace).
 
-    Note that the window usually doesn't block!
-
-    :param img:    Should be provided as RGB, otherwise use flip_channels=True
-    :param title:  Window title
-    :param flip_channels: if you want to display a BGR image properly, set this
-                        to True
-    :return: -1 for compatibility reasons (the same return value as if you
-                    used the OpenCV-based version and there was no key press)
+    Args:
+        img: Should be provided as RGB, otherwise set `flip_channels=True`.
+        title: Window title
+        flip_channels: if you want to display a BGR image properly, set this
+            to True
+        wait_ms: If > 0, this call will block the current thread for the
+            specified amount of milliseconds.
+    Returns:
+        The constant `-1` for compatibility reasons. This is the same return
+        value as if you used the OpenCV backend and there was no key press.
     """
     if flip_channels:
         disp = imutils.flip_layers(img_np)
@@ -34,22 +36,34 @@ def _pil_imshow(img_np, title="Image", flip_channels=False, **kwargs):  # pragma
         disp = img_np
     im = Image.fromarray(disp)
     im.show(title=title)
+    if wait_ms > 0:
+        time.sleep(wait_ms / 1e3)
     return -1
+
 
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
     
-    def imshow(img_np, title="Image", flip_channels=False, wait_ms=-1):  # pragma: no cover
+    def imshow(
+            img_np : np.ndarray,
+            title : str = "Image",
+            flip_channels=False,
+            wait_ms=-1
+        ) -> int:  # pragma: no cover
         """
-        Convenience 1-liner to display image and wait for key input.
+        Convenience 1-liner to display an image and wait for key input.
 
-        :param img_np:    Should be provided as RGB, otherwise use flip_channels=True
-        :param title:     Window title
-        :param wait_ms:   cv2.waitKey() input
-        :param flip_channels: if you want to display a BGR image properly, set this
-                            to True
-        :return: Pressed key or -1, i.e. cv2.waitKey() output
+        Args:
+            img_np: Should be provided as RGB, otherwise set `flip_channels=True`.
+            title: Window title
+            wait_ms: Number of milliseconds to wait for user input. This will
+                be forwarded to the internal `cv2.waitKey()` call.
+            flip_channels: If your input is BGR, set this to True for correct
+                color display.
+
+        Returns:
+            Pressed key code or -1, i.e. the `cv2.waitKey()` output.
         """
         if not flip_channels:
             disp = imutils.flip_layers(img_np)
@@ -62,9 +76,10 @@ try:
             else:
                 return cv2.waitKey(wait_ms)
         except cv2.error:
-            # If opencv is installed headless, cv2.imshow will raise a
-            # cv2.error (couldn't find an easy way to check it before).
-            # Then, we change vito's imshow to the pillow fallback:
+            # If opencv is installed headless, cv2.imshow will raise an error.
+            # I couldn't find an easy workaround to check for headless setup
+            # before the actual imshow call, thus we catch the error and then
+            # change vito's imshow to the pillow fallback:
             global imshow
             imshow = _pil_imshow
             imshow(img_np, title=title, flip_channels=flip_channels)
@@ -90,25 +105,35 @@ exemplary_colors = [
 ]
 
 
-def color_by_id(id, flip_channels=False):
-    """Returns a color tuple (rgb) to colorize labels, identities,
-    segments, trajectories, etc."""
+def color_by_id(id : int, flip_channels : bool = False) -> tuple:
+    """
+    Returns a color `tuple(int, int, int)` to colorize labels, identities,
+    segments, trajectories, etc.
+
+    By default, the returned tuple will hold the RGB values. If you need BGR
+    instead, set `flip_channels = True`.
+    """
     col = exemplary_colors[id % len(exemplary_colors)]
     if flip_channels:
         return (col[2], col[1], col[0])
     return col
 
 
-def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.viridis):
+def pseudocolor(
+        values: np.ndarray,
+        limits : list = [0.0, 1.0],
+        color_map : list = colormaps.viridis
+    ) -> np.ndarray:
     """
-    Return a HxWx3 pseudocolored representation of the input matrix.
+    Returns a HxWx3 pseudocolored representation of the input matrix.
 
     :param values: A single channel, HxW or HxWx1 numpy ndarray.
         NaN or Inf values will be colorized by color_map[0].
-    :param limits: [min, max] to clip the input values. If limits is None or
-        any of min/max is None, the corresponding limits will be computed from
-        the input values.
-    :param color_map: The color map to be used, see colormaps.py
+    :param limits: `[min, max]` to clip the input values. If limits is None or
+        any of min/max is None, the corresponding limit(s) will be computed
+        from the input values.
+    :param color_map: The color map to be used, see `vito.colormaps`, i.e. a
+        list of RGB colors: list(tuple(int, int, int)).
 
     :return: a HxWx3 colorized representation.
     """
@@ -151,14 +176,21 @@ def pseudocolor(values, limits=[0.0, 1.0], color_map=colormaps.viridis):
     return colorized
 
 
-def overlay(img1, alpha1, img2, mask=None):
+def overlay(
+        img1 : np.ndarray,
+        alpha1 : float,
+        img2: np.ndarray,
+        mask : np.ndarray = None
+    ) -> np.ndarray:
     """
-    Overlay two images with alpha blending, s.t.
-        out = img1 * alpha1 + img2 * (1-alpha1).
-    Optionally, only overlays those parts from img2 which are
+    Overlays two images with alpha blending, s.t.
+    `out = img1 * alpha1 + img2 * (1-alpha1)`.
+
+    Optionally, only overlays those parts from `img2` which are
     indicated by non-zero mask pixels:
-        out = blended if mask > 0
-              img1 else
+        out = blended  if mask > 0
+              img1     else
+
     Output dtype will be the same as img1.dtype.
     Only float32, float64 and uint8 are supported.
     """
