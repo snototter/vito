@@ -3,6 +3,7 @@
   ```bash
   pip install pytest-cov
   pytest --cov-config=tests/.coveragerc --cov=vito/
+  pytest --cov-config=tests/.coveragerc --cov=vito/ --cov-report term-missing
   ```
 * Linting:
   ```bash
