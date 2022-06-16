@@ -17,9 +17,10 @@ from PIL import ImageFilter
 __log_fx = print if len(logging.getLogger().handlers) == 0 else logging.getLogger().info
 
 
-def flip_layers(nparray):
+def flip_layers(nparray: np.ndarray) -> np.ndarray:
     """
-    Flip RGB to BGR image data (numpy ndarray).
+    Flips the R & B channels.
+
     Also accepts rgbA/bgrA and single channel images without crashing.
     """
     if nparray is None:
@@ -33,7 +34,7 @@ def flip_layers(nparray):
     return nparray
 
 
-def ensure_c3(nparray):
+def ensure_c3(nparray: np.ndarray):
     """
     Ensures that the output image has 3 channels.
     Valid inputs: monochrome, 3- and 4-channel images.

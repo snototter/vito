@@ -11,9 +11,10 @@ from vito import colormaps, imutils
 
 
 def _pil_imshow(
-        img_np : np.ndarray, title : str ="Image",
-        flip_channels : bool = False,
-        wait_ms : int = -1
+        img_np: np.ndarray,
+        title: str ="Image",
+        flip_channels: bool = False,
+        wait_ms: int = -1
     ) -> int:  # pragma: no cover
     """
     Convenience 1-liner to display an image. This implementation uses
@@ -46,10 +47,10 @@ try:
     import cv2
     
     def imshow(
-            img_np : np.ndarray,
-            title : str = "Image",
-            flip_channels=False,
-            wait_ms=-1
+            img_np: np.ndarray,
+            title: str = "Image",
+            flip_channels: bool = False,
+            wait_ms: int = -1
         ) -> int:  # pragma: no cover
         """
         Convenience 1-liner to display an image and wait for key input.
@@ -105,7 +106,7 @@ exemplary_colors = [
 ]
 
 
-def color_by_id(id : int, flip_channels : bool = False) -> tuple:
+def color_by_id(id: int, flip_channels: bool = False) -> tuple:
     """
     Returns a color `tuple(int, int, int)` to colorize labels, identities,
     segments, trajectories, etc.
@@ -121,8 +122,8 @@ def color_by_id(id : int, flip_channels : bool = False) -> tuple:
 
 def pseudocolor(
         values: np.ndarray,
-        limits : list = [0.0, 1.0],
-        color_map : list = colormaps.viridis
+        limits: list = [0.0, 1.0],
+        color_map: list = colormaps.viridis
     ) -> np.ndarray:
     """
     Returns a HxWx3 pseudocolored representation of the input matrix.
@@ -177,10 +178,10 @@ def pseudocolor(
 
 
 def overlay(
-        img1 : np.ndarray,
-        alpha1 : float,
+        img1: np.ndarray,
+        alpha1: float,
         img2: np.ndarray,
-        mask : np.ndarray = None
+        mask: np.ndarray = None
     ) -> np.ndarray:
     """
     Overlays two images with alpha blending, s.t.
