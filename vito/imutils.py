@@ -108,9 +108,9 @@ try:
         # To be compatible with the Pillow/PIL version (see below), we have to
         # invert the flip_channels flag.
         if not flip_channels:
-            cv2.imwrite(filename, flip_layers(image))
+            cv2.imwrite(str(filename), flip_layers(image))
         else:
-            cv2.imwrite(filename, image)
+            cv2.imwrite(str(filename), image)
 except:
     # Fall back to Pillow
     def imsave(
