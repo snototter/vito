@@ -30,8 +30,8 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
     with open(filename, 'rb') as f:
         # Check magic number
         magic = np.fromfile(f, np.float32, count=1)
-        if 202021.25 != magic:
-            raise ValueError('Invalid magic number in file "%s".' % filename)
+        if 202021.25 != magic[0]:
+            raise ValueError('Magic number should be 202021.25, but got %f in file "%s"' % (magic[0], filename))
         # Next, get the image dimensions
         w = int(np.fromfile(f, np.int32, count=1))
         h = int(np.fromfile(f, np.int32, count=1))
