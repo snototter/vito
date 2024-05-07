@@ -16,7 +16,11 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
 
     Adapted from https://stackoverflow.com/a/28016469/400948
 
-    Returns a HxWx2 numpy array of type `numpy.float32`.
+    Args:
+      filename: Path to the input .flo file.
+
+    Returns:
+      HxWx2 numpy array of type `numpy.float32`.
     """
     if sys.byteorder != 'little':
         raise RuntimeError('Current .flo support requires little-endian architecture!')  # pragma: no cover
@@ -34,7 +38,8 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
         # Check magic number
         magic = np.fromfile(f, np.float32, count=1)
         if 202021.25 != magic[0]:
-            raise ValueError('Magic number should be 202021.25, but got %f in file "%s"' % (magic[0], filename))
+            raise ValueError(
+                'Magic number should be 202021.25, but got %f in file "%s"' % (magic[0], filename))
         # Next, get the image dimensions
         w = int(np.fromfile(f, np.int32, count=1))
         h = int(np.fromfile(f, np.int32, count=1))
@@ -44,7 +49,14 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
 
 
 def flosave(filename: Union[str, Path], flow: np.ndarray) -> None:
-    """Save HxWx2 optical flow to file in Middlebury format."""
+    """
+    Save HxWx2 optical flow to file in Middlebury format.
+    
+    Args:
+      filename: Output file path.
+      flow: Optical flow components as HxWx2 numpy array of
+        type `numpy.float32`
+    """
     if len(flow.shape) != 3 or flow.shape[2] != 2:
         raise ValueError('Invalid flow shape!')
     # Prepare data
@@ -78,14 +90,17 @@ def colorize_uv(
     https://people.csail.mit.edu/celiu/OpticalFlow, also based on
     https://github.com/tomrunia/OpticalFlow_Visualization.
 
-    :param u: horizontal flow components as HxW np.ndarray
-    :param v: vertical flow components as HxW np.ndarray
-    :param return_rgb: bool, whether to return RGB or BGR
-    :param colorwheel: provide a num_colors-by-3 color numpy nd.array
-            which will be used as color wheel
-    :param convert_to_bgr: bool, whether to change ordering and
-         output BGR instead of RGB
-    :return:  HxWx3 uint8 numpy ndarray.
+    Args:
+      u: horizontal flow components as HxW np.ndarray
+      v: vertical flow components as HxW np.ndarray
+      return_rgb: bool, whether to return RGB or BGR
+      colorwheel: provide a num_colors-by-3 color numpy nd.array
+        which will be used as color wheel
+      convert_to_bgr: bool, whether to change ordering and
+        output BGR instead of RGB
+    
+    Returns:
+      HxWx3 uint8 numpy ndarray.
     """
     vis = np.zeros((u.shape[0], u.shape[1], 3), np.uint8)
     ncols = colorwheel.shape[0]
@@ -116,7 +131,10 @@ def colorize_uv(
     return vis
 
 
-def colorize_flow(flow, max_val=None, return_rgb=True):
+def colorize_flow(
+        flow: np.ndarray,
+        max_val: float = None,
+        return_rgb: bool = True) -> np.ndarray:
     """
     Returns the widely used flow visualization.
 
