@@ -2,7 +2,6 @@
 # coding=utf-8
 """Optical flow I/O and visualization."""
 
-import os
 import sys
 import numpy as np
 from pathlib import Path
@@ -27,10 +26,10 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
 
     if filename is None:
         return None
-    
+
     if not Path(filename).exists():
         raise FileNotFoundError('File %s does not exist' % filename)
-    
+
     if not Path(filename).is_file():
         raise FileNotFoundError('Path %s is not a file' % filename)
 
@@ -51,7 +50,7 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
 def flosave(filename: Union[str, Path], flow: np.ndarray) -> None:
     """
     Save HxWx2 optical flow to file in Middlebury format.
-    
+
     Args:
       filename: Output file path.
       flow: Optical flow components as HxWx2 numpy array of
@@ -80,7 +79,7 @@ def colorize_uv(
         v: np.ndarray,
         return_rgb: bool = True,
         colorwheel: np.ndarray = colormaps.make_flow_color_wheel()
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """
     Colorizes the given optical flow using the flow color wheel.
     This function performs no normalization or sanity checks. Usually, you
@@ -98,7 +97,7 @@ def colorize_uv(
         which will be used as color wheel
       convert_to_bgr: bool, whether to change ordering and
         output BGR instead of RGB
-    
+
     Returns:
       HxWx3 uint8 numpy ndarray.
     """

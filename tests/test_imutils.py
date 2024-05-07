@@ -480,8 +480,8 @@ def test_ensure_c3():
 
 def test_concat():
     # Invalid inputs
-    x = np.zeros((3,5))
-    y = np.ones((5,7))
+    x = np.zeros((3, 5))
+    y = np.ones((5, 7))
     assert concat(None, None, True) is None
     assert concat(None, None, False) is None
     assert np.array_equal(concat(None, x, True), x)
@@ -493,7 +493,7 @@ def test_concat():
         concat(x, y, True)
     with pytest.raises(ValueError):
         concat(x, y, False)
-    
+
     # ndim == 2, different dtype
     x = np.random.randint(0, 255, (5, 17), dtype=np.uint8)
     y = np.random.randint(0, 255, (5, 2), dtype=np.int32)

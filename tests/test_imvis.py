@@ -276,7 +276,7 @@ def test_overlay():
                 for maskval in [1, 255]:
                     mask[1, 1] = maskval
                     out = overlay(img1, 0.2, img2, mask)
-                    expval = np.uint8(255 * (0.2 * (img1[1, 1] / 255.0)\
+                    expval = np.uint8(255 * (0.2 * (img1[1, 1] / 255.0)
                                       + 0.8 * (img2[1, 1] / 255.0)))
                     # Unmasked regions should be first image
                     assert np.all(out[:, 0] == img1[:, 0])

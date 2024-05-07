@@ -66,10 +66,21 @@ try:
         Returns:
             Pressed key code or -1, i.e. the `cv2.waitKey()` output.
         """
+        if img_np is None:
+            return -1
+        
         if not flip_channels:
             disp = imutils.flip_layers(img_np)
         else:
             disp = img_np
+        
+        # Common mistake: a boolean mask is not a valid input for cv2.imshow,
+        # this would cause a cv2.error and we would fall back to PIL's imshow
+        # which opens a new window for each image.
+        # To avoid this, we convert boolean masks to uint8 images:
+        if disp.dtype == bool:
+            disp = disp.astype(np.uint8) * 255
+
         try:
             cv2.imshow(title, disp)
             if wait_ms == 0:

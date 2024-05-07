@@ -6,7 +6,6 @@
 # * imread/imsave should use tifffile for tiff files - supports multi-band images
 
 import io
-import os
 from pathlib import Path
 from typing import Any, Sequence, Union
 import numpy as np
@@ -54,9 +53,15 @@ def ensure_c3(nparray: np.ndarray) -> np.ndarray:
 def rgb2gray(
         nparray: np.ndarray,
         is_bgr: bool = False
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """
-    Converts the RGB image to grayscale using `L = 0.2989 R + 0.5870 G + 0.1140 B`.
+    Converts the RGB image to grayscale
+    using `L = 0.2989 R + 0.5870 G + 0.1140 B`.
+
+    Args:
+      nparray: HxWxC numpy array.
+      is_bgr: If True, the input channels are in BGR format. Otherwise, they
+        are assumed to be RGB.
     """
     if nparray is None:
         return None
@@ -77,7 +82,7 @@ grayscale = rgb2gray
 def __imsave_checks(
         filename: Union[str, Path],
         image: np.ndarray
-    ) -> None:
+        ) -> None:
     if not isinstance(filename, Path):
         filename = Path(filename)
     if not filename.exists():
@@ -87,6 +92,7 @@ def __imsave_checks(
             f'Image is not a NumPy array, but `{type(image)}`. Check the'
             'parameter order: (`filename`, `image`, `flip_channels`)!')
 
+
 try:
     # Try to load OpenCV (in case you installed it in your workspace)
     import cv2
@@ -95,9 +101,9 @@ try:
             filename: Union[str, Path],
             image: np.ndarray,
             flip_channels: bool = False
-        ) -> None:  # pragma: no cover
+            ) -> None:  # pragma: no cover
         """Stores the image using OpenCV.
-        
+
         This function *will create the output directory* if it does not
         exist yet.
         If you have a BGR image, set `flip_channels = True` to store it
@@ -117,9 +123,9 @@ except:
             filename: Union[str, Path],
             image: np.ndarray,
             flip_channels: bool = False
-        ) -> None:
+            ) -> None:
         """Stores the image using PIL/Pillow.
-        
+
         This function *will create the output directory* if it does not
         exist yet.
         If you have a BGR image, set `flip_channels = True` to store it
@@ -137,7 +143,7 @@ def imread(
         filename: Union[str, Path],
         flip_channels: bool = False,
         **kwargs
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Loads an image (using PIL/Pillow) into a NumPy array.
 
     Multi-channel images are returned as RGB format unless you
@@ -154,7 +160,8 @@ def imread(
     if not filename.exists() or not filename.is_file():
         raise FileNotFoundError(f'Image `{filename}` does not exist')
     if not isinstance(flip_channels, bool):
-        raise TypeError(f'Parameter `flip_channels` must be bool, not `{type(flip_channels)}` '
+        raise TypeError(
+            f'Parameter `flip_channels` must be bool, not `{type(flip_channels)}` '
             '- you probably forgot the keyword for the PIL **kwargs!')
     # PIL loads 16-bit PNGs as np.int32 ndarray. If we need to support other
     # bit depths, we should look into using pypng, see documentation at
@@ -171,7 +178,7 @@ def imread(
 def ndarray2memory_file(
         np_data: np.ndarray,
         format: str = 'png'
-    ) -> io.BytesIO:
+        ) -> io.BytesIO:
     """Converts the numpy (image) array to a BytesIO stream.
 
     Useful to transfer an image via sockets.
@@ -186,7 +193,7 @@ def ndarray2memory_file(
 
 def memory_file2ndarray(
         memfile: io.BytesIO
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Loads an image stored in the given BytesIO memory file."""
     if memfile is None:
         return None
@@ -197,14 +204,18 @@ def clip_rect_to_image(
         rect: Sequence[Any],
         img_width: int,
         img_height: int
-    ) -> tuple:
+        ) -> tuple:
     """Ensures that the rectangle is within the image boundaries.
 
     Explicitly casts all entries to integer.
-    :param rect: list/tuple (l,t,w,h)
-    :param img_width: int
-    :param img_height: int
-    :return: (l, t, w, h)
+
+    Args:
+      rect: list/tuple (l,t,w,h)
+      img_width: int
+      img_height: int
+
+    Returns:
+      (l, t, w, h)
     """
     l, t, w, h = int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3])
     # Right/bottom bounds are exclusive
@@ -227,19 +238,23 @@ def apply_on_bboxes(
         func,
         *args,
         **func_kwargs
-    ) -> np.ndarray:
-    """Applies the given function (which returns a modified image) on each
+        ) -> np.ndarray:
+    """
+    Applies the given function (which returns a modified image) on each
     bounding box.
-    
+
     This function takes care of proper clipping of each bounding box, roi
     extraction and copying back the results.
 
-    :param image_np: numpy ndarray, input image
-    :param bboxes: list of bounding boxes, i.e. [(l, t, w, h), (...)]
-    :param func: function handle to apply on each bounding box
-    :param func_kwargs: optional kwargs passed on to the function
-    :return: numpy ndarray, a copy of the input image after applying the given
-             function on each (valid) bounding box
+    Args:
+      image_np: numpy ndarray, input image
+      bboxes: list of bounding boxes, i.e. [(l, t, w, h), (...)]
+      func: function handle to apply on each bounding box
+      func_kwargs: optional kwargs passed on to the function
+
+    Returns:
+      numpy ndarray, a copy of the input image after applying the given
+      function on each (valid) bounding box
     """
     if image_np is None:
         return None
@@ -247,7 +262,7 @@ def apply_on_bboxes(
     image_np = image_np.copy()
     # Prevent invalid memory access
     bboxes = [clip_rect_to_image(bb, image_np.shape[1], image_np.shape[0])
-            for bb in bboxes]
+              for bb in bboxes]
     bboxes = [b for b in bboxes if is_valid_bbox(b)]
     for bb in bboxes:
         l, t, w, h = bb
@@ -283,7 +298,7 @@ def pad(
         image_np: np.ndarray,
         border: int,
         color: tuple = None
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Pads the image by 'border' pixels in each direction.
 
     :param image_np: HxWxC numpy ndarray.
@@ -327,7 +342,7 @@ def pixelate(
         image_np: np.ndarray,
         block_width: int = 5,
         block_height: int = -1
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """
     Pixelate the image into blocks of size WxH.
     If H is -1, then H=W. Otherwise, rectangular blocks will
@@ -350,7 +365,7 @@ def pixelate(
 def gaussian_blur(
         image_np: np.ndarray,
         radius: int = 15
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Blurs the image using a Gaussian kernel with the given radius."""
     if image_np is None:
         return None
@@ -362,9 +377,9 @@ def gaussian_blur(
 def set_to(
         image_np: np.ndarray,
         value: Any
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Sets the image pixels to the given value.
-    
+
     The parameter `value` can either be a tuple of float/int (specifying a
     color) or a scalar value (int/float).
     """
@@ -388,7 +403,7 @@ def _make_stack_compatible(
         img1: np.ndarray,
         img2: np.ndarray,
         horizontal: bool
-    ) -> tuple:
+        ) -> tuple:
     """
     Returns two "compatible" images to be used for horizontal or vertical
     stacking, i.e. they'll have the correct size, same dtype and number of
@@ -424,7 +439,7 @@ def _make_stack_compatible(
 def hstack(
         img1: np.ndarray,
         img2: np.ndarray
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Horizontally concatenates the two given images."""
     if img1 is None:
         return img2
@@ -437,7 +452,7 @@ def hstack(
 def vstack(
         img1: np.ndarray,
         img2: np.ndarray
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Vertically concatenates the two given images."""
     if img1 is None:
         return img2
@@ -451,7 +466,7 @@ def concat(
         img1: np.ndarray,
         img2: np.ndarray,
         horizontal: bool = True
-    ) -> np.ndarray:
+        ) -> np.ndarray:
     """Concatenates the two given images either horizontally or vertically."""
     if horizontal:
         return hstack(img1, img2)
