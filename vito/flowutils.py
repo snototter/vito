@@ -26,6 +26,9 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
     
     if not Path(filename).exists():
         raise FileNotFoundError('File %s does not exist' % filename)
+    
+    if not Path(filename).is_file():
+        raise FileNotFoundError('Path %s is not a file' % filename)
 
     with open(filename, 'rb') as f:
         # Check magic number
@@ -40,7 +43,7 @@ def floread(filename: Union[str, Path]) -> np.ndarray:
         return np.resize(flow, (h, w, 2))
 
 
-def flosave(filename, flow):
+def flosave(filename: Union[str, Path], flow: np.ndarray) -> None:
     """Save HxWx2 optical flow to file in Middlebury format."""
     if len(flow.shape) != 3 or flow.shape[2] != 2:
         raise ValueError('Invalid flow shape!')
@@ -61,7 +64,11 @@ def flosave(filename, flow):
 
 
 def colorize_uv(
-        u, v, return_rgb=True, colorwheel=colormaps.make_flow_color_wheel()):
+        u: np.ndarray,
+        v: np.ndarray,
+        return_rgb: bool = True,
+        colorwheel: np.ndarray = colormaps.make_flow_color_wheel()
+    ) -> np.ndarray:
     """
     Colorizes the given optical flow using the flow color wheel.
     This function performs no normalization or sanity checks. Usually, you
