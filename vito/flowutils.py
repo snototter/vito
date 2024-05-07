@@ -5,21 +5,26 @@
 import os
 import sys
 import numpy as np
+from pathlib import Path
+from typing import Union
 from . import colormaps
 
 
-def floread(filename):
+def floread(filename: Union[str, Path]) -> np.ndarray:
     """
     Read optical flow (.flo) files stored in Middlebury format.
 
     Adapted from https://stackoverflow.com/a/28016469/400948
+
+    Returns a HxWx2 numpy array of type `numpy.float32`.
     """
     if sys.byteorder != 'little':
         raise RuntimeError('Current .flo support requires little-endian architecture!')  # pragma: no cover
 
     if filename is None:
         return None
-    if not os.path.exists(filename):
+    
+    if not Path(filename).exists():
         raise FileNotFoundError('File %s does not exist' % filename)
 
     with open(filename, 'rb') as f:

@@ -67,7 +67,7 @@ def test_imread():
     # Load 16-bit PNG
     img = imread(os.path.join(exdir, 'depth.png'))
     assert img.ndim == 2 or img.shape[2] == 1
-    assert img.dtype == np.int32
+    assert img.dtype == np.uint16
     # Load 16-bit PNG, specifying mode manually:
     img = imread(os.path.join(exdir, 'depth.png'), mode='I')
     assert img.ndim == 2 or img.shape[2] == 1
@@ -138,20 +138,18 @@ def test_imsave(tmp_path):
     assert img_out.dtype == np.uint8
     assert np.all(img_in[:] == img_out[:])
     ##########################################################################
-    # Test monochrome 16 bit (will be loaded as np.int32, using PIL's 'I' mode)
+    # Test monochrome 16 bit (PIL <= 8.1 loaded as np.int32, PIL >= 10.0 as
+    # np.uint16, not sure when the API change happened exactly)
     img_in = imread(os.path.join(exdir, 'depth.png'))
     assert img_in.ndim == 2 or img_in.shape[2] == 1
-    assert img_in.dtype == np.int32
-    # Explicitly cast to uint16
-    img_in = img_in.astype(np.uint16)
+    assert img_in.dtype == np.uint16
     # Save (lossless) and reload
     imsave(out_fn, img_in)
     _, finfo = safe_shell_output('file', out_fn)
     assert finfo.split(':')[1].strip() == 'PNG image data, 800 x 600, 16-bit grayscale, non-interlaced'
     img_out = imread(out_fn)
     assert img_out.ndim == 2 or img_out.shape[2] == 1
-    # Loading, however, will still produce a int32 image.
-    assert img_out.dtype == np.int32
+    assert img_out.dtype == np.uint16
     assert np.all(img_in[:] == img_out[:])
     ##########################################################################
     # Test 1-bit PNG (requires specifying the mode!)
