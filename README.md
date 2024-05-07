@@ -64,9 +64,12 @@ The goal of this package is to provide a lightweight python-only package for ver
 
 
 ## Changelog
-* Upcoming `1.6.1`
+* Upcoming `1.6.2`
   * TODO: Type hints and doc style for cam_projections, colormaps, det2d, flowutils
   * TODO: flowutils: filenames should be str|pathlib.Path
+* Upcoming `1.6.1`
+  * Internal adaptations to fix deprecated (NumPy) and changed (PIL) library usage.
+  * CI updates to [PyPI's trusted publishing](https://docs.pypi.org/trusted-publishers/).
 * `1.6.0`
   * Remove deprecated functionality (workarounds for Python versions older than 3.6).
   * Add type hints and update documentation.
